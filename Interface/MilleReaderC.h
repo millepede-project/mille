@@ -48,6 +48,8 @@ class MilleReaderC : public IMilleReader{
         virtual void close() override final;
         /// @brief reset a file to the first entry 
         virtual void reset() override final;
+        /// @brief rewind to the start the last entry read 
+        virtual void rewindEntry() override final; 
         /// @brief read the next record in the file to the provided buffers.
         ///        The labels are guaranteed to be stored in the int buffer,
         ///        and the derivatives in the *double* buffer.
@@ -78,6 +80,7 @@ class MilleReaderC : public IMilleReader{
     private: 
         std::ifstream infile_;
         std::string fname_; 
+        std::streampos lastPos_=0; 
 };
 
 

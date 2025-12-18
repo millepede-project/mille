@@ -48,6 +48,8 @@ class MilleReaderCcompressed : public IMilleReader{
         virtual void close() override final;
         /// @brief reset a file to the first entry 
         virtual void reset() override final;
+        /// @brief rewind to the start the last entry read 
+        virtual void rewindEntry() override final; 
         /// @brief read the next record in the file to the provided buffers.
         ///        The labels are guaranteed to be stored in the int buffer,
         ///        and the derivatives in the *double* buffer.
@@ -78,6 +80,7 @@ class MilleReaderCcompressed : public IMilleReader{
     private: 
         gzFile infile_;
         std::string fname_; 
+        off_t lastPos_ = 0; 
 };
 
 

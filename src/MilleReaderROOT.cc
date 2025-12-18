@@ -71,6 +71,9 @@ void MilleReaderROOT::close(){
 void MilleReaderROOT::reset(){
     entryNumber_ = 0; 
 }
+void MilleReaderROOT::rewindEntry(){
+    entryNumber_ = lastEntry_; 
+}
 std::pair<int,int> MilleReaderROOT::readToBuffer(  double *bufferDouble, 
                             float * /*bufferFloat - unused here*/, 
                             int *bufferInt,
@@ -78,6 +81,7 @@ std::pair<int,int> MilleReaderROOT::readToBuffer(  double *bufferDouble,
     if (!bufferDouble || !bufferInt || !bufferSize) {
         return {0,-1};
     }
+    lastEntry_ = entryNumber_; 
     // the equivalent of EOF with a root tree 
     if (entryNumber_ >= nentries_){
         return {0,0}; 

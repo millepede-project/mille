@@ -25,7 +25,6 @@
 #include <vector>
 #include <iostream>
 #include <limits>
-#include "MilleRecord.h"
 
 /// @brief Comparison method to check for equivalence of two different-typed values
 /// Indented for double - float comparisons where they happen to be needed. 

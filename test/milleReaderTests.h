@@ -23,6 +23,7 @@
 #define MILLE__READER__TESTS__H
 
 #include "IMilleReader.h"
+#include "MilleRecord.h"
 #include "testUtils.h"
 
 // standardised test inputs
@@ -35,6 +36,8 @@ struct MilleTestInputs{
     std::vector<double> globalDeriv{-1.,1.}; 
     double residual = -0.033;
     double deltaResidual = 1.e-3; 
+    /// helper function to write the test data into an 
+    /// arbitraty type of Mille record. 
     void writeTo(MilleRecord & mille){
         mille.addData(residual, deltaResidual, 
                     localDeriv.size(), localLabels.data(),
@@ -46,6 +49,12 @@ struct MilleTestInputs{
     }
 
 };
+
+/// @brief Run a set of tests for any mille reader class
+/// @param reader: The reader instance to test
+/// @param inputs: Set of test inputs to use
+/// @param expectedPrecision: 4 (for float) or 8 (for double) internal precision
+/// @return 0 if success, else 1
 int MilleReaderTestSuite(IMilleReader & reader, MilleTestInputs & inputs, int expectedPrecision=4){
 
     // buffers 
@@ -79,6 +88,14 @@ int MilleReaderTestSuite(IMilleReader & reader, MilleTestInputs & inputs, int ex
     nRead=res.first; status=res.second; 
     TEST_CONDITION(status, expectedPrecision, "Status for successful read"); 
     TEST_CONDITION(nRead, ints.size(), "nRead for successful read"); 
+
+    // this should allow us to read the same entry again, without hitting EoF
+    reader.rewindEntry();
+    // should return a status of 4 and the correct number of read bytes
+    res = reader.readToBuffer(doubles.data(), floats.data(), ints.data(),ints.size()); 
+    nRead=res.first; status=res.second; 
+    TEST_CONDITION(status, expectedPrecision, "Status for successful read after rewind"); 
+    TEST_CONDITION(nRead, ints.size(), "nRead for successful read after rewind"); 
 
     // validate the output against the input 
 

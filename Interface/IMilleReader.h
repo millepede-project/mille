@@ -44,6 +44,8 @@ class IMilleReader{
         virtual void close()=0;
         /// @brief reset a file to the first entry 
         virtual void reset()=0;
+        /// @brief rewind to the start the last entry read 
+        virtual void rewindEntry()=0; 
         /// @brief read the next record in the file to the provided buffers. 
         ///        The labels are guaranteed to be stored in the int buffer,
         ///        and the derivatives in the *double* buffer.

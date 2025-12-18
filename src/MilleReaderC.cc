@@ -38,6 +38,10 @@ void MilleReaderC::reset(){
     infile_.clear();
     infile_.seekg(0, std::ios::beg);
 }
+void MilleReaderC::rewindEntry(){
+    infile_.clear();
+    infile_.seekg(lastPos_,std::ios::beg); 
+}
 std::pair<int,int> MilleReaderC::readToBuffer(  double *bufferDouble, 
                             float *bufferFloat, 
                             int *bufferInt,
@@ -45,6 +49,7 @@ std::pair<int,int> MilleReaderC::readToBuffer(  double *bufferDouble,
     if (!bufferDouble || !bufferFloat || !bufferInt || !bufferSize) {
         return {0,-1};
     }
+    lastPos_ = infile_.tellg(); 
     int recordLength = 0; // get size of the next record 
     infile_.read(reinterpret_cast<char*>(&recordLength), sizeof(recordLength)); 
     if (!infile_.good()){

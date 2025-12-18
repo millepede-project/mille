@@ -24,6 +24,15 @@ install (
     )
 add_test(NAME TestMilleReaderC COMMAND testMilleReaderC)
 
+add_executable(testMilleDecoder testMilleDecoder.cc)
+target_link_libraries(testMilleDecoder PUBLIC Mille2)    
+install (
+        TARGETS testMilleDecoder
+        DESTINATION bin
+    )
+add_test(NAME TestMilleDecoder COMMAND testMilleDecoder)
+
+
 if (build_ROOT_comps)
     add_executable(testMilleRecordROOT testMilleRecordROOT.cc)
     target_link_libraries(testMilleRecordROOT PUBLIC Mille2 )    

@@ -41,6 +41,9 @@ void MilleReaderCcompressed::close(){
 void MilleReaderCcompressed::reset(){
     gzrewind(infile_); 
 }
+void MilleReaderCcompressed::rewindEntry(){
+    gzseek(infile_,lastPos_,SEEK_SET); 
+}
 std::pair<int,int> MilleReaderCcompressed::readToBuffer(  double *bufferDouble, 
                             float *bufferFloat, 
                             int *bufferInt,
@@ -48,6 +51,7 @@ std::pair<int,int> MilleReaderCcompressed::readToBuffer(  double *bufferDouble,
     if (!bufferDouble || !bufferFloat || !bufferInt || !bufferSize) {
         return {0,-1};
     }
+    lastPos_ = gztell(infile_); 
     int recordLength = 0; // get size of the next record 
     int nR = gzread(infile_, &recordLength, sizeof(recordLength)); 
 	if (gzeof(infile_)) {

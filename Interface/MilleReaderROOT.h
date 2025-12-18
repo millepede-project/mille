@@ -51,6 +51,8 @@ class MilleReaderROOT : public IMilleReader{
         virtual void close() override final;
         /// @brief reset a file to the first entry 
         virtual void reset() override final;
+        /// @brief rewind to the start the last entry read 
+        virtual void rewindEntry() override final; 
         /// @brief read the next record in the file to the provided buffers.
         ///        The labels are guaranteed to be stored in the int buffer,
         ///        and the derivatives in the *double* buffer.
@@ -83,6 +85,7 @@ class MilleReaderROOT : public IMilleReader{
         TTree* tree_ = nullptr; ///< TTree object to interface to the stored information
         Long64_t entryNumber_ = 0;  ///< Current entry number - this is the next one to be read
         Long64_t nentries_ = 0; ///< Total number of entries in the tree
+        Long64_t lastEntry_ = 0; ///< The last entry we attempted to read
         std::vector<double>* doubles_ = nullptr; ///< array to access double-precision reals in the tree
         std::vector<float>* floats_ = nullptr; ///< array to access single-precision reals in the tree
         std::vector<int>* ints_ = nullptr; ///< array to access parameter labels in the tree
