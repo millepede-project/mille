@@ -103,3 +103,38 @@ void MilleRecord::addEntry(int i, double k){
     if (doublePrecision_) doubleBuffer_.push_back(k);
     else floatBuffer_.push_back(k); 
 }
+
+bool MilleRecord::copyRecord(IMilleReader & source){
+    doubleBuffer_.clear(); 
+    floatBuffer_.clear(); 
+    intBuffer_.clear(); 
+    const size_t defaultBuffer = 5000; 
+    doubleBuffer_.resize(defaultBuffer); 
+    floatBuffer_.resize(defaultBuffer); 
+    intBuffer_.resize(defaultBuffer); 
+    auto [nRead, status] = source.readToBuffer(doubleBuffer_.data(), floatBuffer_.data(), intBuffer_.data(), doubleBuffer_.size()); 
+    if (status == -4){
+        doubleBuffer_.resize(nRead);
+        floatBuffer_.resize(nRead);
+        intBuffer_.resize(nRead);
+        source.rewindEntry();
+        auto try2 = source.readToBuffer(doubleBuffer_.data(), floatBuffer_.data(), intBuffer_.data(), doubleBuffer_.size()); 
+        nRead = try2.first;
+        status = try2.second;
+    }
+    if (status < 0){
+        std::cerr <<" Read error "<<std::endl;
+        return false;
+    }
+    if (status == 0) return false; 
+    if (status == 4){
+        doubleBuffer_.clear();
+        floatBuffer_.resize(nRead); 
+    }
+    else if (status == 8){
+        floatBuffer_.clear();
+        doubleBuffer_.resize(nRead);  
+    }
+    intBuffer_.resize(nRead); 
+    return true; 
+}

@@ -35,7 +35,8 @@ bool MilleReaderCcompressed::open(const std::string & fname){
     return true; 
 }
 void MilleReaderCcompressed::close(){
-    gzclose(infile_);
+    if (infile_) gzclose(infile_);
+    infile_ = nullptr; 
     fname_ = "";
 }
 void MilleReaderCcompressed::reset(){
@@ -44,10 +45,29 @@ void MilleReaderCcompressed::reset(){
 void MilleReaderCcompressed::rewindEntry(){
     gzseek(infile_,lastPos_,SEEK_SET); 
 }
+void MilleReaderCcompressed::skipEntry(){
+    lastPos_ = gztell(infile_); 
+    int recordLength = 0; // get size of the next record 
+    gzread(infile_, &recordLength, sizeof(recordLength)); 
+    bool doublePrecision = (recordLength < 0); 
+    recordLength = std::abs(recordLength)/2; 
+    if (doublePrecision){
+        gzseek(infile_, recordLength * sizeof(double), SEEK_CUR); 
+    }
+    else{
+        gzseek(infile_,recordLength * sizeof(float), SEEK_CUR); 
+    }
+    gzseek(infile_,recordLength * sizeof(int), SEEK_CUR); 
+    /// TODO: check return code and return a status flag. also for rewind. 
+}
 std::pair<int,int> MilleReaderCcompressed::readToBuffer(  double *bufferDouble, 
                             float *bufferFloat, 
                             int *bufferInt,
                             int bufferSize){
+    if (!infile_){
+        std::cerr << "input file not properly opened?"<<std::endl;
+        return {0,-1}; 
+    }
     if (!bufferDouble || !bufferFloat || !bufferInt || !bufferSize) {
         return {0,-1};
     }

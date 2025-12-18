@@ -53,6 +53,8 @@ class MilleReaderROOT : public IMilleReader{
         virtual void reset() override final;
         /// @brief rewind to the start the last entry read 
         virtual void rewindEntry() override final; 
+        /// @brief skip to the next entry
+        virtual void skipEntry() override final; 
         /// @brief read the next record in the file to the provided buffers.
         ///        The labels are guaranteed to be stored in the int buffer,
         ///        and the derivatives in the *double* buffer.

@@ -31,7 +31,7 @@ bool MilleReaderC::open(const std::string & fname){
     return infile_.is_open(); 
 }
 void MilleReaderC::close(){
-    infile_.close();
+    if (infile_.is_open()) infile_.close();
     fname_ = "";
 }
 void MilleReaderC::reset(){
@@ -42,6 +42,21 @@ void MilleReaderC::rewindEntry(){
     infile_.clear();
     infile_.seekg(lastPos_,std::ios::beg); 
 }
+void MilleReaderC::skipEntry(){
+    lastPos_ = infile_.tellg(); 
+    int recordLength = 0; // get size of the next record 
+    infile_.read(reinterpret_cast<char*>(&recordLength), sizeof(recordLength)); 
+    bool doublePrecision = (recordLength < 0); 
+    recordLength = std::abs(recordLength); 
+    if (doublePrecision){
+        infile_.seekg(recordLength * sizeof(double), std::ios_base::cur); 
+    }
+    else{
+        infile_.seekg(recordLength * sizeof(float), std::ios_base::cur); 
+    }
+    infile_.seekg(recordLength * sizeof(int), std::ios_base::cur); 
+}
+
 std::pair<int,int> MilleReaderC::readToBuffer(  double *bufferDouble, 
                             float *bufferFloat, 
                             int *bufferInt,

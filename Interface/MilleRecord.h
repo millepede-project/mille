@@ -31,6 +31,7 @@
 #define MILLERECORD__H
 
 #include <vector>
+#include "IMilleReader.h"
 
 
 /// @brief  Base class for a writeable Mille record. 
@@ -66,6 +67,13 @@ class MilleRecord{
     /// @param specialFloat: Floating point entries 
     /// @param specialInt: Integer entries 
     void addSpecial(int nSpecial, const std::vector<double> & specialFloat, const std::vector<int> specialInt);
+
+    /// @brief Quickly copies encoded buffers for next record from a reader.
+    ///        Used to quickly translate Mille formats. 
+    /// @param source: A reader instance connected to a file 
+    /// @return A flag indicating the success of the operation. 
+    ///         False indicates either an error or EOF
+    bool copyRecord(IMilleReader & source); 
     
     /// @brief Abort the current record, reset internal storage 
     void abort();

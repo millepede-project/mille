@@ -74,7 +74,19 @@ if (build_ROOT_comps)
                 FILES Interface/MilleRecordROOT.h Interface/MilleReaderROOT.h
                 BASE_DIRS Interface )
 
+    add_executable(cToRoot)
+    target_sources(cToRoot PRIVATE utils/cToRoot.cc)
+    target_link_libraries(cToRoot PUBLIC Mille2)
+    install(TARGETS cToRoot 
+            DESTINATION bin )
+
 endif()
+
+add_executable(inspectBinary)
+target_sources(inspectBinary PRIVATE utils/inspectBinary.cc)
+target_link_libraries(inspectBinary PUBLIC Mille2)
+install(TARGETS inspectBinary 
+        DESTINATION bin )
 
 # ===== LibZ for file compression ===== 
 if (SUPPORT_ZLIB)

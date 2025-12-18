@@ -59,7 +59,7 @@ bool MilleReaderROOT::open(const std::string & fname){
 }
 void MilleReaderROOT::close(){
     // Release the unique_ptr to prevent a ROOT related double-delete 
-    file_->Close(); 
+    if (file_ && file_->IsOpen()) file_->Close(); 
     file_.release(); 
     tree_ = nullptr;
     doubles_ = nullptr;
@@ -73,6 +73,10 @@ void MilleReaderROOT::reset(){
 }
 void MilleReaderROOT::rewindEntry(){
     entryNumber_ = lastEntry_; 
+}
+void MilleReaderROOT::skipEntry(){
+    lastEntry_ = entryNumber_; 
+    ++entryNumber_; 
 }
 std::pair<int,int> MilleReaderROOT::readToBuffer(  double *bufferDouble, 
                             float * /*bufferFloat - unused here*/, 
