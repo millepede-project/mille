@@ -31,6 +31,7 @@
 #define MILLE_DATA_STRUCTURES__H
 
 #include <vector>
+#include <stddef.h>
 
 /// @brief Helper to represent decoded Mille data. 
 ///        This stands for a single measurement (equation). 
