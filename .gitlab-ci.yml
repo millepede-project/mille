@@ -59,7 +59,6 @@ unit-tests:
     - build-job
   script: 
     - ls 
-    - source install/mp2setup.sh
     - cd build 
     - ctest -V
 
