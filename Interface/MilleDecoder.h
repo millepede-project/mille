@@ -28,6 +28,7 @@
  */
 
 #include "IMilleReader.h" 
+#include "MilleDataStructures.h" 
 #include <vector> 
 
 #ifndef MILLE__DECODER__H
@@ -41,30 +42,32 @@ class MilleDecoder{
             atEof=1,
             error=2
         };
-        /// @brief Data structure for the decoded record.
-        struct Measurement{
-            ReadResult res=ReadResult::OK; 
-            double measurement; 
-            double uncertainty;
-            std::vector<std::pair<int, double>> localDerivatives={};
-            std::vector<std::pair<int, double>> globalDerivatives={};
-            std::vector<std::pair<int, double>> specialData={};
-        };
 
         /// @brief constructor
         MilleDecoder()=default;
-        /// @brief accessor - retrieve the next entry 
+        /// @brief accessor - retrieve the next record 
         /// @param[in] reader: A reader connected to a file to read from 
-        /// @return A vector of decoded measurements for the current record
-        std::vector<Measurement> decode (IMilleReader & reader);  
+        /// @param[out] record: A vector to be filled with the measurements from the next record 
+        /// @return A status code indicating the outcome of the operation 
+        ReadResult decode (IMilleReader & reader, std::vector<MilleMeasurement> & record);  
 
     private:
+        /// @brief Find the next measurement in the buffer. 
+        /// @param [in] current Starting index in the buffer to search 
+        /// @param [out] startLocal Will be set to the index storing the measured value
+        /// @param [out] startGlobal Will be set to the index storing the uncertainty on the measurement
+        /// @param [out] lastGlobal Will be set to the index storing the last entry of this measurement (last global derivative or uncertainty if no such)
+        /// @return a bool - true indicates a new measurement was found, false indicates we are done with the buffer 
         bool nextMeasurement(long int current, long int & startLocal, long int  & startGlobal, long int & lastGlobal); 
-        Measurement decodeEntry(long int start, long int startLocal, long int startGlobal, long int lastGlobal); 
+        
+        /// @brief Decodes an entry and extracts a measurement.
+        ///        Expects the indices to be determined by a prior call to nextMeasurement. 
+        /// @param [out] startLocal Index storing the measured value
+        /// @param [out] startGlobal Index storing the uncertainty on the measurement
+        /// @param [out] lastGlobal Index storing the last entry of this measurement (last global derivative or uncertainty if no such)
+        MilleMeasurement decodeEntry(long int startLocal, long int startGlobal, long int lastGlobal); 
 
-        std::vector<int> intBuffer_ = {};       ///< read buffer for ints
-        std::vector<float> floatBuffer_ = {};     ///< read buffer for floats
-        std::vector<double> doubleBuffer_ = {};    ///< read buffer for doubles
+        MilleBuffer buffer_; 
         const size_t defaultBufferSize_ = 5000;  ///< starting buffer size
 
 };

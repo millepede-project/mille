@@ -22,12 +22,10 @@
 #include <iostream> 
 
 MilleRecord::MilleRecord(bool doublePrecision, bool writeZero, std::size_t recordLengthHint):
-    doublePrecision_ (doublePrecision),
     globalDerKeepZeros_(writeZero),
     recordLengthHint_(recordLengthHint){
-    intBuffer_.reserve(recordLengthHint_); 
-    if (doublePrecision) doubleBuffer_.reserve(recordLengthHint_); 
-    else floatBuffer_.reserve(recordLengthHint_); 
+        buffer_.doublePrecision = doublePrecision;
+        buffer_.reserve(recordLengthHint); 
 }
 
 MilleRecord::~MilleRecord(){
@@ -41,17 +39,17 @@ void MilleRecord::addData(double aMeas, double aErr, unsigned int numLocal,
     // ensure the header is in place 
     newSetIfNeeded(); 
     // add measurement
-    addEntry(0, aMeas);
+    buffer_.fill(0, aMeas);
     // add local derivative block
     for (unsigned int i = 0; i < numLocal; ++i){
-        addEntry(indLocal[i], derLocal[i]); 
+        buffer_.fill(indLocal[i], derLocal[i]); 
     }
     // add uncertainty 
-    addEntry(0, aErr); 
+    buffer_.fill(0, aErr); 
     // add global derivative block 
     for (std::size_t k = 0; k < derGlobal.size(); ++k){
         if (derGlobal[k] != 0 or globalDerKeepZeros_){
-            addEntry(labGlobal[k], derGlobal[k]);
+            buffer_.fill(labGlobal[k], derGlobal[k]);
         } 
     }
 }
@@ -66,11 +64,11 @@ void MilleRecord::addSpecial(int nSpecial, const std::vector<double> & specialFl
     }
     hasSpecialInRecord_ = true; 
     // A special record is indicted by:
-    addEntry(0,0.); // a zero measurement, 
+    buffer_.fill(0,0.); // a zero measurement, 
                     // followed by no local derivatives,
-    addEntry(0, -1. * nSpecial);  // and a negative uncertainty, with the magnitude nSpecial 
+    buffer_.fill(0, -1. * nSpecial);  // and a negative uncertainty, with the magnitude nSpecial 
     for (int i = 0; i < nSpecial; ++i){
-        addEntry(specialInt[i],specialFloat[i]); 
+        buffer_.fill(specialInt[i],specialFloat[i]); 
     }
 }
 
@@ -82,43 +80,27 @@ void MilleRecord::abort(){
 }
 void MilleRecord::newSetIfNeeded(){
     /// if we are in an active record, do not add a new header
-    if (intBuffer_.size() != 0){
+    if (!buffer_.empty()){
         return; 
     }
     /// The header of a new record is a pair (0,0) 
-    addEntry(0,0.); 
+    buffer_.fill(0,0.); 
 }
 void MilleRecord::resetBuffers(){
-    intBuffer_.clear();
-    floatBuffer_.clear();
-    doubleBuffer_.clear();
-    intBuffer_.reserve(recordLengthHint_); 
-    if (doublePrecision_) doubleBuffer_.reserve(recordLengthHint_); 
-    else floatBuffer_.reserve(recordLengthHint_); 
+    buffer_.clear(); 
+    buffer_.reserve(recordLengthHint_); 
     hasSpecialInRecord_ = false; 
 }
 
-void MilleRecord::addEntry(int i, double k){
-    intBuffer_.push_back(i);
-    if (doublePrecision_) doubleBuffer_.push_back(k);
-    else floatBuffer_.push_back(k); 
-}
-
 bool MilleRecord::copyRecord(IMilleReader & source){
-    doubleBuffer_.clear(); 
-    floatBuffer_.clear(); 
-    intBuffer_.clear(); 
+    buffer_.clear(); 
     const size_t defaultBuffer = 5000; 
-    doubleBuffer_.resize(defaultBuffer); 
-    floatBuffer_.resize(defaultBuffer); 
-    intBuffer_.resize(defaultBuffer); 
-    auto [nRead, status] = source.readToBuffer(doubleBuffer_.data(), floatBuffer_.data(), intBuffer_.data(), doubleBuffer_.size()); 
+    buffer_.resize(defaultBuffer,true); 
+    auto [nRead, status] = source.readToBuffer(buffer_); 
     if (status == -4){
-        doubleBuffer_.resize(nRead);
-        floatBuffer_.resize(nRead);
-        intBuffer_.resize(nRead);
+        buffer_.resize(nRead,true); 
         source.rewindEntry();
-        auto try2 = source.readToBuffer(doubleBuffer_.data(), floatBuffer_.data(), intBuffer_.data(), doubleBuffer_.size()); 
+        auto try2 = source.readToBuffer(buffer_); 
         nRead = try2.first;
         status = try2.second;
     }
@@ -127,14 +109,7 @@ bool MilleRecord::copyRecord(IMilleReader & source){
         return false;
     }
     if (status == 0) return false; 
-    if (status == 4){
-        doubleBuffer_.clear();
-        floatBuffer_.resize(nRead); 
-    }
-    else if (status == 8){
-        floatBuffer_.clear();
-        doubleBuffer_.resize(nRead);  
-    }
-    intBuffer_.resize(nRead); 
+    buffer_.resize(nRead); 
+    buffer_.clearUnused();  
     return true; 
 }

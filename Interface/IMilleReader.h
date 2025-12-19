@@ -31,6 +31,7 @@
 #define IMILLEREADER__H
 
 #include <string> 
+#include "MilleDataStructures.h"
 
 /// @brief Abstract base class for readers for Mille binaries. 
 class IMilleReader{
@@ -74,7 +75,35 @@ class IMilleReader{
         virtual std::pair<int,int> readToBuffer(  double *bufferDouble, 
                             float *bufferFloat, 
                             int *bufferInt,
-                            int bufferSize)=0;
+                            int bufferSize)=0;        
+
+        /// @brief read the next record in the file to a MilleBuffer struct. 
+        ///        Internally uses the multi-argument signature implemented
+        ///        by the specialisations of this interface. 
+        /// @param [out] MilleBuffer: buffer to populate 
+        /// @return Pair of ints: 
+        ///             First element indicates number of read entries (= used buffer size), 
+        ///                 Sizes larger than buffer size indicate entry was skipped. 
+        ///             Second element is a status code: 
+        ///                  -1: pointer to a buffer or lengthBuffers are null
+        ///                  -2: problem reading record length
+        ///                  -4: given buffers too short for record
+        ///                  -8: problem with stream or EOF reading floats
+        ///                 -16: problem with stream or EOF reading ints
+        ///                 -32: problem with stream or EOF reading doubles
+        ///                  =0: reached end of file (or read empty record?!)
+        ///                  =4: found floats
+        ///                  =8: found doubles   
+        ///                 All non-negative values indicate a success
+        std::pair<int,int> readToBuffer( MilleBuffer & buffer){
+            auto ret = readToBuffer(buffer.doubleBuffer.data(),
+                                    buffer.floatBuffer.data(),
+                                    buffer.intBuffer.data(),
+                                    buffer.size());
+            if (ret.second == 4) buffer.doublePrecision=false;
+            else if (ret.second == 8) buffer.doublePrecision = true; 
+            return ret; 
+        }
 };
 
 

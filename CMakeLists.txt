@@ -15,6 +15,7 @@ include(CTest)
 option(DEBUG "Debug" OFF)
 option(SUPPORT_ROOT "build ROOT file I/O and root plotting scripts" ON)
 option(SUPPORT_ZLIB "support Z lib for file compression" ON)
+option(BUILD_TESTS "compile unit tests" ON)
 
 set(build_ROOT_comps false)
 if(SUPPORT_ROOT)
@@ -56,8 +57,26 @@ target_sources(Mille2
             PRIVATE src/MilleRecord.cc src/MilleRecordC.cc src/MilleReaderC.cc src/MilleDecoder.cc
             PUBLIC 
                 FILE_SET HEADERS 
-                FILES Interface/MilleRecord.h Interface/MilleRecordC.h Interface/MilleReaderC.h Interface/IMilleReader.h Interface/MilleDecoder.h
+                FILES Interface/MilleDataStructures.h Interface/MilleRecord.h Interface/MilleRecordC.h Interface/MilleReaderC.h Interface/IMilleReader.h Interface/MilleDecoder.h 
                 BASE_DIRS Interface )
+
+
+add_executable(inspectBinary)
+target_sources(inspectBinary PRIVATE utils/inspectBinary.cc)
+target_link_libraries(inspectBinary PUBLIC Mille2)
+install(TARGETS inspectBinary 
+        DESTINATION bin )
+
+# ===== LibZ for file compression ===== 
+if (SUPPORT_ZLIB)
+    target_link_libraries(Mille2 PUBLIC z )
+    target_compile_definitions(inspectBinary PUBLIC SUPPORT_LZ)
+    target_sources(Mille2 PRIVATE src/MilleReaderCcompressed.cc
+            PUBLIC 
+                FILE_SET HEADERS 
+                FILES  Interface/MilleReaderCcompressed.h
+                BASE_DIRS Interface )
+endif()
 
 
 if (build_ROOT_comps)
@@ -67,6 +86,7 @@ if (build_ROOT_comps)
 
     # enable ROOT support in Mille2
     target_compile_definitions(Mille2 PUBLIC SUPPORT_ROOTIO)
+    target_compile_definitions(inspectBinary PUBLIC SUPPORT_ROOTIO)
     target_link_libraries(Mille2 PUBLIC ROOT::Core ROOT::Tree ROOT::RIO )
     target_sources(Mille2 PRIVATE src/MilleRecordROOT.cc src/MilleReaderROOT.cc
             PUBLIC 
@@ -82,21 +102,7 @@ if (build_ROOT_comps)
 
 endif()
 
-add_executable(inspectBinary)
-target_sources(inspectBinary PRIVATE utils/inspectBinary.cc)
-target_link_libraries(inspectBinary PUBLIC Mille2)
-install(TARGETS inspectBinary 
-        DESTINATION bin )
 
-# ===== LibZ for file compression ===== 
-if (SUPPORT_ZLIB)
-    target_link_libraries(Mille2 PUBLIC z )
-    target_sources(Mille2 PRIVATE src/MilleReaderCcompressed.cc
-            PUBLIC 
-                FILE_SET HEADERS 
-                FILES  Interface/MilleReaderCcompressed.h
-                BASE_DIRS Interface )
-endif()
 # install headers for Mille2 
 install(
   TARGETS Mille2
@@ -126,4 +132,6 @@ install(FILES ${mille_BINARY_DIR}/cmake/milleConfig.cmake
 
 
 # Unit tests 
-subdirs(test)
+if (BUILD_TESTS)
+    subdirs(test)
+endif()

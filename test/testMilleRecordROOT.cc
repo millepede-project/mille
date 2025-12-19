@@ -33,7 +33,7 @@
 
 
 int main(int, char**){
-    using ::ssize; 
+    using ::my_ssize; 
     /// dummy data for testing 
     std::vector<unsigned int> localLabels{1,2,4}; 
     std::vector<double> localDeriv{1.0, -0.3, 1.2}; 
@@ -77,8 +77,8 @@ int main(int, char**){
     tree->SetBranchAddress("floatingPointFormat",&floatingPointFormat); 
     tree->GetEntry(0); 
     TEST_CONDITION(floatingPointFormat,4,"Recorded floating point format"); 
-    TEST_CONDITION(ssize(*floats),3 + ssize(globalDeriv) + ssize(localDeriv),"Number of float entries"); 
-    TEST_CONDITION(ssize(*ints),3 + ssize(globalDeriv) + ssize(localDeriv),"Number of int entries"); 
+    TEST_CONDITION(my_ssize(*floats),3 + my_ssize(globalDeriv) + my_ssize(localDeriv),"Number of float entries"); 
+    TEST_CONDITION(my_ssize(*ints),3 + my_ssize(globalDeriv) + my_ssize(localDeriv),"Number of int entries"); 
 
     size_t ix = 0; 
     TEST_CONDITION(floats->at(ix++),0, "Float header word"); 

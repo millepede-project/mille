@@ -35,22 +35,22 @@ MilleRecordC::~MilleRecordC(){
 } 
 void MilleRecordC::writeRecord(){
     // skip empty records 
-    if (intBuffer_.empty()) return;
+    if (buffer_.empty()) return;
 	const int recordLength =
-			(doublePrecision_) ? -intBuffer_.size() * 2 : intBuffer_.size() * 2;
+			(buffer_.doublePrecision) ? -buffer_.size() * 2 : buffer_.size() * 2;
     // header word indicating record size and type 
     myOutFile_.write(reinterpret_cast<const char*>(&recordLength),
 			sizeof(recordLength));
     // floating point content 
-	if (doublePrecision_)
-		myOutFile_.write(reinterpret_cast<char*>(doubleBuffer_.data()),
-				doubleBuffer_.size() * sizeof(doubleBuffer_[0]));
+	if (buffer_.doublePrecision)
+		myOutFile_.write(reinterpret_cast<char*>(buffer_.doubleBuffer.data()),
+				buffer_.size() * sizeof(double));
 	else
-		myOutFile_.write(reinterpret_cast<char*>(floatBuffer_.data()),
-				floatBuffer_.size() * sizeof(floatBuffer_[0]));
+		myOutFile_.write(reinterpret_cast<char*>(buffer_.floatBuffer.data()),
+				buffer_.size() * sizeof(float));
     // integer content 
-	myOutFile_.write(reinterpret_cast<char*>(intBuffer_.data()),
-			intBuffer_.size() * sizeof(intBuffer_[0]));
+	myOutFile_.write(reinterpret_cast<char*>(buffer_.intBuffer.data()),
+			buffer_.size() * sizeof(int));
 
     // prepare for next record 
     resetBuffers();

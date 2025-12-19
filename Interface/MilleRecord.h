@@ -31,6 +31,7 @@
 #define MILLERECORD__H
 
 #include <vector>
+#include "MilleDataStructures.h"
 #include "IMilleReader.h"
 
 
@@ -97,19 +98,8 @@ class MilleRecord{
         /// @brief reset the internal buffers, ready for a new entry
         void resetBuffers(); 
 
-        /// @brief add one pair <label, value> to internal buffers. 
-        /// Picks the floating point buffer corresponding to user-configured precision.
-        /// Use of this interface ensures consistent buffer shape. 
-        /// @param i: Label / value to fill into the integer array 
-        /// @param k: Value to fill into the floating point array
-        void addEntry(int i, double k);
-
         /// ==== Data members - accessible to derived classes === 
-
-        std::vector<int> intBuffer_ = {}; ///< Integer buffer
-        std::vector<float> floatBuffer_ = {}; ///< Float buffer
-        std::vector<double> doubleBuffer_ = {}; ///< Double buffer
-        bool doublePrecision_ = false;  ///< Flag for double precision storage
+        MilleBuffer buffer_; 
         bool globalDerKeepZeros_ = false;   ///< Flag to write global derivatives with value zero
         bool hasSpecialInRecord_ = false;   ///< Flag whether we already have a 'special' block in the current record
         std::size_t recordLengthHint_ = 2000; /// < expected record length 

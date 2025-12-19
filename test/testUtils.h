@@ -58,6 +58,6 @@ template <typename T> typename std::enable_if<std::is_integral_v<T>, bool>::type
 
 // pre-c++20 signed size accessor
 template <class container> 
-long ssize (container c){return c.size();} 
+long my_ssize (const container & c){return c.size();} 
 
 #endif // MILLE_TESTUTILS__H

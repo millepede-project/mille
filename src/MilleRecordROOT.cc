@@ -36,9 +36,9 @@ MilleRecordROOT::~MilleRecordROOT(){
 } 
 void MilleRecordROOT::writeRecord(){
     floatingPointFormat_ = 4; 
-    if (doublePrecision_) floatingPointFormat_ = 8;
+    if (buffer_.doublePrecision) floatingPointFormat_ = 8;
     // skip empty records 
-    if (intBuffer_.empty()) return;
+    if (buffer_.empty()) return;
     outTree_->Fill(); 
 
     // prepare for next record 
@@ -63,9 +63,9 @@ void MilleRecordROOT::open(){
   }
   outTree_ = new TTree("MilleRecords","MilleRecords");
   outTree_->SetDirectory(file_.get()); 
-  outTree_->Branch("floats",&floatBuffer_); 
-  outTree_->Branch("ints",&intBuffer_); 
-  outTree_->Branch("doubles",&doubleBuffer_); 
+  outTree_->Branch("floats",&(buffer_.floatBuffer)); 
+  outTree_->Branch("ints",&(buffer_.intBuffer)); 
+  outTree_->Branch("doubles",&(buffer_.doubleBuffer)); 
   outTree_->Branch("floatingPointFormat",&floatingPointFormat_); 
   outTree_->SetAutoFlush(100); 
 

@@ -31,32 +31,32 @@
 #include <filesystem>
 
 
-int compareExpectMeasurement(const MilleDecoder::Measurement & meas, const MilleTestInputs & inputs){
+int compareExpectMeasurement(const MilleMeasurement & meas, const MilleTestInputs & inputs){
 
     TEST_CONDITION((float)meas.measurement, inputs.residual, "Extracted residual");
     TEST_CONDITION((float)meas.uncertainty, inputs.deltaResidual, "Extracted uncertainty");
-    TEST_CONDITION(ssize(meas.localDerivatives),ssize(inputs.localDeriv), "number of extracted local derivatives");
-    TEST_CONDITION(ssize(meas.globalDerivatives),ssize(inputs.globalDeriv), "number of extracted global derivatives");
-    for (size_t k = 0; k < meas.localDerivatives.size(); ++k){
-        TEST_CONDITION(meas.localDerivatives[k].first, inputs.localLabels[k], "Local derivative #"<<k<<": label");
-        TEST_CONDITION((float)meas.localDerivatives[k].second, inputs.localDeriv[k], "Local derivative #"<<k<<": value");
+    TEST_CONDITION((long)meas.nLocal(),my_ssize(inputs.localDeriv), "number of extracted local derivatives");
+    TEST_CONDITION((long)meas.nGlobal(),my_ssize(inputs.globalDeriv), "number of extracted global derivatives");
+    for (size_t k = 0; k < meas.nLocal(); ++k){
+        TEST_CONDITION(meas.localLabels[k], inputs.localLabels[k], "Local derivative #"<<k<<": label");
+        TEST_CONDITION((float)meas.localDerivatives[k], inputs.localDeriv[k], "Local derivative #"<<k<<": value");
     }
-    for (size_t k = 0; k < meas.globalDerivatives.size(); ++k){
-        TEST_CONDITION(meas.globalDerivatives[k].first, inputs.globalLabels[k], "Global derivative #"<<k<<": label");
-        TEST_CONDITION((float)meas.globalDerivatives[k].second, inputs.globalDeriv[k], "Global derivative #"<<k<<": value");
+    for (size_t k = 0; k < meas.nGlobal(); ++k){
+        TEST_CONDITION(meas.globalLabels[k], inputs.globalLabels[k], "Global derivative #"<<k<<": label");
+        TEST_CONDITION((float)meas.globalDerivatives[k], inputs.globalDeriv[k], "Global derivative #"<<k<<": value");
     }
 
     return 0; 
 };
 
-int compareExpectSpecial(const MilleDecoder::Measurement & meas, const std::vector<int> & specialInt, const std::vector<double> & specialDouble){
+int compareExpectSpecial(const MilleMeasurement & meas, const std::vector<int> & specialInt, const std::vector<double> & specialDouble){
 
-    TEST_CONDITION(ssize(meas.localDerivatives),0, "no local derivatives on special data");
-    TEST_CONDITION(ssize(meas.globalDerivatives),0, "no global derivatives on special data");
-    TEST_CONDITION(ssize(meas.specialData),specialInt.size(), "number of special data entries");
-    for (size_t k = 0; k < meas.specialData.size(); ++k){
-        TEST_CONDITION(meas.specialData[k].first, specialInt[k], "Special int data #"<<k<<": label");
-        TEST_CONDITION((float)meas.specialData[k].second, specialDouble[k], "Special double data #"<<k<<": value");
+    TEST_CONDITION((long)meas.nLocal(),0, "no local derivatives on special data");
+    TEST_CONDITION((long)meas.nGlobal(),0, "no global derivatives on special data");
+    TEST_CONDITION((long)meas.nSpecial(),(long)specialInt.size(), "number of special data entries");
+    for (size_t k = 0; k < meas.nSpecial(); ++k){
+        TEST_CONDITION(meas.specialInts[k], specialInt[k], "Special int data #"<<k<<": label");
+        TEST_CONDITION((float)meas.specialFloat[k], specialDouble[k], "Special double data #"<<k<<": value");
     }
     return 0; 
 };
@@ -99,15 +99,21 @@ int main(int, char**){
         return 1;    
     }
     MilleDecoder decoder;
-    auto measurementsFirst = decoder.decode(reader); 
-    TEST_CONDITION(ssize(measurementsFirst), 3, "Number of measurements in first record"); 
+    std::vector<MilleMeasurement> measurementsFirst; 
+    auto resFirst = decoder.decode(reader,measurementsFirst); 
+    TEST_CONDITION(my_ssize(measurementsFirst), 3, "Number of measurements in first record"); 
+    TEST_CONDITION((int)resFirst, (int)MilleDecoder::ReadResult::OK, "Read status of first record");
 
-    auto measurementsSecond = decoder.decode(reader); 
-    TEST_CONDITION(ssize(measurementsSecond), 1, "Number of measurements in second record"); 
+    std::vector<MilleMeasurement> measurementsSecond; 
+    auto resSecond = decoder.decode(reader,measurementsSecond); 
+    TEST_CONDITION(my_ssize(measurementsSecond), 1, "Number of measurements in second record"); 
+    TEST_CONDITION((int)resSecond, (int)MilleDecoder::ReadResult::OK, "Read status of second record");
 
-    // the file only has two record. Should now return an empty record, indicating EOF
-    auto measurementsEOF = decoder.decode(reader); 
-    TEST_CONDITION(ssize(measurementsEOF), 0, "Number of measurements when reading past EOF"); 
+    // the file only has two records. Should now return an empty record, indicating EOF
+    std::vector<MilleMeasurement> measurementsEOF; 
+    auto resThird  = decoder.decode(reader,measurementsEOF); 
+    TEST_CONDITION(my_ssize(measurementsEOF), 0, "Number of measurements when reading past EOF"); 
+    TEST_CONDITION((int)resThird, (int)MilleDecoder::ReadResult::atEof, "Read status when reading past EOF");
 
     /// validate content 
     int ret = 0; 

@@ -17,10 +17,13 @@
  *  details); if not, write to the Free Software Foundation, Inc.,
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  */
-
-#include "MilleReaderCcompressed.h"
+#ifdef SUPPORT_LZ
+    #include "MilleReaderCcompressed.h"
+#endif
 #include "MilleReaderC.h"
-#include "MilleReaderROOT.h"
+#ifdef SUPPORT_ROOTIO
+    #include "MilleReaderROOT.h"
+#endif 
 #include "MilleDecoder.h"
 #include <iostream>
 #include <filesystem>
@@ -83,8 +86,22 @@ int main(int argc, char** argv){
         }
     }
     if (readC) reader = std::make_unique<MilleReaderC>(); 
-    else if (readCGZ) reader = std::make_unique<MilleReaderCcompressed>(); 
-    else if (readROOT) reader = std::make_unique<MilleReaderROOT>(); 
+    else if (readCGZ){
+#ifdef SUPPORT_LZ
+        reader = std::make_unique<MilleReaderCcompressed>(); 
+#else
+        std::cerr << "Sorry! gzip-compressed binary reading not compiled into this build of Mille :-( Please rebuild with libz support to inspect this file. "<<std::endl;
+        return 1; 
+#endif 
+    }
+    else if (readROOT){
+#ifdef SUPPORT_ROOTIO
+        reader = std::make_unique<MilleReaderROOT>(); 
+#else
+        std::cerr << "Sorry! ROOT binary reading not compiled into this build of Mille :-( Please rebuild with ROOT support to inspect this file. "<<std::endl;
+        return 1; 
+#endif 
+    }
 
     if (!reader->open(inFile)){
         std::cerr <<" Failed to open input file "<<inFile<<std::endl;
@@ -96,35 +113,48 @@ int main(int argc, char** argv){
         reader->skipEntry(); 
     }
     MilleDecoder d; 
-    long long record = first; 
+    long long recordIndex = first; 
+    std::vector<MilleMeasurement> myRecord; 
     do{
-        if (last > 0 && record >= last) break; 
-        auto measurements = d.decode(*reader); 
-        if (measurements.empty()) break; 
-        std::cout <<" ========== Record "<<record<<" ========== " <<" ----"<<std::endl; 
-        for (size_t m = 0; m < measurements.size(); ++m){
-            if (measurements[m].specialData.empty()){
-                std::cout << " ---- Measurement "<<m<<"/"<<measurements.size()<<std::endl; 
-                std::cout << "    Value      : "<<measurements[m].measurement<<std::endl; 
-                std::cout << "    Uncertainty: "<<measurements[m].uncertainty<<std::endl; 
+        if (last > 0 && recordIndex >= last) break; 
+        myRecord.clear(); 
+        auto result = d.decode(*reader,myRecord); 
+        if (result == MilleDecoder::ReadResult::error){
+            std::cerr <<" Careful! Encountered decoding error. "<<std::endl;
+            break;
+        }
+        else if (result == MilleDecoder::ReadResult::atEof){
+            break; // done with file 
+        }
+        if (myRecord.empty()) continue; // empty record?!
+        std::cout <<" ========== Record "<<recordIndex<<" ========== " <<" ----"<<std::endl; 
+        size_t nMeasurements = 0; 
+        for (const MilleMeasurement & measurement : myRecord){
+            if (measurement.nSpecial() == 0){
+                std::cout << " ---- Measurement "<<++nMeasurements<<":"<<std::endl; 
+                std::cout << "    Value      : "<<measurement.measurement<<std::endl; 
+                std::cout << "    Uncertainty: "<<measurement.uncertainty<<std::endl; 
                 std::cout << "    Local derivatives: " <<std::endl; 
-                for (auto & [label, value] : measurements[m].localDerivatives){
+                for (size_t k = 0; k < measurement.nLocal(); ++k){
+                    const auto & [label,value] = measurement.localEntry(k); 
                     std::cout << "        "<<label<<" -- "<<value <<std::endl; 
                 }
                 std::cout << "    Global derivatives: " <<std::endl; 
-                for (auto & [label, value] : measurements[m].globalDerivatives){
+                for (size_t k = 0; k < measurement.nGlobal(); ++k){
+                    const auto & [label,value] = measurement.globalEntry(k); 
                     std::cout << "        "<<label<<" -- "<<value <<std::endl; 
                 }
             }
             else{
-                std::cout << " ---- Special block "<<m<<"/"<<measurements.size()<<" ----"<<std::endl; 
-                for (auto & [label, value] : measurements[m].specialData){
-                    std::cout << "        "<<label<<" -- "<<value <<std::endl; 
+                std::cout << " ---- Special block ----"<<std::endl; 
+                for (size_t k = 0; k < measurement.nSpecial(); ++k){
+                    const auto & [specInt,specFloat] = measurement.specialEntry(k); 
+                    std::cout << "        "<<specInt<<" -- "<<specFloat <<std::endl; 
                 }
             }
             std::cout << std::endl; 
         }
-        ++record;
+        ++recordIndex;
         std::cout << std::endl; 
     } while (true); 
     return 0;

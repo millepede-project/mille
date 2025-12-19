@@ -28,9 +28,9 @@ class MilleRecordTester: public MilleRecord{
         template <typename... args> MilleRecordTester(args && ...a): MilleRecord(a...){}
 
         /// read-only accessors to the internal storage 
-        const std::vector<double> & doubleBuffer() const {return doubleBuffer_;}
-        const std::vector<float> & floatBuffer() const {return floatBuffer_;}
-        const std::vector<int> & intBuffer() const {return intBuffer_;}
+        const std::vector<double> & doubleBuffer() const {return buffer_.doubleBuffer;}
+        const std::vector<float> & floatBuffer() const {return buffer_.floatBuffer;}
+        const std::vector<int> & intBuffer() const {return buffer_.intBuffer;}
 
         /// implement pure virtual functions with dummies to permit instantiation 
         virtual void writeRecord() override final{}; 
@@ -40,7 +40,7 @@ class MilleRecordTester: public MilleRecord{
 
 
 int main(int, char**){
-    using ::ssize; 
+    using ::my_ssize; 
     /// dummy data for testing 
 
     std::vector<unsigned int> localLabels{1,2,4}; 
@@ -61,15 +61,15 @@ int main(int, char**){
 
     // check for internal state after first data addition 
     TEST_CONDITION(
-        ssize(tester.floatBuffer()), 
-        3l + ssize(localDeriv) + ssize(globalDeriv),
+        my_ssize(tester.floatBuffer()), 
+        3l + my_ssize(localDeriv) + my_ssize(globalDeriv),
         "Length of float buffer after first rcd"); 
     TEST_CONDITION(
-        ssize(tester.intBuffer()), 
-        3l + ssize(localDeriv) + ssize(globalDeriv),
+        my_ssize(tester.intBuffer()), 
+        3l + my_ssize(localDeriv) + my_ssize(globalDeriv),
         "Length of float buffer after first rcd"); 
     TEST_CONDITION(
-        ssize(tester.doubleBuffer()),  
+        my_ssize(tester.doubleBuffer()),  
         0l,
         "Length of double buffer after first rcd"); 
     // also test the contents of the arrays
@@ -109,17 +109,17 @@ int main(int, char**){
     // check effect of abort function 
     tester.abort(); 
     TEST_CONDITION(
-        ssize(tester.floatBuffer()),
+        my_ssize(tester.floatBuffer()),
         1l,
         "Length of post-reset float buffer"
     ); 
     TEST_CONDITION(
-        ssize(tester.intBuffer()),
+        my_ssize(tester.intBuffer()),
         1l,
         "Length of post-reset float buffer"
     ); 
     TEST_CONDITION(
-        ssize(tester.doubleBuffer()),
+        my_ssize(tester.doubleBuffer()),
         0l,
         "Length of post-reset double buffer"
     ); 
@@ -128,17 +128,17 @@ int main(int, char**){
     tester.addSpecial(globalDeriv.size(), globalDeriv, globalLabels); 
 
     TEST_CONDITION(
-        ssize(tester.floatBuffer()), 
-        3l + ssize(globalDeriv),
+        my_ssize(tester.floatBuffer()), 
+        3l + my_ssize(globalDeriv),
         "Length of special data float buffer"
     ); 
     TEST_CONDITION(
-        ssize(tester.intBuffer()), 
-        3l + ssize(globalLabels),
+        my_ssize(tester.intBuffer()), 
+        3l + my_ssize(globalLabels),
         "Length of special data float buffer"
     ); 
     TEST_CONDITION(
-        ssize(tester.doubleBuffer()), 
+        my_ssize(tester.doubleBuffer()), 
         0l,
         "Length of special data double buffer"
     ); 
@@ -153,15 +153,15 @@ int main(int, char**){
 
     // check for internal state after first data addition 
     TEST_CONDITION(
-        ssize(testerDouble.doubleBuffer()), 
-        3l + ssize(localDeriv) + ssize(globalDeriv),
+        my_ssize(testerDouble.doubleBuffer()), 
+        3l + my_ssize(localDeriv) + my_ssize(globalDeriv),
         "Double precision - Length of float buffer after first rcd"); 
     TEST_CONDITION(
-        ssize(testerDouble.intBuffer()), 
-        3l + ssize(localDeriv) + ssize(globalDeriv),
+        my_ssize(testerDouble.intBuffer()), 
+        3l + my_ssize(localDeriv) + my_ssize(globalDeriv),
         "Double precision - Length of float buffer after first rcd"); 
     TEST_CONDITION(
-        ssize(testerDouble.floatBuffer()),  
+        my_ssize(testerDouble.floatBuffer()),  
         0l,
         "Double precision - Length of double buffer after first rcd"); 
     // also test the contents of the arrays

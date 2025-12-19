@@ -21,75 +21,65 @@
 #include "MilleDecoder.h"
 #include <iostream>
 
-std::vector<MilleDecoder::Measurement> MilleDecoder::decode (IMilleReader & reader){
-    intBuffer_.clear();
-    floatBuffer_.clear();
-    doubleBuffer_.clear();
-    intBuffer_.resize(defaultBufferSize_,0);
-    floatBuffer_.resize(defaultBufferSize_,0.);
-    doubleBuffer_.resize(defaultBufferSize_,0.);
+MilleDecoder::ReadResult MilleDecoder::decode (IMilleReader & reader, std::vector<MilleMeasurement> & record){
+    buffer_.clear();
+    buffer_.resize(defaultBufferSize_,true); 
     // attempt to read 
-    auto [nRead, status] = reader.readToBuffer(doubleBuffer_.data(), 
-                                               floatBuffer_.data(), 
-                                               intBuffer_.data(), 
-                                               intBuffer_.size()); 
+    auto [nRead, status] = reader.readToBuffer(buffer_); 
 
     if (status == 0){
-        return {}; 
+        return ReadResult::atEof; 
     }
     if (status == -4){
-        intBuffer_.resize(nRead);
-        floatBuffer_.resize(nRead);
-        doubleBuffer_.resize(nRead);
+        buffer_.resize(nRead,true);
         reader.rewindEntry(); 
-        auto res = reader.readToBuffer(doubleBuffer_.data(), 
-                                    floatBuffer_.data(), 
-                                    intBuffer_.data(), 
-                                    intBuffer_.size()); 
+        auto res = reader.readToBuffer(buffer_); 
         nRead = res.first;
         status = res.second;
     }
     if (status < 0){
         std::cerr << "MilleDecoder: Failed to read the next entry " <<std::endl;
-        return {}; 
+        return ReadResult::error; 
     }
     // read was OK, now we decode the content and populate the passed data object 
     long int current = 1;   // skip record header
     long int startLocal = 0; 
     long int startGlobal = 0; 
     long int lastGlobal = 0; 
-    std::vector<Measurement> result; 
     while (nextMeasurement(current, startLocal, startGlobal, lastGlobal) && current < nRead){
-        result.push_back(decodeEntry(current, startLocal, startGlobal, lastGlobal)); 
+        record.push_back(decodeEntry(startLocal, startGlobal, lastGlobal)); 
         current = lastGlobal+1;
     }
-    return result; 
+    return ReadResult::OK; 
 }
    
-MilleDecoder::Measurement MilleDecoder::decodeEntry(long int start, long int startLocal, long int startGlobal, long int lastGlobal){
-    MilleDecoder::Measurement meas; 
+MilleMeasurement MilleDecoder::decodeEntry(long int startLocal, long int startGlobal, long int lastGlobal){
+    MilleMeasurement meas; 
     // special blocks
-    if (    doubleBuffer_.at(startLocal) == 0 
-            && doubleBuffer_.at(startGlobal) < 0 
+    if (    buffer_.doubleBuffer.at(startLocal) == 0 
+            && buffer_.doubleBuffer.at(startGlobal) < 0 
             && startGlobal == startLocal + 1 ){
         std::cout <<" reading a special block" <<std::endl; 
-        int nSpecial = int(-doubleBuffer_.at(startGlobal)); 
+        int nSpecial = int(-buffer_.doubleBuffer.at(startGlobal)); 
         for (int k = startGlobal+1; k <= startGlobal+nSpecial; ++k){
-            meas.specialData.push_back(std::make_pair(intBuffer_[k],doubleBuffer_[k])); 
+            meas.specialInts.push_back(buffer_.intBuffer[k]);
+            meas.specialFloat.push_back(buffer_.doubleBuffer[k]); 
         }
         return meas; 
     }
     // normal blocks 
-    meas.measurement = doubleBuffer_.at(startLocal); 
-    meas.uncertainty = doubleBuffer_.at(startGlobal); 
+    meas.measurement = buffer_.doubleBuffer.at(startLocal); 
+    meas.uncertainty = buffer_.doubleBuffer.at(startGlobal); 
     if (startGlobal > startLocal + 1){
         for (int ix = startLocal+1; ix < startGlobal; ++ix){
-            meas.localDerivatives.push_back(std::make_pair(intBuffer_[ix], doubleBuffer_[ix]));
+            meas.localLabels.push_back(buffer_.intBuffer[ix]);
+            meas.localDerivatives.push_back(buffer_.doubleBuffer[ix]);
         }
     }
     if (lastGlobal > startGlobal){
         for (int ix = startGlobal+1; ix <= lastGlobal; ++ix){
-            meas.globalDerivatives.push_back(std::make_pair(intBuffer_[ix], doubleBuffer_[ix]));
+            meas.globalLabels.push_back(buffer_.intBuffer[ix]);
+            meas.globalDerivatives.push_back(buffer_.doubleBuffer[ix]);
         }
     }
     return meas; 
@@ -98,14 +88,14 @@ bool MilleDecoder::nextMeasurement(long int current, long int & startLocal, long
     startLocal = -1;
     startGlobal = -1;
     lastGlobal = -1; 
-    for (long int index = current; index < intBuffer_.size(); ++index){
-        if (intBuffer_[index] == 0 && startLocal < 0) startLocal = index; 
-        else if (intBuffer_[index] == 0 && startLocal >=0 && startGlobal < 0) startGlobal = index;
-        else if (intBuffer_[index] == 0 && startLocal >=0 && startGlobal >=0) {
+    for (long int index = current; index < buffer_.intBuffer.size(); ++index){
+        if (buffer_.intBuffer[index] == 0 && startLocal < 0) startLocal = index; 
+        else if (buffer_.intBuffer[index] == 0 && startLocal >=0 && startGlobal < 0) startGlobal = index;
+        else if (buffer_.intBuffer[index] == 0 && startLocal >=0 && startGlobal >=0) {
             lastGlobal = index - 1;
             break;
         }
     }
-    if (startLocal >= 0 && startGlobal >=0 && lastGlobal < 0) lastGlobal = intBuffer_.size() - 1; 
+    if (startLocal >= 0 && startGlobal >=0 && lastGlobal < 0) lastGlobal = buffer_.intBuffer.size() - 1; 
     return (startLocal >=0 && startGlobal >=0 && lastGlobal >=0);
 }
