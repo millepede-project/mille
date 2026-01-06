@@ -22,20 +22,19 @@
 #include <iostream>
 #include <sstream>
 
-std::string MilleReaderCSV::nextLine(std::ifstream & str){
-    char buf[1000]; 
-    str.getline(buf,1000); 
-    if (str.eof()) return ""; 
-    std::string myString(buf);
-    myString = myString.substr(0,myString.find_first_of("!#")); 
-    auto start = myString.find_first_not_of(" "); 
-    auto end = myString.find_last_not_of(" "); 
-    if (start == std::string::npos) myString = ""; 
+std::string MilleReaderCSV::nextLine(std::ifstream & input){
+    std::string line;  
+    std::getline(input, line ); 
+    if (input.eof()) return ""; 
+    line = line.substr(0,line.find_first_of("!#")); 
+    auto start = line.find_first_not_of(" "); 
+    auto end = line.find_last_not_of(" "); 
+    if (start == std::string::npos) line = ""; 
     else{
-        myString = myString.substr(start,end-start+1); 
+        line = line.substr(start,end-start+1); 
     }
-    if (myString.empty()) return nextLine(str); 
-    return myString;
+    if (line.empty()) return nextLine(input); 
+    return line;
 }
 
 bool MilleReaderCSV::open(const std::string & fname){
@@ -94,7 +93,7 @@ std::pair<int,int> MilleReaderCSV::readToBuffer(  double *bufferDouble,
     std::stringstream sstr(line); 
     sstr >> recordLength; 
     bool doublePrecision = (recordLength < 0); 
-    recordLength /=2; 
+    recordLength = std::abs(recordLength) / 2 ; 
 
     /// catch if we exceed the buffer size 
     if (recordLength > bufferSize){

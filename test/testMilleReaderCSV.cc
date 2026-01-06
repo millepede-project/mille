@@ -38,6 +38,8 @@ int main(int, char**){
     {
         MilleRecordCSV mille("milleTest.csv");
         inputs.writeTo(mille); 
+        MilleRecordCSV milleDouble("milleTestDouble.csv",true);
+        inputs.writeTo(milleDouble); 
     }
 
     MilleReaderCSV reader; 
@@ -45,6 +47,14 @@ int main(int, char**){
         std::cout << " Failed to open file"<<std::endl;
         return 1;    
     }
+    int ret =  MilleReaderTestSuite(reader,inputs, 4); 
+    if (ret !=0) return ret; 
+    reader.close(); 
 
-    return MilleReaderTestSuite(reader,inputs, 8); 
+    // test double precision
+    if (!reader.open("milleTestDouble.csv")){
+        std::cout << " Failed to open file"<<std::endl;
+        return 1;    
+    }
+    return MilleReaderTestSuite(reader,inputs,8); 
 }
