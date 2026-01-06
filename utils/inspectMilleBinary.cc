@@ -17,14 +17,8 @@
  *  details); if not, write to the Free Software Foundation, Inc.,
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  */
-#ifdef SUPPORT_LZ
-    #include "MilleReaderCcompressed.h"
-#endif
-#include "MilleReaderC.h"
-#ifdef SUPPORT_ROOTIO
-    #include "MilleReaderROOT.h"
-#endif 
 #include "MilleDecoder.h"
+#include "MilleFactory.h"
 #include <iostream>
 #include <filesystem>
 
@@ -32,29 +26,27 @@
 int main(int argc, char** argv){
 
     if (argc < 2){
-        std::cerr << "Usage: inspectBinary [-r / -c / -z to force file format] <file name> [first record to print][last record to print] "<<std::endl;
+        std::cerr << "Usage: inspectMilleBinary [-r / -c / -z to force file format] <file name> [first record to print][last record to print] "<<std::endl;
         return 1; 
     }
-    bool readROOT = false;
-    bool readC = false;
-    bool readCGZ = false; 
     int iarg = 1; 
+    MilleFormat userFormat = MilleFormat::Unknown; 
     if (std::string(argv[iarg]).find("-") == 0){
         if (argv[iarg] == "-z"){
-            readCGZ=true;  
+            userFormat = MilleFormat::Ccompressed; 
             ++iarg;
         }
         else if (argv[iarg] == "-r"){
-            readROOT=true;  
+            userFormat = MilleFormat::ROOT; 
             ++iarg;
         }
         else if (argv[iarg] == "-c"){
-            readC=true;  
+            userFormat = MilleFormat::C; 
             ++iarg;
         }
     }
     if (iarg >= argc){
-        std::cerr << "Usage: inspectBinary [-r / -c / -z to force file format] <file name> [first record to print][last record to print] "<<std::endl;
+        std::cerr << "Usage: inspectMilleBinary [-r / -c / -z to force file format] <file name> [first record to print][last record to print] "<<std::endl;
         return 1; 
     }
     const std::filesystem::path inFile = argv[iarg++];
@@ -67,40 +59,17 @@ int main(int argc, char** argv){
         last = std::atoll(argv[iarg++]);    
     }
     std::unique_ptr<IMilleReader> reader = nullptr; 
-    if (!readC && !readCGZ && !readROOT){
-        if (inFile.extension() == ".dat" || inFile.extension() == ".bin"){
-            std::cout <<" Auto-detected C binary from file extension"<<std::endl; 
-            readC = true; 
-        }
-        else if (inFile.extension() == ".gz"){
-            std::cout <<" Auto-detected compressed C binary from file extension"<<std::endl; 
-            readCGZ = true; 
-        }
-        else if (inFile.extension() == ".root" ){
-            std::cout <<" Auto-detected ROOT binary from file extension"<<std::endl; 
-            readROOT = true; 
-        }
-        else{
-            std::cerr <<" Unable to auto-detect file type from name "<<inFile<<" - please specify the format using the -c (C-binary) / -r (ROOT binary) / -z (compressed C binary) CLI args"<<std::endl;
-            return 1; 
-        }
+    // if the user has not set an option, try to auto-detect
+    if (userFormat == MilleFormat::Unknown){
+        reader = spawnMilleReader(inFile); 
     }
-    if (readC) reader = std::make_unique<MilleReaderC>(); 
-    else if (readCGZ){
-#ifdef SUPPORT_LZ
-        reader = std::make_unique<MilleReaderCcompressed>(); 
-#else
-        std::cerr << "Sorry! gzip-compressed binary reading not compiled into this build of Mille :-( Please rebuild with libz support to inspect this file. "<<std::endl;
-        return 1; 
-#endif 
+    else {
+        /// hint type using user-specified option
+        reader = spawnMilleReader(userFormat, inFile);
     }
-    else if (readROOT){
-#ifdef SUPPORT_ROOTIO
-        reader = std::make_unique<MilleReaderROOT>(); 
-#else
-        std::cerr << "Sorry! ROOT binary reading not compiled into this build of Mille :-( Please rebuild with ROOT support to inspect this file. "<<std::endl;
+    if (!reader){
+        std::cerr << "Unable to spawn reader for file "<<inFile<<", bailing out"<<std::endl; 
         return 1; 
-#endif 
     }
 
     if (!reader->open(inFile)){

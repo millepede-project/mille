@@ -32,6 +32,13 @@ install (
     )
 add_test(NAME TestMilleDecoder COMMAND testMilleDecoder)
 
+add_executable(testMilleFactory testMilleFactory.cc)
+target_link_libraries(testMilleFactory PUBLIC Mille2)    
+install (
+        TARGETS testMilleFactory
+        DESTINATION bin
+    )
+add_test(NAME TestMilleFactory COMMAND testMilleFactory)
 
 if (build_ROOT_comps)
     add_executable(testMilleRecordROOT testMilleRecordROOT.cc)

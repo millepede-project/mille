@@ -18,15 +18,11 @@
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include "MilleReaderCcompressed.h"
-#include "MilleReaderC.h"
-#include "MilleRecordROOT.h"
-#include "MilleDecoder.h"
+#include "MilleFactory.h"
 #include <iostream>
 
-int decodeFile(IMilleReader & reader, MilleRecordROOT & writer, const std::string & fname){
+int decodeFile(IMilleReader & reader, MilleRecord & writer, const std::string & fname){
     int nentries = 0; 
-    MilleDecoder decoder; 
     if(!reader.open(fname)){
         std::cerr <<" Failed to import "<<fname<<" due to open errors"<<std::endl;    
     } 
@@ -44,24 +40,46 @@ int decodeFile(IMilleReader & reader, MilleRecordROOT & writer, const std::strin
 int main(int argc, char** argv){
 
     if (argc < 3){
-        std::cerr << "Usage: cToRoot <target ROOT file> <one or many mille binaries>"<<std::endl;
+        std::cerr << "Usage: convertMilleFormats [-r / -c / -z to force file format] <destination file name> <one or many files to convert> "<<std::endl;
         return 1; 
     }
-    const std::string outFile = argv[1]; 
-    MilleRecordROOT out (outFile); 
-    std::vector<std::string> inMilleFiles{};
-    inMilleFiles.reserve(argc - 2); 
-    MilleReaderC readC;
-    MilleReaderCcompressed readCGZ; 
-    for (size_t i = 2; i < argc; ++i){
-        if(std::string(argv[i]).find(".gz")!= std::string::npos){
-            int nentries = decodeFile(readCGZ, out, argv[i]);
-            std::cout << " Imported "<<nentries<<" entries from file "<<argv[i]<<std::endl; 
+    int iarg = 1; 
+    MilleFormat userOutputFormat = MilleFormat::Unknown; 
+    if (std::string(argv[iarg]).find("-") == 0){
+        if (argv[iarg] == "-z"){
+            userOutputFormat = MilleFormat::Ccompressed; 
+            ++iarg;
         }
-        else{
-            int nentries = decodeFile(readC, out, argv[i]);
-            std::cout << " Imported "<<nentries<<" entries from file "<<argv[i]<<std::endl; 
+        else if (argv[iarg] == "-r"){
+            userOutputFormat = MilleFormat::ROOT; 
+            ++iarg;
         }
+        else if (argv[iarg] == "-c"){
+            userOutputFormat = MilleFormat::C; 
+            ++iarg;
+        }
+    }
+    const std::string outFile = argv[iarg++]; 
+
+    std::unique_ptr<MilleRecord> out(nullptr); 
+    if (userOutputFormat == MilleFormat::Unknown){
+        out = spawnMilleRecord(outFile); 
+    }
+    else{
+        out = spawnMilleRecord(userOutputFormat, outFile);
+    }
+    if (!out){
+        std::cerr <<" Failed to deduce output file format - bailing out "<<std::endl; 
+        return 1; 
+    }
+    for (size_t i = iarg; i < argc; ++i){
+        std::unique_ptr<IMilleReader> reader = spawnMilleReader(std::string(argv[i])); 
+        if (!reader){
+            std::cout <<" Unable to deduce file type for " <<argv[i]<<std::endl; 
+            continue; 
+        }
+        int nentries = decodeFile(*reader, *out, argv[i]);
+        std::cout << " Imported "<<nentries<<" entries from file "<<argv[i]<<std::endl; 
     }
     return 0;
 }

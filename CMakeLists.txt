@@ -54,23 +54,23 @@ endif()
 # ===== Mille2 ======= 
 add_library(Mille2 SHARED)
 target_sources(Mille2 
-            PRIVATE src/MilleRecord.cc src/MilleRecordC.cc src/MilleReaderC.cc src/MilleDecoder.cc
+            PRIVATE src/MilleRecord.cc src/MilleRecordC.cc src/MilleReaderC.cc src/MilleDecoder.cc src/MilleFactory.cc
             PUBLIC 
                 FILE_SET HEADERS 
-                FILES Interface/MilleDataStructures.h Interface/MilleRecord.h Interface/MilleRecordC.h Interface/MilleReaderC.h Interface/IMilleReader.h Interface/MilleDecoder.h 
+                FILES Interface/MilleDataStructures.h Interface/MilleRecord.h Interface/MilleRecordC.h Interface/MilleReaderC.h Interface/IMilleReader.h Interface/MilleDecoder.h  Interface/MilleFactory.h 
                 BASE_DIRS Interface )
 
 
-add_executable(inspectBinary)
-target_sources(inspectBinary PRIVATE utils/inspectBinary.cc)
-target_link_libraries(inspectBinary PUBLIC Mille2)
-install(TARGETS inspectBinary 
+add_executable(inspectMilleBinary)
+target_sources(inspectMilleBinary PRIVATE utils/inspectMilleBinary.cc)
+target_link_libraries(inspectMilleBinary PUBLIC Mille2)
+install(TARGETS inspectMilleBinary 
         DESTINATION bin )
 
 # ===== LibZ for file compression ===== 
 if (SUPPORT_ZLIB)
     target_link_libraries(Mille2 PUBLIC z )
-    target_compile_definitions(inspectBinary PUBLIC SUPPORT_LZ)
+    target_compile_definitions(Mille2 PUBLIC SUPPORT_LZ)
     target_sources(Mille2 PRIVATE src/MilleReaderCcompressed.cc
             PUBLIC 
                 FILE_SET HEADERS 
@@ -86,7 +86,7 @@ if (build_ROOT_comps)
 
     # enable ROOT support in Mille2
     target_compile_definitions(Mille2 PUBLIC SUPPORT_ROOTIO)
-    target_compile_definitions(inspectBinary PUBLIC SUPPORT_ROOTIO)
+    target_compile_definitions(inspectMilleBinary PUBLIC SUPPORT_ROOTIO)
     target_link_libraries(Mille2 PUBLIC ROOT::Core ROOT::Tree ROOT::RIO )
     target_sources(Mille2 PRIVATE src/MilleRecordROOT.cc src/MilleReaderROOT.cc
             PUBLIC 
@@ -94,10 +94,10 @@ if (build_ROOT_comps)
                 FILES Interface/MilleRecordROOT.h Interface/MilleReaderROOT.h
                 BASE_DIRS Interface )
 
-    add_executable(cToRoot)
-    target_sources(cToRoot PRIVATE utils/cToRoot.cc)
-    target_link_libraries(cToRoot PUBLIC Mille2)
-    install(TARGETS cToRoot 
+    add_executable(convertMilleFormats)
+    target_sources(convertMilleFormats PRIVATE utils/convertMilleFormats.cc)
+    target_link_libraries(convertMilleFormats PUBLIC Mille2)
+    install(TARGETS convertMilleFormats 
             DESTINATION bin )
 
 endif()
