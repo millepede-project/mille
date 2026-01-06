@@ -21,6 +21,9 @@
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#ifndef MILLERECORD__C__H
+#define MILLERECORD__C__H
+
  #include "MilleRecord.h"
  #include <string> 
  #include <fstream> 
@@ -58,3 +61,4 @@
     std::string fname_ = "mille.dat"; ///< File name for the output binary  
     std::ofstream myOutFile_; ///< C-binary for output
  }; 
+#endif

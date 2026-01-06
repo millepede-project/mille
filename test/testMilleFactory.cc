@@ -22,6 +22,8 @@
 #include "MilleFactory.h"
 #include "MilleReaderC.h"
 #include "MilleRecordC.h"
+#include "MilleReaderCSV.h"
+#include "MilleRecordCSV.h"
 #include "MilleReaderCcompressed.h"
 #ifdef SUPPORT_ROOTIO
     #include "MilleReaderROOT.h"
@@ -41,6 +43,10 @@ int main(int, char**){
     TEST_CONDITION(dynamic_cast<MilleReaderC*>(spawnMilleReader("MyCoolFile.bin").get()) != nullptr, true, "Detection of C binary as .bin - reader"); 
     TEST_CONDITION(dynamic_cast<MilleRecordC*>(spawnMilleRecord("MyCoolFile.dat").get()) != nullptr, true, "Detection of C binary as .dat - writer"); 
     TEST_CONDITION(dynamic_cast<MilleRecordC*>(spawnMilleRecord("MyCoolFile.bin").get()) != nullptr, true, "Detection of C binary as .bin - writer"); 
+    TEST_CONDITION(dynamic_cast<MilleReaderCSV*>(spawnMilleReader("MyCoolFile.csv").get()) != nullptr, true, "Detection of plain text as .csv - reader"); 
+    TEST_CONDITION(dynamic_cast<MilleRecordCSV*>(spawnMilleRecord("MyCoolFile.csv").get()) != nullptr, true, "Detection of plain text as .csv - writer"); 
+    TEST_CONDITION(dynamic_cast<MilleReaderCSV*>(spawnMilleReader("MyCoolFile.txt").get()) != nullptr, true, "Detection of plain text as .txt - reader"); 
+    TEST_CONDITION(dynamic_cast<MilleRecordCSV*>(spawnMilleRecord("MyCoolFile.txt").get()) != nullptr, true, "Detection of plain text as .txt - writer"); 
 #ifdef SUPPORT_LZ
     TEST_CONDITION(dynamic_cast<MilleReaderCcompressed*>(spawnMilleReader("MyCoolFile.dat.gz").get()) != nullptr, true, "Detection of compressed C binary as .dat.gz"); 
     TEST_CONDITION(dynamic_cast<MilleReaderCcompressed*>(spawnMilleReader("MyCoolFile.bin.gz").get()) != nullptr, true, "Detection of compressed C binary as .dat.gz"); 

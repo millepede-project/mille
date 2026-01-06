@@ -16,6 +16,14 @@ install (
     )
 add_test(NAME TestMilleRecordC COMMAND testMilleRecordC)
 
+add_executable(testMilleRecordCSV testMilleRecordCSV.cc)
+target_link_libraries(testMilleRecordCSV PUBLIC Mille2)    
+install (
+        TARGETS testMilleRecordCSV
+        DESTINATION bin
+    )
+add_test(NAME TestMilleRecordCSV COMMAND testMilleRecordCSV)
+
 add_executable(testMilleReaderC testMilleReaderC.cc)
 target_link_libraries(testMilleReaderC PUBLIC Mille2)    
 install (
@@ -23,6 +31,14 @@ install (
         DESTINATION bin
     )
 add_test(NAME TestMilleReaderC COMMAND testMilleReaderC)
+
+add_executable(testMilleReaderCSV testMilleReaderCSV.cc)
+target_link_libraries(testMilleReaderCSV PUBLIC Mille2)    
+install (
+        TARGETS testMilleReaderCSV
+        DESTINATION bin
+    )
+add_test(NAME TestMilleReaderCSV COMMAND testMilleReaderCSV)
 
 add_executable(testMilleDecoder testMilleDecoder.cc)
 target_link_libraries(testMilleDecoder PUBLIC Mille2)    

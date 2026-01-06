@@ -21,6 +21,9 @@
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#ifndef MILLERECORD__ROOT__H
+#define MILLERECORD__ROOT__H
+
  #include "MilleRecord.h"
  #include <string> 
 #include <memory>
@@ -64,3 +67,5 @@
     Long64_t nentries_ = 0; ///< Total number of entries in the tree
     int floatingPointFormat_ = 4;   ///< floating point format
  }; 
+
+#endif // MILLERECORD__ROOT__H

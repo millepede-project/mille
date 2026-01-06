@@ -26,7 +26,7 @@
 int main(int argc, char** argv){
 
     if (argc < 2){
-        std::cerr << "Usage: inspectMilleBinary [-r / -c / -z to force file format] <file name> [first record to print][last record to print] "<<std::endl;
+        std::cerr << "Usage: inspectMilleBinary [-r / -c / -z / -t to force file format to ROOT / C / zipped C / plain text] <file name> [first record to print][last record to print] "<<std::endl;
         return 1; 
     }
     int iarg = 1; 
@@ -44,10 +44,10 @@ int main(int argc, char** argv){
             userFormat = MilleFormat::C; 
             ++iarg;
         }
-    }
-    if (iarg >= argc){
-        std::cerr << "Usage: inspectMilleBinary [-r / -c / -z to force file format] <file name> [first record to print][last record to print] "<<std::endl;
-        return 1; 
+        else if (argv[iarg] == "-t"){
+            userFormat = MilleFormat::CSV; 
+            ++iarg;
+        }
     }
     const std::filesystem::path inFile = argv[iarg++];
     long long first = 0; 

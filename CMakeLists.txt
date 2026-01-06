@@ -54,10 +54,10 @@ endif()
 # ===== Mille2 ======= 
 add_library(Mille2 SHARED)
 target_sources(Mille2 
-            PRIVATE src/MilleRecord.cc src/MilleRecordC.cc src/MilleReaderC.cc src/MilleDecoder.cc src/MilleFactory.cc
+            PRIVATE src/MilleRecord.cc src/MilleRecordCSV.cc src/MilleRecordC.cc src/MilleReaderC.cc src/MilleReaderCSV.cc src/MilleDecoder.cc src/MilleFactory.cc
             PUBLIC 
                 FILE_SET HEADERS 
-                FILES Interface/MilleDataStructures.h Interface/MilleRecord.h Interface/MilleRecordC.h Interface/MilleReaderC.h Interface/IMilleReader.h Interface/MilleDecoder.h  Interface/MilleFactory.h 
+                FILES Interface/MilleDataStructures.h Interface/MilleRecord.h Interface/MilleRecordC.h Interface/MilleRecordCSV.h Interface/MilleReaderC.h Interface/MilleReaderCSV.h Interface/IMilleReader.h Interface/MilleDecoder.h  Interface/MilleFactory.h 
                 BASE_DIRS Interface )
 
 

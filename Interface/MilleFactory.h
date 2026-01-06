@@ -38,6 +38,7 @@
 /// @brief Enum describing the supported Mille formats.  
 enum class MilleFormat{
     C,
+    CSV,
     Ccompressed,
     ROOT, 
     Unknown 
@@ -50,6 +51,7 @@ enum class MilleFormat{
 ///         .root --> ROOT 
 ///         .dat or .bin  --> C-binary 
 ///         .gz   --> compressed C-binary  
+///         .txt or .csv --> plain text
 ///         MilleFormat::Unknown will be return if the deduction failed.
 MilleFormat deduceMilleFormat(const std::filesystem::path & fname);
 
@@ -69,6 +71,7 @@ std::unique_ptr<IMilleReader> spawnMilleReader(MilleFormat fmt, const std::strin
 ///         .root --> ROOT 
 ///         .dat or .bin  --> C-binary 
 ///         .gz   --> compressed C-binary  
+///         .txt or .csv --> plain text
 ///         Will return a nullptr in case of an unknown format.
 std::unique_ptr<IMilleReader> spawnMilleReader(const std::string & fname);
 
@@ -97,6 +100,7 @@ std::unique_ptr<MilleRecord> spawnMilleRecord(MilleFormat fmt,
 ///         Supported formats: 
 ///         .root --> ROOT 
 ///         .dat or .bin  --> C-binary 
+///         .txt or .csv --> plain text
 ///         Compressed C-binary is not supported for direct writing - please write to C binary and then manually run gzip. 
 ///         Will return a nullptr in case of an unsupported format.
 std::unique_ptr<MilleRecord> spawnMilleRecord(

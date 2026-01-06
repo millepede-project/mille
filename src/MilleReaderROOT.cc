@@ -79,10 +79,10 @@ void MilleReaderROOT::skipEntry(){
     ++entryNumber_; 
 }
 std::pair<int,int> MilleReaderROOT::readToBuffer(  double *bufferDouble, 
-                            float * /*bufferFloat - unused here*/, 
+                            float * bufferFloat, 
                             int *bufferInt,
                             int bufferSize){
-    if (!bufferDouble || !bufferInt || !bufferSize) {
+    if (!bufferDouble || !bufferFloat || !bufferInt || !bufferSize) {
         return {0,-1};
     }
     lastEntry_ = entryNumber_; 
@@ -109,10 +109,10 @@ std::pair<int,int> MilleReaderROOT::readToBuffer(  double *bufferDouble,
         std::memcpy(bufferDouble, doubles_->data(),recordLength*sizeof(doubles_->front())); 
     }
     else{
-        size_t iD = 0; 
+        std::memcpy(bufferFloat, floats_->data(),recordLength*sizeof(floats_->front())); 
         // convert and populate double array 
         for (size_t k = 0; k < floats_->size(); ++k){
-            bufferDouble[k] = (*floats_)[k]; 
+            bufferDouble[k] = bufferFloat[k]; 
         }
     }
     return {recordLength, floatingPointFormat_}; 

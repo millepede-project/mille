@@ -40,7 +40,7 @@ int decodeFile(IMilleReader & reader, MilleRecord & writer, const std::string & 
 int main(int argc, char** argv){
 
     if (argc < 3){
-        std::cerr << "Usage: convertMilleFormats [-r / -c / -z to force file format] <destination file name> <one or many files to convert> "<<std::endl;
+        std::cerr << "Usage: convertMilleFormats [-r / -c / -z / -t to force input file format to ROOT / C / zipped C / plain text] <destination file name> <one or many files to convert> "<<std::endl;
         return 1; 
     }
     int iarg = 1; 
@@ -56,6 +56,10 @@ int main(int argc, char** argv){
         }
         else if (argv[iarg] == "-c"){
             userOutputFormat = MilleFormat::C; 
+            ++iarg;
+        }
+        else if (argv[iarg] == "-t"){
+            userOutputFormat = MilleFormat::CSV; 
             ++iarg;
         }
     }

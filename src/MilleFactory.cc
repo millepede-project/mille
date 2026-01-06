@@ -23,6 +23,8 @@
 
 #include "MilleReaderC.h"
 #include "MilleRecordC.h"
+#include "MilleReaderCSV.h"
+#include "MilleRecordCSV.h"
 #ifdef SUPPORT_LZ
     #include "MilleReaderCcompressed.h"
 #endif
@@ -35,6 +37,7 @@ MilleFormat deduceMilleFormat(const std::filesystem::path & fname){
     if (fname.extension() == ".dat" || fname.extension() == ".bin") return MilleFormat::C;
     if (fname.extension() == ".gz") return MilleFormat::Ccompressed;
     if (fname.extension() == ".root") return MilleFormat::ROOT;
+    if (fname.extension() == ".txt" || fname.extension() == ".csv") return MilleFormat::CSV;
     std::cerr << "Could not deduce reader type for file "<<fname<<", extension "<<fname.extension()<<std::endl;
     return MilleFormat::Unknown; 
 }
@@ -44,6 +47,9 @@ std::unique_ptr<IMilleReader> spawnMilleReader(MilleFormat fmt, const std::strin
     switch (fmt){
         case MilleFormat::C:
             return std::make_unique<MilleReaderC>(fname);
+            break; 
+        case MilleFormat::CSV:
+            return std::make_unique<MilleReaderCSV>(fname);
             break; 
         case MilleFormat::Ccompressed:
 #ifdef SUPPORT_LZ
@@ -78,6 +84,9 @@ std::unique_ptr<MilleRecord> spawnMilleRecord(MilleFormat fmt, const std::string
     switch (fmt){
         case MilleFormat::C:
             return std::make_unique<MilleRecordC>(fname, doublePrecision, writeZero, recordLengthHint);
+            break; 
+        case MilleFormat::CSV:
+            return std::make_unique<MilleRecordCSV>(fname, doublePrecision, writeZero, recordLengthHint);
             break; 
         case MilleFormat::Ccompressed:
             std::cerr << "Sorry! gzip-compressed binary writing is not yet supported. Please write to C-binary and then manually compress using gzip."<<std::endl;
