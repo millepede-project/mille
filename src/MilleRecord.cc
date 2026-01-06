@@ -63,7 +63,7 @@ void MilleRecord::addSpecial(int nSpecial, const std::vector<double> & specialFl
         return;
     }
     hasSpecialInRecord_ = true; 
-    // A special record is indicted by:
+    // A special record is indicated by:
     buffer_.fill(0,0.); // a zero measurement, 
                     // followed by no local derivatives,
     buffer_.fill(0, -1. * nSpecial);  // and a negative uncertainty, with the magnitude nSpecial 
