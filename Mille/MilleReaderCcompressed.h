@@ -1,12 +1,12 @@
 /*
- * MilleReaderROOT.h
+ * MilleReaderCcompressed.h
  *
  *  Created on: Dec 18, 2025
  *      Author: goblirsc
  */
 
 /** \file
- *  MilleReaderROOT declaration. Reader for ROOT-binaries. 
+ *  MilleReaderCcompressed declaration. Reader for gzip-compressed C-binaries. 
  *
  *  \author Maximilian Goblirsch-Kolb, DESY, 2025 
  *
@@ -27,26 +27,23 @@
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
- #ifndef MILLE_READER_ROOT__H
- #define MILLE_READER_ROOT__H
+ #ifndef MILLE_READER_C__COMPRESSED_H
+ #define MILLE_READER_C__COMPRESSED_H
  
  #include "IMilleReader.h" 
- #include "TFile.h" 
- #include "TTree.h"
- #include <memory> 
- #include <vector> 
+ #include <zlib.h> 
 
 
-/// @brief Reader for ROOT binaries 
-class MilleReaderROOT : public IMilleReader{
+/// @brief Reader for zlib-compressed C-binaries
+class MilleReaderCcompressed : public IMilleReader{
     public: 
-        MilleReaderROOT()=default; 
-        MilleReaderROOT(const std::string fin){open(fin);} 
-        virtual ~MilleReaderROOT(){close();}
+        MilleReaderCcompressed()=default; 
+        MilleReaderCcompressed(const std::string & fin){fname_ = fin;} 
+        virtual ~MilleReaderCcompressed(){close();}
         /// @brief Open a file for reading
         /// @param fname path to the file 
         /// @return true on success, false on error. 
-        virtual bool open(const std::string & fname) override final;
+        virtual bool open(const std::string & fname="") override final;
         /// @brief  Close a file 
         virtual void close() override final;
         /// @brief reset a file to the first entry 
@@ -58,7 +55,8 @@ class MilleReaderROOT : public IMilleReader{
         /// @brief read the next record in the file to the provided buffers.
         ///        The labels are guaranteed to be stored in the int buffer,
         ///        and the derivatives in the *double* buffer.
-        ///        The float buffer will not be used when reading from ROOT. 
+        ///        Depending on the file format, the float buffer may or may not 
+        ///        be filled with the derivatives as well. 
         /// @param [out] bufferDouble: buffer to store the double array   
         /// @param [out] bufferFloat: buffer to store the float array   
         /// @param [out] bufferInt: buffer to store the integer array   
@@ -82,17 +80,13 @@ class MilleReaderROOT : public IMilleReader{
                             int *bufferInt,
                             int bufferSize) override final;
     private: 
+        gzFile infile_;
         std::string fname_; 
-        std::unique_ptr<TFile> file_ = nullptr; ///< TFile object to read input file 
-        TTree* tree_ = nullptr; ///< TTree object to interface to the stored information
-        Long64_t entryNumber_ = 0;  ///< Current entry number - this is the next one to be read
-        Long64_t nentries_ = 0; ///< Total number of entries in the tree
-        Long64_t lastEntry_ = 0; ///< The last entry we attempted to read
-        std::vector<double>* doubles_ = nullptr; ///< array to access double-precision reals in the tree
-        std::vector<float>* floats_ = nullptr; ///< array to access single-precision reals in the tree
-        std::vector<int>* ints_ = nullptr; ///< array to access parameter labels in the tree
-        int floatingPointFormat_ = 0; ///< accessor for the floating point format stored in the tree
+        off_t lastPos_ = 0; 
 };
+
+
  
  
- #endif // MILLE_READER_ROOT__H
+ 
+ #endif // MILLE_READER_C__COMPRESSED_H

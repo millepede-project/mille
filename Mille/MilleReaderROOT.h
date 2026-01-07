@@ -1,12 +1,12 @@
 /*
- * MilleReaderC.h
+ * MilleReaderROOT.h
  *
- *  Created on: Dec 17, 2025
+ *  Created on: Dec 18, 2025
  *      Author: goblirsc
  */
 
 /** \file
- *  MilleReaderC declaration. Reader for non-compressed C-binaries. 
+ *  MilleReaderROOT declaration. Reader for ROOT-binaries. 
  *
  *  \author Maximilian Goblirsch-Kolb, DESY, 2025 
  *
@@ -27,23 +27,26 @@
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
- #ifndef MILLE_READER_C__H
- #define MILLE_READER_C__H
+ #ifndef MILLE_READER_ROOT__H
+ #define MILLE_READER_ROOT__H
  
  #include "IMilleReader.h" 
- #include "fstream" 
+ #include "TFile.h" 
+ #include "TTree.h"
+ #include <memory> 
+ #include <vector> 
 
 
-/// @brief Reader for uncompressed C binaries. 
-class MilleReaderC : public IMilleReader{
+/// @brief Reader for ROOT binaries 
+class MilleReaderROOT : public IMilleReader{
     public: 
-        MilleReaderC()=default; 
-        MilleReaderC(const std::string fin){open(fin);} 
-        virtual ~MilleReaderC(){close();}
+        MilleReaderROOT()=default; 
+        MilleReaderROOT(const std::string & fin){fname_ = fin;} 
+        virtual ~MilleReaderROOT(){ file_.release(); /* no close() because ROOT is ROOT... */}
         /// @brief Open a file for reading
         /// @param fname path to the file 
         /// @return true on success, false on error. 
-        virtual bool open(const std::string & fname) override final;
+        virtual bool open(const std::string & fname="") override final;
         /// @brief  Close a file 
         virtual void close() override final;
         /// @brief reset a file to the first entry 
@@ -55,8 +58,7 @@ class MilleReaderC : public IMilleReader{
         /// @brief read the next record in the file to the provided buffers.
         ///        The labels are guaranteed to be stored in the int buffer,
         ///        and the derivatives in the *double* buffer.
-        ///        Depending on the file format, the float buffer may or may not 
-        ///        be filled with the derivatives as well. 
+        ///        The float buffer will not be used when reading from ROOT. 
         /// @param [out] bufferDouble: buffer to store the double array   
         /// @param [out] bufferFloat: buffer to store the float array   
         /// @param [out] bufferInt: buffer to store the integer array   
@@ -80,13 +82,17 @@ class MilleReaderC : public IMilleReader{
                             int *bufferInt,
                             int bufferSize) override final;
     private: 
-        std::ifstream infile_;
         std::string fname_; 
-        std::streampos lastPos_=0; 
+        std::unique_ptr<TFile> file_ = nullptr; ///< TFile object to read input file 
+        TTree* tree_ = nullptr; ///< TTree object to interface to the stored information
+        Long64_t entryNumber_ = 0;  ///< Current entry number - this is the next one to be read
+        Long64_t nentries_ = 0; ///< Total number of entries in the tree
+        Long64_t lastEntry_ = 0; ///< The last entry we attempted to read
+        std::vector<double>* doubles_ = nullptr; ///< array to access double-precision reals in the tree
+        std::vector<float>* floats_ = nullptr; ///< array to access single-precision reals in the tree
+        std::vector<int>* ints_ = nullptr; ///< array to access parameter labels in the tree
+        int floatingPointFormat_ = 0; ///< accessor for the floating point format stored in the tree
 };
-
-
  
  
- 
- #endif // MILLE_READER_C__H
+ #endif // MILLE_READER_ROOT__H

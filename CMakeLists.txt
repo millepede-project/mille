@@ -57,8 +57,8 @@ target_sources(Mille2
             PRIVATE src/MilleRecord.cc src/MilleRecordCSV.cc src/MilleRecordC.cc src/MilleReaderC.cc src/MilleReaderCSV.cc src/MilleDecoder.cc src/MilleFactory.cc
             PUBLIC 
                 FILE_SET HEADERS 
-                FILES Interface/MilleDataStructures.h Interface/MilleRecord.h Interface/MilleRecordC.h Interface/MilleRecordCSV.h Interface/MilleReaderC.h Interface/MilleReaderCSV.h Interface/IMilleReader.h Interface/MilleDecoder.h  Interface/MilleFactory.h 
-                BASE_DIRS Interface )
+                FILES Mille/MilleDataStructures.h Mille/MilleRecord.h Mille/MilleRecordC.h Mille/MilleRecordCSV.h Mille/MilleReaderC.h Mille/MilleReaderCSV.h Mille/IMilleReader.h Mille/MilleDecoder.h  Mille/MilleFactory.h 
+                BASE_DIRS Mille )
 
 
 add_executable(inspectMilleBinary)
@@ -74,8 +74,8 @@ if (SUPPORT_ZLIB)
     target_sources(Mille2 PRIVATE src/MilleReaderCcompressed.cc
             PUBLIC 
                 FILE_SET HEADERS 
-                FILES  Interface/MilleReaderCcompressed.h
-                BASE_DIRS Interface )
+                FILES  Mille/MilleReaderCcompressed.h
+                BASE_DIRS Mille )
 endif()
 
 
@@ -91,8 +91,8 @@ if (build_ROOT_comps)
     target_sources(Mille2 PRIVATE src/MilleRecordROOT.cc src/MilleReaderROOT.cc
             PUBLIC 
                 FILE_SET HEADERS 
-                FILES Interface/MilleRecordROOT.h Interface/MilleReaderROOT.h
-                BASE_DIRS Interface )
+                FILES Mille/MilleRecordROOT.h Mille/MilleReaderROOT.h
+                BASE_DIRS Mille )
 
     add_executable(convertMilleFormats)
     target_sources(convertMilleFormats PRIVATE utils/convertMilleFormats.cc)
@@ -130,6 +130,21 @@ install(FILES ${mille_BINARY_DIR}/cmake/milleConfig.cmake
         ${mille_BINARY_DIR}/cmake/milleConfig-version.cmake
         DESTINATION cmake/)
 
+# C-bindings
+add_library(MilleC SHARED)
+target_sources(MilleC PRIVATE Interfaces/MilleC.cc
+            PUBLIC 
+                FILE_SET HEADERS 
+                FILES Interfaces/MilleC.h 
+                BASE_DIRS Interfaces )
+target_link_libraries(MilleC PUBLIC Mille2 )
+install(
+  TARGETS MilleC
+  EXPORT mille-targets
+  LIBRARY DESTINATION lib
+  FILE_SET HEADERS 
+  DESTINATION include
+)
 
 # Unit tests 
 if (BUILD_TESTS)

@@ -22,14 +22,20 @@
 #include <iostream>
 
 bool MilleReaderCcompressed::open(const std::string & fname){
-    if (!fname_.empty()){
+    if (fname.empty() && fname_.empty()){
+        std::cerr << "Empty file name passed to MilleReaderC::open"<<std::endl;
+        return false; 
+    }
+    std::string fToOpen = fname; 
+    if (fToOpen.empty()) fToOpen = fname_; // allow using pre-configured file name (from c-tor call)
+    if (infile_ != nullptr){
         std::cerr << " Careful, calling open() on an already active file handler!"<<std::endl;
         close(); 
     }
-    fname_ = fname; 
-    infile_ = gzopen(fname_.c_str(),"rb"); 
+    fname_ = fToOpen; 
+    infile_ = gzopen(fToOpen.c_str(),"rb"); 
     if (!infile_){
-        std::cerr <<" Failed to open '"<<fname_<<"'"<<std::endl;
+        std::cerr <<" Failed to open '"<<fToOpen<<"'"<<std::endl;
         return false; 
     }
     return true; 

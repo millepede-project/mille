@@ -1,12 +1,12 @@
 /*
- * MilleReaderCcompressed.h
+ * MilleReaderC.h
  *
- *  Created on: Dec 18, 2025
+ *  Created on: Dec 17, 2025
  *      Author: goblirsc
  */
 
 /** \file
- *  MilleReaderCcompressed declaration. Reader for gzip-compressed C-binaries. 
+ *  MilleReaderC declaration. Reader for non-compressed C-binaries. 
  *
  *  \author Maximilian Goblirsch-Kolb, DESY, 2025 
  *
@@ -27,23 +27,23 @@
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
- #ifndef MILLE_READER_C__COMPRESSED_H
- #define MILLE_READER_C__COMPRESSED_H
+ #ifndef MILLE_READER_C__H
+ #define MILLE_READER_C__H
  
  #include "IMilleReader.h" 
- #include <zlib.h> 
+ #include "fstream" 
 
 
-/// @brief Reader for zlib-compressed C-binaries
-class MilleReaderCcompressed : public IMilleReader{
+/// @brief Reader for uncompressed C binaries. 
+class MilleReaderC : public IMilleReader{
     public: 
-        MilleReaderCcompressed()=default; 
-        MilleReaderCcompressed(const std::string fin){open(fin);} 
-        virtual ~MilleReaderCcompressed(){close();}
+        MilleReaderC()=default; 
+        MilleReaderC(const std::string & fin){fname_ = fin;} 
+        virtual ~MilleReaderC(){close();}
         /// @brief Open a file for reading
         /// @param fname path to the file 
         /// @return true on success, false on error. 
-        virtual bool open(const std::string & fname) override final;
+        virtual bool open(const std::string & fname="") override final;
         /// @brief  Close a file 
         virtual void close() override final;
         /// @brief reset a file to the first entry 
@@ -80,13 +80,13 @@ class MilleReaderCcompressed : public IMilleReader{
                             int *bufferInt,
                             int bufferSize) override final;
     private: 
-        gzFile infile_;
+        std::ifstream infile_;
         std::string fname_; 
-        off_t lastPos_ = 0; 
+        std::streampos lastPos_=0; 
 };
 
 
  
  
  
- #endif // MILLE_READER_C__COMPRESSED_H
+ #endif // MILLE_READER_C__H

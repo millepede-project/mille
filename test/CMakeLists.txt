@@ -85,3 +85,11 @@ if (SUPPORT_ZLIB)
     add_test(NAME TestMilleReaderCcompressed COMMAND testMilleReaderCcompressed)
 
 endif()
+
+add_executable(testMilleC testMilleC.cc)
+target_link_libraries(testMilleC PUBLIC MilleC)    
+install (
+        TARGETS testMilleC
+        DESTINATION bin
+    )
+add_test(NAME TestMilleC COMMAND testMilleC)

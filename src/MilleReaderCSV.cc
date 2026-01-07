@@ -38,12 +38,18 @@ std::string MilleReaderCSV::nextLine(std::ifstream & input){
 }
 
 bool MilleReaderCSV::open(const std::string & fname){
-    if (infile_.is_open() || !fname_.empty()){
+    if (fname.empty() && fname_.empty()){
+        std::cerr << "Empty file name passed to MilleReaderC::open"<<std::endl;
+        return false; 
+    }
+    std::string fToOpen = fname; 
+    if (fToOpen.empty()) fToOpen = fname_; // allow using pre-configured file name (from c-tor call)
+    if (infile_.is_open()){
         std::cerr << " Careful, calling open() on an already active file handler!"<<std::endl;
         close(); 
     }
-    fname_ = fname; 
-    infile_.open(fname, std::ios::in); 
+    fname_ = fToOpen; 
+    infile_.open(fToOpen, std::ios::in); 
     return infile_.is_open(); 
 }
 void MilleReaderCSV::close(){

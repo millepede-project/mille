@@ -21,22 +21,29 @@
 #include "MilleReaderROOT.h"
 #include <iostream>
 
+
 bool MilleReaderROOT::open(const std::string & fname){
-    if (file_ && file_->IsOpen() && !fname_.empty()){
+    if (fname.empty() && fname_.empty()){
+        std::cerr << "Empty file name passed to MilleReaderC::open"<<std::endl;
+        return false; 
+    }
+    std::string fToOpen = fname; 
+    if (fToOpen.empty()) fToOpen = fname_; // allow using pre-configured file name (from c-tor call)
+    if (file_ && file_->IsOpen()){
         std::cerr << " Careful, calling open() on an already active file handler!"<<std::endl;
         close(); 
     }
-    fname_ = fname; 
+    fname_ = fToOpen; 
     // Access the ROOT file. 
-    file_.reset(TFile::Open(fname.c_str(),"READ")); 
+    file_.reset(TFile::Open(fToOpen.c_str(),"READ")); 
     if (!file_ || !file_->IsOpen()){
-        std::cerr << "could not open file "<<fname<<std::endl;
+        std::cerr << "could not open file "<<fToOpen<<std::endl;
         return false; 
     }
     // Load the tree
     file_->GetObject<TTree>("MilleRecords",tree_);
     if (!tree_){
-        std::cerr << "could not read the tree 'MilleRecords' from file "<<fname<<std::endl;
+        std::cerr << "could not read the tree 'MilleRecords' from file "<<fToOpen<<std::endl;
         return false; 
     }
     // connect our branches 
@@ -58,9 +65,11 @@ bool MilleReaderROOT::open(const std::string & fname){
     return true; 
 }
 void MilleReaderROOT::close(){
-    // Release the unique_ptr to prevent a ROOT related double-delete 
-    if (file_ && file_->IsOpen()) file_->Close(); 
+    if (file_ && file_->IsOpen()){
+        file_->Close(); 
+    }
     file_.release(); 
+    fname_ = ""; 
     tree_ = nullptr;
     doubles_ = nullptr;
     ints_ = nullptr;

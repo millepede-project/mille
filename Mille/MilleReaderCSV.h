@@ -38,12 +38,12 @@
 class MilleReaderCSV : public IMilleReader{
     public: 
         MilleReaderCSV()=default; 
-        MilleReaderCSV(const std::string fin){open(fin);} 
+        MilleReaderCSV(const std::string & fin){fname_ = fin;} 
         virtual ~MilleReaderCSV(){close();}
         /// @brief Open a file for reading
         /// @param fname path to the file 
         /// @return true on success, false on error. 
-        virtual bool open(const std::string & fname) override final;
+        virtual bool open(const std::string & fname="") override final;
         /// @brief  Close a file 
         virtual void close() override final;
         /// @brief reset a file to the first entry 
