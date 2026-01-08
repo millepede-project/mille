@@ -86,10 +86,18 @@ if (SUPPORT_ZLIB)
 
 endif()
 
-add_executable(testMilleC testMilleC.cc)
-target_link_libraries(testMilleC PUBLIC MilleC)    
+add_executable(testReadMilleC testReadMilleC.cc)
+target_link_libraries(testReadMilleC PUBLIC MilleC)    
 install (
-        TARGETS testMilleC
+        TARGETS testReadMilleC
         DESTINATION bin
     )
-add_test(NAME TestMilleC COMMAND testMilleC)
+add_test(NAME TestReadMilleC COMMAND testReadMilleC)
+
+add_executable(testWriteMilleC testWriteMilleC.cc)
+target_link_libraries(testWriteMilleC PUBLIC MilleC)    
+install (
+        TARGETS testWriteMilleC
+        DESTINATION bin
+    )
+add_test(NAME TestWriteMilleC COMMAND testWriteMilleC)

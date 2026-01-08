@@ -21,27 +21,28 @@
 *  675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "MilleC.h"
+#include "readMilleC.h"
 #include "MilleFactory.h"
 #include <vector>
 #include <iostream>
+#include <atomic>
 /* ________ global variables used for file handling __________ */
 
-std::vector<std::unique_ptr<IMilleReader>> g_fileHandles;   ///< pointer to list of pointers to opened binary files
-int g_lastFileIndex = 0; 
+std::vector<std::unique_ptr<IMilleReader>> g_readFileHandles;   ///< pointer to list of pointers to opened binary files
+std::atomic<int> g_lastInFileIndex = 0; 
 /*______________________________________________________________*/
 /// Initialises the 'global' variables used for file handling.
 void initMille() {
-    g_fileHandles.reserve(100); 
+    g_readFileHandles.reserve(100); 
 }
 
 /*______________________________________________________________*/
 /// Open file.
-void openMille(const char *fileName, int lengthFileName, int nFileIn, int *errorFlag)
+void openMille(const char *fileName, int lengthFileName, int *errorFlag, int nFileIn)
 {
     if (!errorFlag)
         return; /* 'printout' error? */
-    if (nFileIn < 0) nFileIn = g_fileHandles.size()+1; 
+    if (nFileIn < 0) nFileIn = g_readFileHandles.size()+1; 
     int fileIndex = nFileIn - 1; /* index of specific file */
 
     // some sanitation of the input file name
@@ -50,13 +51,13 @@ void openMille(const char *fileName, int lengthFileName, int nFileIn, int *error
     fname[lengthFileName] = '\0';
 
     // now access the file 
-    if (fileIndex >= g_fileHandles.size()) g_fileHandles.resize(fileIndex+1); 
-    g_fileHandles.at(fileIndex) = std::move(spawnMilleReader(fname)); 
-    if (!g_fileHandles.at(fileIndex) || !g_fileHandles.at(fileIndex)->open(fname)){
+    if (fileIndex >= g_readFileHandles.size()) g_readFileHandles.resize(fileIndex+1); 
+    g_readFileHandles.at(fileIndex) = std::move(spawnMilleReader(fname)); 
+    if (!g_readFileHandles.at(fileIndex) || !g_readFileHandles.at(fileIndex)->open(fname)){
         *errorFlag = 2;     // failed to open file 
         return; 
     }
-    g_lastFileIndex = nFileIn;
+    g_lastInFileIndex = nFileIn;
     // all good!
     *errorFlag = 0; 
 }
@@ -65,34 +66,34 @@ void openMille(const char *fileName, int lengthFileName, int nFileIn, int *error
 /// Close file.
 void closeMille(int nFileIn) {
     int fileIndex = nFileIn - 1; /* index of current file */
-    if (fileIndex < 0 || fileIndex >= g_fileHandles.size())
+    if (fileIndex < 0 || fileIndex >= g_readFileHandles.size())
         return; /* no file opened at all... */
-    if (g_fileHandles.at(fileIndex)) g_fileHandles.at(fileIndex)->close();
+    if (g_readFileHandles.at(fileIndex)) g_readFileHandles.at(fileIndex)->close();
 }
 
 /*______________________________________________________________*/
 /// Rewind file.
 void resetMille(int nFileIn) {
     int fileIndex = nFileIn - 1; /* index of current file */
-    if (fileIndex < 0 || fileIndex >= g_fileHandles.size())
+    if (fileIndex < 0 || fileIndex >= g_readFileHandles.size())
         return; /* no file opened at all... */
-    if (g_fileHandles.at(fileIndex)) g_fileHandles.at(fileIndex)->reset();
+    if (g_readFileHandles.at(fileIndex)) g_readFileHandles.at(fileIndex)->reset();
 }
 
 /*______________________________________________________________*/
 /// Rewind file.
 void resetMilleEntry(int nFileIn) {
     int fileIndex = nFileIn - 1; /* index of current file */
-    if (fileIndex < 0 || fileIndex >= g_fileHandles.size())
+    if (fileIndex < 0 || fileIndex >= g_readFileHandles.size())
         return; /* no file opened at all... */
-    if (g_fileHandles.at(fileIndex)) g_fileHandles.at(fileIndex)->rewindEntry();
+    if (g_readFileHandles.at(fileIndex)) g_readFileHandles.at(fileIndex)->rewindEntry();
 }
 
 /**______________________________________________________________*/
 // Read record from file.
 
 void readMille(double *bufferDouble, float *bufferFloat, int *bufferInt,
-    int *lengthBuffers, int nFileIn, int *errorFlag) {
+    int *lengthBuffers, int *errorFlag, int nFileIn) {
         /* No return value since to be called as subroutine from fortran,
         negative *errorFlag are errors, otherwise fine.
         
@@ -107,19 +108,19 @@ void readMille(double *bufferDouble, float *bufferFloat, int *bufferInt,
 	if (fileIndex < 0)
 		return; /* no file opened at all... */
     // check for a valid file index
-    if (fileIndex >= g_fileHandles.size()){
-        std::cerr <<" Requested file " <<nFileIn<<" out of " <<g_fileHandles.size()<<std::endl;
+    if (fileIndex >= g_readFileHandles.size()){
+        std::cerr <<" Requested file " <<nFileIn<<" out of " <<g_readFileHandles.size()<<std::endl;
 		*errorFlag = -3; 
         return; 
     }
     /// check if the file handler is well-defined
-    if (!g_fileHandles.at(fileIndex)){
-        std::cerr <<" File " <<nFileIn<<" out of " <<g_fileHandles.size()<<" is in invalid state"<<std::endl;
+    if (!g_readFileHandles.at(fileIndex)){
+        std::cerr <<" File " <<nFileIn<<" out of " <<g_readFileHandles.size()<<" is in invalid state"<<std::endl;
 		*errorFlag = -3; 
         return; 
     }
     // access the requested handler 
-    IMilleReader* reader = g_fileHandles.at(fileIndex).get(); 
+    IMilleReader* reader = g_readFileHandles.at(fileIndex).get(); 
     // read the next record via ROOT's TTree I/O 
     bool foundDouble = false; 
     std::pair<int,int> readResult = reader->readToBuffer(bufferDouble, bufferFloat, bufferInt, *lengthBuffers); 
@@ -127,9 +128,9 @@ void readMille(double *bufferDouble, float *bufferFloat, int *bufferInt,
     *lengthBuffers = readResult.first; 
 }
 
-void lastMilleFileIndex(int* index){
+void lastMilleInFileIndex(int* index){
     if (!index) return; 
-    *index = g_lastFileIndex; 
+    *index = g_lastInFileIndex; 
 }
 
 

@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef MILLE_C_BINDINGS__H
-#define MILLE_C_BINDINGS__H
+#ifndef READ_MILLE_C_BINDINGS__H
+#define READ_MILLE_C_BINDINGS__H
  
 /*______________________________________________________________*/
 /// Initialises the 'global' variables used for file handling.
@@ -46,25 +46,25 @@ extern "C"
  *      * 2: if file could not be opened
  *      * 3: if file opened, but with error (can that happen?)
  */
- void openMille(const char *fileName, int lengthFileName, int nFileIn, int *errorFlag); 
+ void openMille(const char *fileName, int lengthFileName, int *errorFlag, int nFileIn=-1); 
 /*______________________________________________________________*/
 /// Close file.
 /**
  * \param[in]  nFileIn  File number (1 .. maxNumFiles)
  */
-void closeMille(int nFileIn);
+void closeMille(int nFileIn=-1);
 /*______________________________________________________________*/
 /// Rewind file to first entry.
 /**
  * \param[in]  nFileIn  File number (1 .. maxNumFiles)
  */
-void resetMille(int nFileIn);
+void resetMille(int nFileIn=-1);
 /*______________________________________________________________*/
 /// Rewind file to start of previous entry.
 /**
  * \param[in]  nFileIn  File number (1 .. maxNumFiles)
  */
-void resetMilleEntry(int nFileIn);
+void resetMilleEntry(int nFileIn=-1);
 /*______________________________________________________________*/
 /// Read record from file.
 /**
@@ -92,10 +92,10 @@ void resetMilleEntry(int nFileIn);
     starting from 1 (not 0)
     */
 void readMille(double *bufferDouble, float *bufferFloat, int *bufferInt,
-		int *lengthBuffers, int nFileIn, int *errorFlag);
+		int *lengthBuffers, int *errorFlag, int nFileIn=-1);
 
 // get the index of the last file added (useful if passing "-1")
-void lastMilleFileIndex(int* index); 
+void lastMilleInFileIndex(int* index); 
 
 
 #ifdef __cplusplus
@@ -103,4 +103,4 @@ void lastMilleFileIndex(int* index);
 #endif
 
 
-#endif // MILLE_C_BINDINGS__H
+#endif // READ_MILLE_C_BINDINGS__H

@@ -132,10 +132,10 @@ install(FILES ${mille_BINARY_DIR}/cmake/milleConfig.cmake
 
 # C-bindings
 add_library(MilleC SHARED)
-target_sources(MilleC PRIVATE Interfaces/MilleC.cc
+target_sources(MilleC PRIVATE Interfaces/readMilleC.cc Interfaces/writeMilleC.cc
             PUBLIC 
                 FILE_SET HEADERS 
-                FILES Interfaces/MilleC.h 
+                FILES Interfaces/readMilleC.h Interfaces/writeMilleC.h
                 BASE_DIRS Interfaces )
 target_link_libraries(MilleC PUBLIC Mille2 )
 install(
