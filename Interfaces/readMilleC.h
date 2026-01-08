@@ -23,17 +23,17 @@
 
 #ifndef READ_MILLE_C_BINDINGS__H
 #define READ_MILLE_C_BINDINGS__H
- 
-/*______________________________________________________________*/
-/// Initialises the 'global' variables used for file handling.
+
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-/**
- * \param[in]  nFiles  Maximal number of C binary files to use.
- */
- void initMille();
+
+
+/// Reserve space for output files - no longer strictly needed 
+void initMille();
+
 /*______________________________________________________________*/
 /// Open file.
 /**
@@ -94,7 +94,7 @@ void resetMilleEntry(int nFileIn=-1);
 void readMille(double *bufferDouble, float *bufferFloat, int *bufferInt,
 		int *lengthBuffers, int *errorFlag, int nFileIn=-1);
 
-// get the index of the last file added (useful if passing "-1")
+// get the index of the last file added (useful if passing "-1") to openMille
 void lastMilleInFileIndex(int* index); 
 
 
