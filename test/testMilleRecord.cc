@@ -55,9 +55,8 @@ int main(int, char**){
 
     // add an entry
     tester.addData(residual, deltaResidual, 
-                   localDeriv.size(), localLabels.data(),
-                   localDeriv.data(), globalLabels,
-                   globalDeriv); 
+                   localLabels, localDeriv, 
+                   globalLabels,globalDeriv); 
 
     // check for internal state after first data addition 
     TEST_CONDITION(
@@ -147,9 +146,8 @@ int main(int, char**){
 
     MilleRecordTester testerDouble("double.dat", true);
     testerDouble.addData(residual, deltaResidual, 
-                   localDeriv.size(), localLabels.data(),
-                   localDeriv.data(), globalLabels,
-                   globalDeriv); 
+                        localLabels, localDeriv, 
+                        globalLabels, globalDeriv); 
 
     // check for internal state after first data addition 
     TEST_CONDITION(

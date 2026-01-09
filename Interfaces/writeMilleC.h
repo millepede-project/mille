@@ -54,17 +54,17 @@ void writeMilleOut(int nFileOut=-1);
 /// @param derGlobal Global derivatives
 /// @param nFileOut Index of the file to apply the operation to  
 void addMilleData( double aMeas, double aErr, unsigned int numLocal,
-        unsigned int* indLocal, double* derLocal,
+        const unsigned int* indLocal, const double* derLocal,
         int nGlobal, 
-        int* labGlobal,
-        double* derGlobal, int nFileOut=-1);
+        const int* labGlobal,
+        const double* derGlobal, int nFileOut=-1);
 
 /// @brief Add a special data block to the current record. 
 /// @param nSpecial: Size of the special data block 
 /// @param specialFlot: Floating point entries of the block 
 /// @param specialInt: Integer entries of the block 
 /// @param nFileOut Index of the file to apply the operation to  
-void addMilleSpecial(int nSpecial, const double* specialFloat, int* specialInt, int nFileOut=-1);
+void addMilleSpecial(int nSpecial, const double* specialFloat, const int* specialInt, int nFileOut=-1);
 
 /// @brief Abort the current record, discarding measurements
 /// @param nFileOut Index of the file to apply the operation to  

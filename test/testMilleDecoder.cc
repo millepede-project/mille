@@ -72,20 +72,20 @@ int main(int, char**){
         // single floating point precision
         MilleRecordC mille("milleTest.dat");
         
-        mille.addData(inputs.residual, inputs.deltaResidual, inputs.localDeriv.size(), 
-        inputs.localLabels.data(), inputs.localDeriv.data(),
+        mille.addData(inputs.residual, inputs.deltaResidual,  
+        inputs.localLabels, inputs.localDeriv,
         inputs.globalLabels, inputs.globalDeriv);
 
-        mille.addData(inputs.residual, inputs.deltaResidual, inputs.localDeriv.size(), 
-        inputs.localLabels.data(), inputs.localDeriv.data(),
+        mille.addData(inputs.residual, inputs.deltaResidual,  
+        inputs.localLabels, inputs.localDeriv,
         inputs.globalLabels, inputs.globalDeriv);
 
         mille.addSpecial(specialInt.size(), specialDouble, specialInt); 
 
         mille.writeRecord();
 
-        mille.addData(inputs.residual, inputs.deltaResidual, inputs.localDeriv.size(), 
-        inputs.localLabels.data(), inputs.localDeriv.data(),
+        mille.addData(inputs.residual, inputs.deltaResidual,  
+        inputs.localLabels, inputs.localDeriv,
         inputs.globalLabels, inputs.globalDeriv);
 
         mille.writeRecord();

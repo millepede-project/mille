@@ -32,16 +32,16 @@ MilleRecord::~MilleRecord(){
 
 }
 
-void MilleRecord::addData(double aMeas, double aErr, unsigned int numLocal,
-			unsigned int* indLocal, double* derLocal,
-			const std::vector<int> &labGlobal,
-			const std::vector<double> &derGlobal){
+void MilleRecord::addData(double aMeas, double aErr, 
+			std::span<const unsigned int> indLocal, std::span<const double> derLocal,
+			std::span<const int> labGlobal,
+			std::span<const double> derGlobal){
     // ensure the header is in place 
     newSetIfNeeded(); 
     // add measurement
     buffer_.fill(0, aMeas);
     // add local derivative block
-    for (unsigned int i = 0; i < numLocal; ++i){
+    for (unsigned int i = 0; i < derLocal.size(); ++i){
         buffer_.fill(indLocal[i], derLocal[i]); 
     }
     // add uncertainty 
@@ -54,7 +54,7 @@ void MilleRecord::addData(double aMeas, double aErr, unsigned int numLocal,
     }
 }
 
-void MilleRecord::addSpecial(int nSpecial, const std::vector<double> & specialFloat, const std::vector<int> specialInt){
+void MilleRecord::addSpecial(int nSpecial, std::span<const double> specialFloat, std::span<const int> specialInt){
     if (!nSpecial) return;  // trivial empty special block 
     newSetIfNeeded(); // header 
     if (hasSpecialInRecord_){

@@ -40,8 +40,9 @@ struct MilleTestInputs{
     /// arbitraty type of Mille record. 
     void writeTo(MilleRecord & mille){
         mille.addData(residual, deltaResidual, 
-                    localDeriv.size(), localLabels.data(),
-                    localDeriv.data(), globalLabels,
+                    localLabels,
+                    localDeriv, 
+                    globalLabels,
                     globalDeriv); 
 
         mille.writeRecord();

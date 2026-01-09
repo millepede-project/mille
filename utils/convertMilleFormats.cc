@@ -20,6 +20,7 @@
 
 #include "MilleFactory.h"
 #include <iostream>
+#include <span>
 
 int decodeFile(IMilleReader & reader, MilleRecord & writer, const std::string & fname){
     int nentries = 0; 

@@ -44,9 +44,8 @@ int main(int, char**){
         MilleRecordCSV mille("milleTest.csv");
         // add an entry
         mille.addData(residual, deltaResidual, 
-                    localDeriv.size(), localLabels.data(),
-                    localDeriv.data(), globalLabels,
-                    globalDeriv); 
+                    localLabels, localDeriv, 
+                    globalLabels,globalDeriv); 
 
         mille.writeRecord();
         mille.flushOutputFile(); 

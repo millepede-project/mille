@@ -60,33 +60,34 @@ void writeMilleOut(int nFileOut){
     }
 }
 
-void addMilleData( double aMeas, double aErr, unsigned int numLocal,
-        unsigned int* indLocal, double* derLocal,
+void addMilleData( double aMeas, double aErr, 
+        unsigned int numLocal,
+        const unsigned int* indLocal, const double* derLocal,
         int nGlobal, 
-        int* labGlobal,
-        double* derGlobal, int nFileOut){
+        const int* labGlobal, const double* derGlobal, 
+        int nFileOut){
     if (nFileOut < 0) nFileOut = g_lastOutFileIndex; 
     int fileIndex = nFileOut - 1; 
     if (fileIndex < g_writeFileHandles.size() && g_writeFileHandles[fileIndex] != nullptr){
-        std::vector<int> vecLabGlobal(nGlobal,0);
-        std::vector<double> vecDerGlobal(nGlobal,0.);
-        std::memcpy(vecDerGlobal.data(), derGlobal,nGlobal*sizeof(double));
-        std::memcpy(vecLabGlobal.data(), labGlobal,nGlobal*sizeof(int));
-        g_writeFileHandles[fileIndex]->addData(aMeas, aErr, numLocal, indLocal, derLocal,
-            vecLabGlobal, vecDerGlobal);
+        g_writeFileHandles[fileIndex]->addData(aMeas, aErr, 
+            std::span<const unsigned int>(indLocal,numLocal), 
+            std::span<const double>(derLocal,numLocal),
+            std::span<const int>(labGlobal, nGlobal), 
+            std::span<const double>(derGlobal, nGlobal));
     }
 }
 
         
-void addMilleSpecial(int nSpecial, const double* specialFloat, int* specialInt, int nFileOut){
+void addMilleSpecial(int nSpecial, 
+                     const double* specialFloat, const int* specialInt, 
+                     int nFileOut){
     if (nFileOut < 0) nFileOut = g_lastOutFileIndex; 
     int fileIndex = nFileOut - 1; 
     if (fileIndex < g_writeFileHandles.size() && g_writeFileHandles[fileIndex] != nullptr){
-        std::vector<int> vecSpecialInt(nSpecial,0);
-        std::vector<double> vecSpecialFloat(nSpecial,0.);
-        std::memcpy(vecSpecialFloat.data(), specialFloat,nSpecial*sizeof(double));
-        std::memcpy(vecSpecialInt.data(), specialInt,nSpecial*sizeof(int));
-        g_writeFileHandles[fileIndex]->addSpecial(nSpecial, vecSpecialFloat, vecSpecialInt); 
+        g_writeFileHandles[fileIndex]->addSpecial(nSpecial, 
+            std::span<const double>(specialFloat, nSpecial),
+            std::span<const int>(specialInt, nSpecial)
+        ); 
     }
 }
 

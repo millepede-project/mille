@@ -30,7 +30,7 @@
 #ifndef MILLERECORD__H
 #define MILLERECORD__H
 
-#include <vector>
+#include <span>
 #include "MilleDataStructures.h"
 #include "IMilleReader.h"
 
@@ -58,16 +58,16 @@ class MilleRecord{
 	/// @param derLocal Local derivatives 
 	/// @param labGlobal Labels for global parameters
 	/// @param derGlobal  Global derivatives 
-	void addData(double aMeas, double aErr, unsigned int numLocal,
-			unsigned int* indLocal, double* derLocal,
-			const std::vector<int> &labGlobal,
-			const std::vector<double> &derGlobal);
+	void addData(double aMeas, double aErr,
+			std::span<const unsigned int> indLocal, std::span<const double> derLocal,
+			std::span<const int>    labGlobal,
+			std::span<const double> derGlobal);
     
-            /// @brief Add a special block to the current record. 
+    /// @brief Add a special block to the current record. 
     /// @param nSpecial: Length of the special block 
     /// @param specialFloat: Floating point entries 
     /// @param specialInt: Integer entries 
-    void addSpecial(int nSpecial, const std::vector<double> & specialFloat, const std::vector<int> specialInt);
+    void addSpecial(int nSpecial, std::span<const double> specialFloat, std::span<const int> specialInt);
 
     /// @brief Quickly copies encoded buffers for next record from a reader.
     ///        Used to quickly translate Mille formats. 
