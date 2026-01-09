@@ -76,6 +76,16 @@ void addMilleData( double aMeas, double aErr,
             std::span<const double>(derGlobal, nGlobal));
     }
 }
+void copyToMilleBuffer(unsigned int nEntries,
+        const int* indices, const double* derivatives,
+        int nFileOut){
+    if (nFileOut < 0) nFileOut = g_lastOutFileIndex; 
+    int fileIndex = nFileOut - 1; 
+    if (fileIndex < g_writeFileHandles.size() && g_writeFileHandles[fileIndex] != nullptr){
+        g_writeFileHandles[fileIndex]->copyToBuffer(std::span<const int>(indices, nEntries), 
+                                                    std::span<const double>(derivatives, nEntries)); 
+    }
+}
 
         
 void addMilleSpecial(int nSpecial, 

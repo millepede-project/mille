@@ -59,6 +59,15 @@ void addMilleData( double aMeas, double aErr, unsigned int numLocal,
         const int* labGlobal,
         const double* derGlobal, int nFileOut=-1);
 
+/// @brief Directly write to the Mille buffers 
+/// @param nEntries The number of entries to copy
+/// @param indices The integer elements to copy
+/// @param derivatives The derivatives to copy 
+/// @param nFileOut Index of the file to apply the operation to  
+void copyToMilleBuffer(unsigned int nEntries,
+        const int* indices, const double* derivatives,
+        int nFileOut=-1);
+
 /// @brief Add a special data block to the current record. 
 /// @param nSpecial: Size of the special data block 
 /// @param specialFlot: Floating point entries of the block 

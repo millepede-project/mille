@@ -94,6 +94,9 @@ void resetMilleEntry(int nFileIn=-1);
 void readMille(double *bufferDouble, float *bufferFloat, int *bufferInt,
 		int *lengthBuffers, int *errorFlag, int nFileIn=-1);
 
+/// skip the next record 
+void skipMille(int nFileIn = -1); 
+
 // get the index of the last file added (useful if passing "-1") to openMille
 void lastMilleInFileIndex(int* index); 
 

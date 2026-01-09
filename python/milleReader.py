@@ -101,6 +101,10 @@ class milleReader:
         return (stat, inp[:nRec],  dnp[:nRec] )
     
     # rewind the file to the first entry 
+    def skipRecord(self):
+        return milleC.skipMille(self.fileIndex)
+    
+    # rewind the file to the first entry 
     def rewindToStart(self):
         return milleC.resetMille(self.fileIndex)
     

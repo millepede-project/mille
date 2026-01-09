@@ -78,6 +78,13 @@ class milleWriter:
     def addSpecial(self,  specialFloat: np.array, specialInt: np.array):
         milleC.addMilleSpecial(len(specialInt), specialFloat, specialInt, self.fileIndex) 
 
+    # Directly copy (encoded) data into the Mille buffer
+    # @param ints: Content for the integer buffer (type: int32)
+    # @param floats: Content for the integer buffer  (type: float64)
+    # Both arrays are expected to be of the same size. 
+    def copyToBuffer(self,  ints: np.array, floats: np.array):
+        milleC.copyToMilleBuffer(len(ints), ints, floats, self.fileIndex) 
+
     # Finish the current record, write to storage, and prepare next record
     def write(self):
         milleC.writeMilleOut(self.fileIndex)

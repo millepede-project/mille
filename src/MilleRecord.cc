@@ -53,6 +53,15 @@ void MilleRecord::addData(double aMeas, double aErr,
         } 
     }
 }
+void MilleRecord::copyToBuffer(std::span<const int> integers, std::span<const double> floats){
+    if (integers.size() != floats.size()){
+        std::cerr << " MilleRecord::copyToBuffer expects both arrays to have same size, but received "<<integers.size()<<" int and "<<floats.size()<<" float. "<<std::endl; 
+        return ;   
+    }
+    for (size_t k = 0; k < integers.size(); ++k){
+        buffer_.fill(integers[k], floats[k]);
+    }
+}
 
 void MilleRecord::addSpecial(int nSpecial, std::span<const double> specialFloat, std::span<const int> specialInt){
     if (!nSpecial) return;  // trivial empty special block 

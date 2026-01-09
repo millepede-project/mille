@@ -62,6 +62,13 @@ class MilleRecord{
 			std::span<const unsigned int> indLocal, std::span<const double> derLocal,
 			std::span<const int>    labGlobal,
 			std::span<const double> derGlobal);
+
+    /// @brief Interface to directly set the buffer content,
+    ///        without relying on the internal data encoding.
+    ///        Used to copy already encoded data from other sources.
+	/// @param integers Integer entries 
+	/// @param floats Floating point entries 
+	void copyToBuffer(std::span<const int> integers, std::span<const double> floats);
     
     /// @brief Add a special block to the current record. 
     /// @param nSpecial: Length of the special block 

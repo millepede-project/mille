@@ -89,6 +89,13 @@ void resetMilleEntry(int nFileIn) {
     if (g_readFileHandles.at(fileIndex)) g_readFileHandles.at(fileIndex)->rewindEntry();
 }
 
+void skipMille(int nFileIn){
+    int fileIndex = nFileIn - 1; /* index of current file */
+    if (fileIndex < 0 || fileIndex >= g_readFileHandles.size())
+        return; /* no file opened at all... */
+    if (g_readFileHandles.at(fileIndex)) g_readFileHandles.at(fileIndex)->skipEntry();
+}
+
 /**______________________________________________________________*/
 // Read record from file.
 
