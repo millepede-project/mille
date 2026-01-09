@@ -20,14 +20,21 @@
 
 #include "MilleFactory.h"
 #include <iostream>
-#include <span>
 
-int decodeFile(IMilleReader & reader, MilleRecord & writer, const std::string & fname){
+int decodeFile(IMilleReader & reader, MilleRecord & writer, const std::string & fname, long long int & nRecords, long long int & nSkip){
     int nentries = 0; 
     if(!reader.open(fname)){
         std::cerr <<" Failed to import "<<fname<<" due to open errors"<<std::endl;    
     } 
     do{
+        if (nSkip > 0 && nSkip-- > 0){
+            reader.skipEntry();
+            continue; 
+        }
+        if (nRecords >= 0 && nentries+1 > nRecords){
+            nRecords = 0; 
+            break; 
+        }
         if (!writer.copyRecord(reader)) break; 
         writer.writeRecord(); 
         ++nentries;
@@ -41,28 +48,51 @@ int decodeFile(IMilleReader & reader, MilleRecord & writer, const std::string & 
 int main(int argc, char** argv){
 
     if (argc < 3){
-        std::cerr << "Usage: convertMilleFormats [-r / -c / -z / -t to force input file format to ROOT / C / zipped C / plain text] <destination file name> <one or many files to convert> "<<std::endl;
+        std::cerr << "Usage: convertMilleFormats [-r / -c / -z / -t to force input file format to ROOT / C / zipped C / plain text]"
+                  << " [-s <Nskip> to skip first Nskip records]"
+                  << " [-n <nRec> to only write nRec records] "
+                  << " <destination file name> <one or many files to convert> "<<std::endl;
         return 1; 
     }
     int iarg = 1; 
+    long long int nRecords = -1; 
+    long long int nSkip = -1; 
     MilleFormat userOutputFormat = MilleFormat::Unknown; 
-    if (std::string(argv[iarg]).find("-") == 0){
-        if (argv[iarg] == "-z"){
+    while (std::string(argv[iarg]).find("-") == 0){
+        std::string arg = argv[iarg]; 
+        if (arg == "-z"){
             userOutputFormat = MilleFormat::Ccompressed; 
             ++iarg;
         }
-        else if (argv[iarg] == "-r"){
+        else if (arg == "-r"){
             userOutputFormat = MilleFormat::ROOT; 
             ++iarg;
         }
-        else if (argv[iarg] == "-c"){
+        else if (arg == "-c"){
             userOutputFormat = MilleFormat::C; 
             ++iarg;
         }
-        else if (argv[iarg] == "-t"){
+        else if (arg == "-t"){
             userOutputFormat = MilleFormat::CSV; 
             ++iarg;
         }
+        else if (arg == "-s"){
+            ++iarg; 
+            nSkip = std::atoll(argv[iarg++]); 
+        }
+        else if (arg == "-n"){
+            ++iarg; 
+            nRecords = std::atoll(argv[iarg++]); 
+        }
+        else{
+            ++iarg; 
+        }
+    }
+    if (nSkip > 0 ){
+        std::cout <<" Will skip the first "<<nSkip<<" Records"<<std::endl;
+    }
+    if (nRecords > 0 ){
+        std::cout <<" Will copy at most "<<nRecords<<" Records"<<std::endl;
     }
     const std::string outFile = argv[iarg++]; 
 
@@ -83,7 +113,7 @@ int main(int argc, char** argv){
             std::cout <<" Unable to deduce file type for " <<argv[i]<<std::endl; 
             continue; 
         }
-        int nentries = decodeFile(*reader, *out, argv[i]);
+        int nentries = decodeFile(*reader, *out, argv[i],nRecords, nSkip);
         std::cout << " Imported "<<nentries<<" entries from file "<<argv[i]<<std::endl; 
     }
     return 0;

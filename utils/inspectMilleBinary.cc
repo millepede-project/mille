@@ -32,19 +32,20 @@ int main(int argc, char** argv){
     int iarg = 1; 
     MilleFormat userFormat = MilleFormat::Unknown; 
     if (std::string(argv[iarg]).find("-") == 0){
-        if (argv[iarg] == "-z"){
+        std::string arg = argv[iarg]; 
+        if (arg == "-z"){
             userFormat = MilleFormat::Ccompressed; 
             ++iarg;
         }
-        else if (argv[iarg] == "-r"){
+        else if (arg == "-r"){
             userFormat = MilleFormat::ROOT; 
             ++iarg;
         }
-        else if (argv[iarg] == "-c"){
+        else if (arg == "-c"){
             userFormat = MilleFormat::C; 
             ++iarg;
         }
-        else if (argv[iarg] == "-t"){
+        else if (arg == "-t"){
             userFormat = MilleFormat::CSV; 
             ++iarg;
         }
