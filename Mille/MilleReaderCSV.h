@@ -89,7 +89,7 @@ class MilleReaderCSV : public IMilleReader{
         static std::string nextLine(std::ifstream & str);
     private: 
         std::ifstream infile_;
-        std::string fname_; 
+        std::string fname_=""; 
         std::streampos lastPos_=0; 
 };
 

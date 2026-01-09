@@ -81,7 +81,7 @@ class MilleReaderC : public IMilleReader{
                             int bufferSize) override final;
     private: 
         std::ifstream infile_;
-        std::string fname_; 
+        std::string fname_=""; 
         std::streampos lastPos_=0; 
 };
 

@@ -82,7 +82,7 @@ class MilleReaderROOT : public IMilleReader{
                             int *bufferInt,
                             int bufferSize) override final;
     private: 
-        std::string fname_; 
+        std::string fname_=""; 
         std::unique_ptr<TFile> file_ = nullptr; ///< TFile object to read input file 
         TTree* tree_ = nullptr; ///< TTree object to interface to the stored information
         Long64_t entryNumber_ = 0;  ///< Current entry number - this is the next one to be read
