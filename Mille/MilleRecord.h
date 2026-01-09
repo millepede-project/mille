@@ -30,7 +30,42 @@
 #ifndef MILLERECORD__H
 #define MILLERECORD__H
 
-#include <span>
+/// Data can be passed to the MilleRecord as a combination of 
+/// std::vector, std::array or C-arrays with additional size information. 
+/// This is abstracted away using std::span in C++20. 
+/// In older version, a minimal placeholder is used. 
+/// When passing C-arrays, you can invoke 
+/// MilleArrayView(c_array, array_size);  
+
+#if __cplusplus >= 202002L
+    #include <span>
+    template<class T> using MilleArrayView = std::span<const T>; 
+#else 
+    #include <vector>
+    #include <array>
+    /// @brief Helper class to emulate a needed subset of std::span featurs
+    ///        in older C++ releases.
+    ///        Wraps a C-array, std::array or std::vector into a read-only view 
+    ///        without copy overhead. 
+    ///        Unlike the real span, no iterators - we only want size and element access. 
+    /// @tparam T Type of the array we are viewing into 
+    template<class T> class MilleArrayView{
+        public:
+        MilleArrayView(const std::vector<T> & s): arr_(s.data()),n_(s.size()){}
+        MilleArrayView(const T* arr, size_t size):arr_(arr),n_(size){}
+        template <size_t N> MilleArrayView(const std::array<T,N> & arr): arr_(arr.data()),n_(N){}
+
+        const T & operator[](size_t n) const {return arr_[n];}
+        size_t size() const {return n_;}
+
+        private: 
+        const T* arr_;
+        size_t n_; 
+
+    };
+#endif
+
+
 #include "MilleDataStructures.h"
 #include "IMilleReader.h"
 
@@ -59,22 +94,22 @@ class MilleRecord{
 	/// @param labGlobal Labels for global parameters
 	/// @param derGlobal  Global derivatives 
 	void addData(double aMeas, double aErr,
-			std::span<const unsigned int> indLocal, std::span<const double> derLocal,
-			std::span<const int>    labGlobal,
-			std::span<const double> derGlobal);
+			MilleArrayView<unsigned int> indLocal, MilleArrayView<double> derLocal,
+			MilleArrayView<int>    labGlobal,
+			MilleArrayView<double> derGlobal);
 
     /// @brief Interface to directly set the buffer content,
     ///        without relying on the internal data encoding.
     ///        Used to copy already encoded data from other sources.
 	/// @param integers Integer entries 
 	/// @param floats Floating point entries 
-	void copyToBuffer(std::span<const int> integers, std::span<const double> floats);
+	void copyToBuffer(MilleArrayView<int> integers, MilleArrayView<double> floats);
     
     /// @brief Add a special block to the current record. 
     /// @param nSpecial: Length of the special block 
     /// @param specialFloat: Floating point entries 
     /// @param specialInt: Integer entries 
-    void addSpecial(int nSpecial, std::span<const double> specialFloat, std::span<const int> specialInt);
+    void addSpecial(int nSpecial, MilleArrayView<double> specialFloat, MilleArrayView<int> specialInt);
 
     /// @brief Quickly copies encoded buffers for next record from a reader.
     ///        Used to quickly translate Mille formats. 

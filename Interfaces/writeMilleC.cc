@@ -70,10 +70,10 @@ void addMilleData( double aMeas, double aErr,
     int fileIndex = nFileOut - 1; 
     if (fileIndex < g_writeFileHandles.size() && g_writeFileHandles[fileIndex] != nullptr){
         g_writeFileHandles[fileIndex]->addData(aMeas, aErr, 
-            std::span<const unsigned int>(indLocal,numLocal), 
-            std::span<const double>(derLocal,numLocal),
-            std::span<const int>(labGlobal, nGlobal), 
-            std::span<const double>(derGlobal, nGlobal));
+            MilleArrayView<unsigned int>(indLocal,numLocal), 
+            MilleArrayView<double>(derLocal,numLocal),
+            MilleArrayView<int>(labGlobal, nGlobal), 
+            MilleArrayView<double>(derGlobal, nGlobal));
     }
 }
 void copyToMilleBuffer(unsigned int nEntries,
@@ -82,8 +82,8 @@ void copyToMilleBuffer(unsigned int nEntries,
     if (nFileOut < 0) nFileOut = g_lastOutFileIndex; 
     int fileIndex = nFileOut - 1; 
     if (fileIndex < g_writeFileHandles.size() && g_writeFileHandles[fileIndex] != nullptr){
-        g_writeFileHandles[fileIndex]->copyToBuffer(std::span<const int>(indices, nEntries), 
-                                                    std::span<const double>(derivatives, nEntries)); 
+        g_writeFileHandles[fileIndex]->copyToBuffer(MilleArrayView<int>(indices, nEntries), 
+                                                    MilleArrayView<double>(derivatives, nEntries)); 
     }
 }
 
@@ -95,8 +95,8 @@ void addMilleSpecial(int nSpecial,
     int fileIndex = nFileOut - 1; 
     if (fileIndex < g_writeFileHandles.size() && g_writeFileHandles[fileIndex] != nullptr){
         g_writeFileHandles[fileIndex]->addSpecial(nSpecial, 
-            std::span<const double>(specialFloat, nSpecial),
-            std::span<const int>(specialInt, nSpecial)
+            MilleArrayView<double>(specialFloat, nSpecial),
+            MilleArrayView<int>(specialInt, nSpecial)
         ); 
     }
 }

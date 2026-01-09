@@ -33,9 +33,9 @@ MilleRecord::~MilleRecord(){
 }
 
 void MilleRecord::addData(double aMeas, double aErr, 
-			std::span<const unsigned int> indLocal, std::span<const double> derLocal,
-			std::span<const int> labGlobal,
-			std::span<const double> derGlobal){
+			MilleArrayView<unsigned int> indLocal, MilleArrayView<double> derLocal,
+			MilleArrayView<int> labGlobal,
+			MilleArrayView<double> derGlobal){
     // ensure the header is in place 
     newSetIfNeeded(); 
     // add measurement
@@ -53,7 +53,7 @@ void MilleRecord::addData(double aMeas, double aErr,
         } 
     }
 }
-void MilleRecord::copyToBuffer(std::span<const int> integers, std::span<const double> floats){
+void MilleRecord::copyToBuffer(MilleArrayView<int> integers, MilleArrayView<double> floats){
     if (integers.size() != floats.size()){
         std::cerr << " MilleRecord::copyToBuffer expects both arrays to have same size, but received "<<integers.size()<<" int and "<<floats.size()<<" float. "<<std::endl; 
         return ;   
@@ -63,7 +63,7 @@ void MilleRecord::copyToBuffer(std::span<const int> integers, std::span<const do
     }
 }
 
-void MilleRecord::addSpecial(int nSpecial, std::span<const double> specialFloat, std::span<const int> specialInt){
+void MilleRecord::addSpecial(int nSpecial, MilleArrayView<double> specialFloat, MilleArrayView<int> specialInt){
     if (!nSpecial) return;  // trivial empty special block 
     newSetIfNeeded(); // header 
     if (hasSpecialInRecord_){
