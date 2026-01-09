@@ -80,8 +80,8 @@ class MilleReaderCcompressed : public IMilleReader{
                             int *bufferInt,
                             int bufferSize) override final;
     private: 
-        gzFile infile_;
-        std::string fname_; 
+        gzFile infile_ = nullptr;
+        std::string fname_ = ""; 
         off_t lastPos_ = 0; 
 };
 
