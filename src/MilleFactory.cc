@@ -18,19 +18,19 @@
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include "MilleFactory.h"
+#include "Mille/MilleFactory.h"
 #include <iostream>
 
-#include "MilleReaderC.h"
-#include "MilleRecordC.h"
-#include "MilleReaderCSV.h"
-#include "MilleRecordCSV.h"
+#include "Mille/MilleReaderC.h"
+#include "Mille/MilleRecordC.h"
+#include "Mille/MilleReaderCSV.h"
+#include "Mille/MilleRecordCSV.h"
 #ifdef SUPPORT_LZ
-    #include "MilleReaderCcompressed.h"
+    #include "Mille/MilleReaderCcompressed.h"
 #endif
 #ifdef SUPPORT_ROOTIO
-    #include "MilleReaderROOT.h"
-    #include "MilleRecordROOT.h"
+    #include "Mille/MilleReaderROOT.h"
+    #include "Mille/MilleRecordROOT.h"
 #endif 
 
 MilleFormat deduceMilleFormat(const std::filesystem::path & fname){

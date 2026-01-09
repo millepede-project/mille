@@ -20,7 +20,7 @@
 */ 
 
 #include "testUtils.h"
-#include "MilleRecord.h"
+#include "Mille/MilleRecord.h"
 /// @brief Test class - expose internal storage for testing. 
 class MilleRecordTester: public MilleRecord{
     public: 

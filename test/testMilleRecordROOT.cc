@@ -22,7 +22,7 @@
 
 
 #include "testUtils.h"
-#include "MilleRecordROOT.h"
+#include "Mille/MilleRecordROOT.h"
 #include <vector>
 #include <iostream>
 #include <limits>

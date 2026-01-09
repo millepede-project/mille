@@ -19,18 +19,18 @@
  * 
 */ 
 
-#include "MilleFactory.h"
-#include "MilleReaderC.h"
-#include "MilleRecordC.h"
-#include "MilleReaderCSV.h"
-#include "MilleRecordCSV.h"
-#include "MilleReaderCcompressed.h"
+#include "Mille/MilleFactory.h"
+#include "Mille/MilleReaderC.h"
+#include "Mille/MilleRecordC.h"
+#include "Mille/MilleReaderCSV.h"
+#include "Mille/MilleRecordCSV.h"
+#include "Mille/MilleReaderCcompressed.h"
 #ifdef SUPPORT_ROOTIO
-    #include "MilleReaderROOT.h"
-    #include "MilleRecordROOT.h"
+    #include "Mille/MilleReaderROOT.h"
+    #include "Mille/MilleRecordROOT.h"
 #endif
 #ifdef SUPPORT_LZ
-    #include "MilleReaderROOT.h"
+    #include "Mille/MilleReaderROOT.h"
 #endif
 #include <iostream>
 #include <memory>

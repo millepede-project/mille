@@ -24,7 +24,7 @@
 #ifndef MILLERECORD__C__H
 #define MILLERECORD__C__H
 
- #include "MilleRecord.h"
+ #include "Mille/MilleRecord.h"
  #include <string> 
  #include <fstream> 
 

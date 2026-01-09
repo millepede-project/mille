@@ -18,7 +18,7 @@
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include "MilleRecordC.h"
+#include "Mille/MilleRecordC.h"
 #include <iostream> 
 
 MilleRecordC::MilleRecordC( const std::string & fname, 

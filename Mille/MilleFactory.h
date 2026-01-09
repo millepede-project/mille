@@ -30,8 +30,8 @@
 #ifndef MILLE_MILLEREADERFACTORY__H
 #define MILLE_MILLEREADERFACTORY__H
 
-#include "IMilleReader.h" 
-#include "MilleRecord.h" 
+#include "Mille/IMilleReader.h" 
+#include "Mille/MilleRecord.h" 
 #include <memory> 
 #include <filesystem>
 

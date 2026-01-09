@@ -30,7 +30,7 @@
  #ifndef MILLE_READER_C__COMPRESSED_H
  #define MILLE_READER_C__COMPRESSED_H
  
- #include "IMilleReader.h" 
+ #include "Mille/IMilleReader.h" 
  #include <zlib.h> 
 
 

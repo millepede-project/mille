@@ -20,8 +20,8 @@
 */ 
 
 #include "testUtils.h"
-#include "MilleReaderCSV.h"
-#include "MilleRecordCSV.h"
+#include "Mille/MilleReaderCSV.h"
+#include "Mille/MilleRecordCSV.h"
 #include "milleReaderTests.h"
 #include <vector>
 #include <iostream>

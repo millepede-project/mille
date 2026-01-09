@@ -20,9 +20,9 @@
 */ 
 
 #include "testUtils.h"
-#include "MilleReaderC.h"
-#include "MilleRecordC.h"
-#include "MilleDecoder.h"
+#include "Mille/MilleReaderC.h"
+#include "Mille/MilleRecordC.h"
+#include "Mille/MilleDecoder.h"
 #include "milleReaderTests.h"
 #include <vector>
 #include <iostream>

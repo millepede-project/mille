@@ -18,7 +18,7 @@
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include "MilleReaderROOT.h"
+#include "Mille/MilleReaderROOT.h"
 #include <iostream>
 
 

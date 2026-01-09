@@ -20,7 +20,7 @@
 */ 
 
 #include "testUtils.h"
-#include "MilleRecordC.h"
+#include "Mille/MilleRecordC.h"
 #include <vector>
 #include <iostream>
 #include <limits>

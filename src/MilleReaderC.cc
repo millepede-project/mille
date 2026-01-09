@@ -18,7 +18,7 @@
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include "MilleReaderC.h"
+#include "Mille/MilleReaderC.h"
 #include <iostream>
 
 bool MilleReaderC::open(const std::string & fname){

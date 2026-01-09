@@ -17,8 +17,8 @@
  *  details); if not, write to the Free Software Foundation, Inc.,
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  */
-#include "MilleDecoder.h"
-#include "MilleFactory.h"
+#include "Mille/MilleDecoder.h"
+#include "Mille/MilleFactory.h"
 #include <iostream>
 #include <filesystem>
 

@@ -30,7 +30,7 @@
  #ifndef MILLE_READER_ROOT__H
  #define MILLE_READER_ROOT__H
  
- #include "IMilleReader.h" 
+ #include "Mille/IMilleReader.h" 
  #include "TFile.h" 
  #include "TTree.h"
  #include <memory> 

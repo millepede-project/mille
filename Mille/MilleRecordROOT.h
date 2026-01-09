@@ -24,7 +24,7 @@
 #ifndef MILLERECORD__ROOT__H
 #define MILLERECORD__ROOT__H
 
- #include "MilleRecord.h"
+ #include "Mille/MilleRecord.h"
  #include <string> 
 #include <memory>
  #include "TTree.h" 

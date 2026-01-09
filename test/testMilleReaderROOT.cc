@@ -20,8 +20,8 @@
 */ 
 
 #include "testUtils.h"
-#include "MilleRecordROOT.h"
-#include "MilleReaderROOT.h"
+#include "Mille/MilleRecordROOT.h"
+#include "Mille/MilleReaderROOT.h"
 #include "milleReaderTests.h"
 #include <vector>
 #include <iostream>

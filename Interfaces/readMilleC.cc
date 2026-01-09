@@ -21,15 +21,15 @@
 *  675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "readMilleC.h"
-#include "MilleFactory.h"
+#include "Mille/readMilleC.h"
+#include "Mille/MilleFactory.h"
 #include <vector>
 #include <iostream>
 #include <atomic>
 /* ________ global variables used for file handling __________ */
 
 std::vector<std::unique_ptr<IMilleReader>> g_readFileHandles;   ///< pointer to list of pointers to opened binary files
-std::atomic<int> g_lastInFileIndex = 0; 
+std::atomic<int> g_lastInFileIndex = 0;                         ///< index of the last opened file handle
 /*______________________________________________________________*/
 /// Initialises the 'global' variables used for file handling.
 void initMille() {

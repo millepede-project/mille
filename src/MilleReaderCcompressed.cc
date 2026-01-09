@@ -18,7 +18,7 @@
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include "MilleReaderCcompressed.h"
+#include "Mille/MilleReaderCcompressed.h"
 #include <iostream>
 
 bool MilleReaderCcompressed::open(const std::string & fname){

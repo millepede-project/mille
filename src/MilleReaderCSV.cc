@@ -18,7 +18,7 @@
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include "MilleReaderCSV.h"
+#include "Mille/MilleReaderCSV.h"
 #include <iostream>
 #include <sstream>
 

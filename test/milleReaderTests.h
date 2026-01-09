@@ -22,8 +22,8 @@
 #ifndef MILLE__READER__TESTS__H
 #define MILLE__READER__TESTS__H
 
-#include "IMilleReader.h"
-#include "MilleRecord.h"
+#include "Mille/IMilleReader.h"
+#include "Mille/MilleRecord.h"
 #include "testUtils.h"
 
 // standardised test inputs

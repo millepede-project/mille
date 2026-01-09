@@ -66,8 +66,8 @@
 #endif
 
 
-#include "MilleDataStructures.h"
-#include "IMilleReader.h"
+#include "Mille/MilleDataStructures.h"
+#include "Mille/IMilleReader.h"
 
 
 /// @brief  Base class for a writeable Mille record. 

@@ -30,7 +30,7 @@
  #ifndef MILLE_READER_C__H
  #define MILLE_READER_C__H
  
- #include "IMilleReader.h" 
+ #include "Mille/IMilleReader.h" 
  #include "fstream" 
 
 

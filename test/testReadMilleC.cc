@@ -19,10 +19,10 @@
  * 
 */ 
 
-#include "readMilleC.h"
+#include "Mille/readMilleC.h"
 #include "testUtils.h"
 #include "milleReaderTests.h"
-#include "MilleFactory.h"
+#include "Mille/MilleFactory.h"
 
 int main(int, char**){
     /// dummy data for testing 

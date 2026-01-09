@@ -18,7 +18,7 @@
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include "MilleRecord.h"
+#include "Mille/MilleRecord.h"
 #include <iostream> 
 
 MilleRecord::MilleRecord(bool doublePrecision, bool writeZero, std::size_t recordLengthHint):

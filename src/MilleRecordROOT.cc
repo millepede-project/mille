@@ -19,7 +19,7 @@
  */
 
 
-#include "MilleRecordROOT.h"
+#include "Mille/MilleRecordROOT.h"
 #include <iostream>
 
 MilleRecordROOT::MilleRecordROOT( const std::string & fname, 

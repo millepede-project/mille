@@ -31,7 +31,7 @@
 #define IMILLEREADER__H
 
 #include <string> 
-#include "MilleDataStructures.h"
+#include "Mille/MilleDataStructures.h"
 
 /// @brief Abstract base class for readers for Mille binaries. 
 class IMilleReader{

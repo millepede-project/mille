@@ -8,7 +8,7 @@ set(CMAKE_C_COMPILER ${gcc_loc})
 set(CMAKE_CXX_COMPILER ${gpp_loc})
 
 PROJECT(mille LANGUAGES CXX)
-set(mille_VERSION 01.00.00)
+set(mille_VERSION 00.01.00)
 include(CTest)
 
 # Arguments for CMake
@@ -58,13 +58,20 @@ target_sources(Mille2
             PUBLIC 
                 FILE_SET HEADERS 
                 FILES Mille/MilleDataStructures.h Mille/MilleRecord.h Mille/MilleRecordC.h Mille/MilleRecordCSV.h Mille/MilleReaderC.h Mille/MilleReaderCSV.h Mille/IMilleReader.h Mille/MilleDecoder.h  Mille/MilleFactory.h 
-                BASE_DIRS Mille )
+                 )
 
 
 add_executable(inspectMilleBinary)
 target_sources(inspectMilleBinary PRIVATE utils/inspectMilleBinary.cc)
 target_link_libraries(inspectMilleBinary PUBLIC Mille2)
 install(TARGETS inspectMilleBinary 
+        DESTINATION bin )
+
+
+add_executable(convertMilleFormats)
+target_sources(convertMilleFormats PRIVATE utils/convertMilleFormats.cc)
+target_link_libraries(convertMilleFormats PUBLIC Mille2)
+install(TARGETS convertMilleFormats 
         DESTINATION bin )
 
 # ===== LibZ for file compression ===== 
@@ -75,7 +82,7 @@ if (SUPPORT_ZLIB)
             PUBLIC 
                 FILE_SET HEADERS 
                 FILES  Mille/MilleReaderCcompressed.h
-                BASE_DIRS Mille )
+                 )
 endif()
 
 
@@ -92,18 +99,35 @@ if (build_ROOT_comps)
             PUBLIC 
                 FILE_SET HEADERS 
                 FILES Mille/MilleRecordROOT.h Mille/MilleReaderROOT.h
-                BASE_DIRS Mille )
-
-    add_executable(convertMilleFormats)
-    target_sources(convertMilleFormats PRIVATE utils/convertMilleFormats.cc)
-    target_link_libraries(convertMilleFormats PUBLIC Mille2)
-    install(TARGETS convertMilleFormats 
-            DESTINATION bin )
+                 )
 
 endif()
 
+# C-bindings
+add_library(MilleC SHARED)
+target_sources(MilleC PRIVATE Interfaces/readMilleC.cc Interfaces/writeMilleC.cc
+            PUBLIC 
+                FILE_SET HEADERS 
+                FILES Mille/readMilleC.h Mille/writeMilleC.h
+                )
+target_link_libraries(MilleC PUBLIC Mille2 )
 
-# install headers for Mille2 
+# install C-bindings
+install(
+  TARGETS MilleC
+  EXPORT mille-targets
+  LIBRARY DESTINATION lib
+  FILE_SET HEADERS 
+  DESTINATION include
+)
+
+# Unit tests 
+if (BUILD_TESTS)
+    subdirs(test)
+endif()
+
+
+# install components for Mille
 install(
   TARGETS Mille2
   EXPORT mille-targets
@@ -112,6 +136,10 @@ install(
   DESTINATION include
 )
 
+# install python modules 
+install (FILES python/milleLibBindings.py python/milleReader.py python/milleWriter.py python/__init__.py 
+        DESTINATION python/Mille)
+        
 
 install (EXPORT mille-targets
         DESTINATION cmake 
@@ -129,24 +157,3 @@ ${mille_BINARY_DIR}/cmake/milleConfig-version.cmake @ONLY)
 install(FILES ${mille_BINARY_DIR}/cmake/milleConfig.cmake
         ${mille_BINARY_DIR}/cmake/milleConfig-version.cmake
         DESTINATION cmake/)
-
-# C-bindings
-add_library(MilleC SHARED)
-target_sources(MilleC PRIVATE Interfaces/readMilleC.cc Interfaces/writeMilleC.cc
-            PUBLIC 
-                FILE_SET HEADERS 
-                FILES Interfaces/readMilleC.h Interfaces/writeMilleC.h
-                BASE_DIRS Interfaces )
-target_link_libraries(MilleC PUBLIC Mille2 )
-install(
-  TARGETS MilleC
-  EXPORT mille-targets
-  LIBRARY DESTINATION lib
-  FILE_SET HEADERS 
-  DESTINATION include
-)
-
-# Unit tests 
-if (BUILD_TESTS)
-    subdirs(test)
-endif()

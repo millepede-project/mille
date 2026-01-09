@@ -27,8 +27,8 @@
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include "IMilleReader.h" 
-#include "MilleDataStructures.h" 
+#include "Mille/IMilleReader.h" 
+#include "Mille/MilleDataStructures.h" 
 #include <vector> 
 
 #ifndef MILLE__DECODER__H

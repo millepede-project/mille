@@ -20,8 +20,8 @@
 */ 
 
 #include "testUtils.h"
-#include "MilleReaderCcompressed.h"
-#include "MilleRecordC.h"
+#include "Mille/MilleReaderCcompressed.h"
+#include "Mille/MilleRecordC.h"
 #include "milleReaderTests.h"
 #include <vector>
 #include <iostream>

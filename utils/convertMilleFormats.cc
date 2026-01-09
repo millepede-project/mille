@@ -18,7 +18,7 @@
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include "MilleFactory.h"
+#include "Mille/MilleFactory.h"
 #include <iostream>
 
 int decodeFile(IMilleReader & reader, MilleRecord & writer, const std::string & fname, long long int & nRecords, long long int & nSkip){

@@ -18,7 +18,7 @@
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include "MilleDecoder.h"
+#include "Mille/MilleDecoder.h"
 #include <iostream>
 
 MilleDecoder::ReadResult MilleDecoder::decode (IMilleReader & reader, std::vector<MilleMeasurement> & record){

@@ -21,8 +21,8 @@
  *
  */
 
-#include "writeMilleC.h"
-#include "MilleFactory.h"
+#include "Mille/writeMilleC.h"
+#include "Mille/MilleFactory.h"
 #include <vector>
 #include <atomic>
 #include <iostream>

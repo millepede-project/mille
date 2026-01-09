@@ -19,10 +19,10 @@
  * 
 */ 
 
-#include "writeMilleC.h"
+#include "Mille/writeMilleC.h"
 #include "testUtils.h"
 #include "milleReaderTests.h"
-#include "MilleFactory.h"
+#include "Mille/MilleFactory.h"
 #include "TTree.h"
 #include "TFile.h"
 
