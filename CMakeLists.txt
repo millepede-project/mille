@@ -6,8 +6,9 @@ find_program(gpp_loc g++)
 
 set(CMAKE_C_COMPILER ${gcc_loc})
 set(CMAKE_CXX_COMPILER ${gpp_loc})
+set(CMAKE_Fortran_COMPILER ${gf_loc})
 
-PROJECT(mille LANGUAGES CXX)
+PROJECT(mille LANGUAGES Fortran CXX)
 set(mille_VERSION 00.01.00)
 include(CTest)
 
@@ -40,6 +41,7 @@ endif()
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
+set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/modules)
 
 
 if (DEBUG)
@@ -120,6 +122,23 @@ install(
   FILE_SET HEADERS 
   DESTINATION include
 )
+# F90-bindings
+add_library(MilleF SHARED)
+target_sources(MilleF PRIVATE Fortran/MilleF.f90)
+target_link_libraries(MilleF PUBLIC MilleC )
+
+# install F90-bindings
+install(
+  TARGETS MilleF
+  EXPORT mille-targets
+  LIBRARY DESTINATION lib
+)
+install (FILES ${CMAKE_Fortran_MODULE_DIRECTORY}/millef.mod DESTINATION modules )
+
+add_executable(TestMilleF)
+target_sources(TestMilleF PRIVATE Fortran/TestMilleF.f90)
+target_link_libraries(TestMilleF PUBLIC MilleF MilleC)
+install(TARGETS TestMilleF DESTINATION bin)
 
 # Unit tests 
 if (BUILD_TESTS)

@@ -53,7 +53,6 @@ void open_mille_out(const char *fileName, int lengthFileName, int nFileOut, bool
 }
 
 void write_mille_out(int nFileOut){
-void writeMilleOut(int nFileOut){
     if (nFileOut < 0) nFileOut = g_lastOutFileIndex; 
     int fileIndex = nFileOut - 1; 
     if (fileIndex < g_writeFileHandles.size() && g_writeFileHandles[fileIndex] != nullptr){
