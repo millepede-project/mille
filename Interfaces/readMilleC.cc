@@ -38,7 +38,7 @@ void initMille() {
 
 /*______________________________________________________________*/
 /// Open file.
-void openMille(const char *fileName, int lengthFileName, int *errorFlag, int nFileIn)
+void open_mille(const char *fileName, int lengthFileName, int *errorFlag, int nFileIn)
 {
     if (!errorFlag)
         return; /* 'printout' error? */
@@ -64,7 +64,7 @@ void openMille(const char *fileName, int lengthFileName, int *errorFlag, int nFi
 
 /*______________________________________________________________*/
 /// Close file.
-void closeMille(int nFileIn) {
+void close_mille(int nFileIn) {
     int fileIndex = nFileIn - 1; /* index of current file */
     if (fileIndex < 0 || fileIndex >= g_readFileHandles.size())
         return; /* no file opened at all... */
@@ -73,7 +73,7 @@ void closeMille(int nFileIn) {
 
 /*______________________________________________________________*/
 /// Rewind file.
-void resetMille(int nFileIn) {
+void reset_mille(int nFileIn) {
     int fileIndex = nFileIn - 1; /* index of current file */
     if (fileIndex < 0 || fileIndex >= g_readFileHandles.size())
         return; /* no file opened at all... */
@@ -82,14 +82,14 @@ void resetMille(int nFileIn) {
 
 /*______________________________________________________________*/
 /// Rewind file.
-void resetMilleEntry(int nFileIn) {
+void reset_mille_entry(int nFileIn) {
     int fileIndex = nFileIn - 1; /* index of current file */
     if (fileIndex < 0 || fileIndex >= g_readFileHandles.size())
         return; /* no file opened at all... */
     if (g_readFileHandles.at(fileIndex)) g_readFileHandles.at(fileIndex)->rewindEntry();
 }
 
-void skipMille(int nFileIn){
+void skip_mille(int nFileIn){
     int fileIndex = nFileIn - 1; /* index of current file */
     if (fileIndex < 0 || fileIndex >= g_readFileHandles.size())
         return; /* no file opened at all... */
@@ -99,7 +99,7 @@ void skipMille(int nFileIn){
 /**______________________________________________________________*/
 // Read record from file.
 
-void readMille(double *bufferDouble, float *bufferFloat, int *bufferInt,
+void read_mille(double *bufferDouble, float *bufferFloat, int *bufferInt,
     int *lengthBuffers, int *errorFlag, int nFileIn) {
         /* No return value since to be called as subroutine from fortran,
         negative *errorFlag are errors, otherwise fine.
@@ -135,7 +135,7 @@ void readMille(double *bufferDouble, float *bufferFloat, int *bufferInt,
     *lengthBuffers = readResult.first; 
 }
 
-void lastMilleInFileIndex(int* index){
+void last_mille_file_index(int* index){
     if (!index) return; 
     *index = g_lastInFileIndex; 
 }

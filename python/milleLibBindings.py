@@ -4,53 +4,53 @@ import ctypes
 
 # Setup the argument types for the library's functions
 milleC = ctypes.CDLL("libMilleC.so")
-milleC.openMille.restype = None  
-milleC.openMille.argtypes = [ctypes.c_char_p, ctypes.c_int, ctypes.POINTER(ctypes.c_int), ctypes.c_int]
-milleC.readMille.restype = None  
-milleC.readMille.argtypes = [ndpointer(ctypes.c_double, flags="C_CONTIGUOUS"),
+milleC.open_mille.restype = None  
+milleC.open_mille.argtypes = [ctypes.c_char_p, ctypes.c_int, ctypes.POINTER(ctypes.c_int), ctypes.c_int]
+milleC.read_mille.restype = None  
+milleC.read_mille.argtypes = [ndpointer(ctypes.c_double, flags="C_CONTIGUOUS"),
                                     ndpointer(ctypes.c_float, flags="C_CONTIGUOUS"),
                                     ndpointer(ctypes.c_int, flags="C_CONTIGUOUS"),
                                     ctypes.POINTER(ctypes.c_int), 
                                     ctypes.POINTER(ctypes.c_int), 
                                     ctypes.c_int]
-milleC.lastMilleInFileIndex.restype = None  
-milleC.lastMilleInFileIndex.argtypes = [ctypes.POINTER(ctypes.c_int)]
-milleC.closeMille.restype = None  
-milleC.closeMille.argtypes = [ctypes.c_int]
-milleC.resetMilleEntry.restype = None  
-milleC.resetMilleEntry.argtypes = [ctypes.c_int]
-milleC.resetMille.restype = None  
-milleC.resetMille.argtypes = [ctypes.c_int]
-milleC.skipMille.restype = None  
-milleC.skipMille.argtypes = [ctypes.c_int]
+milleC.last_mille_in_file_index.restype = None  
+milleC.last_mille_in_file_index.argtypes = [ctypes.POINTER(ctypes.c_int)]
+milleC.close_mille.restype = None  
+milleC.close_mille.argtypes = [ctypes.c_int]
+milleC.reset_mille_entry.restype = None  
+milleC.reset_mille_entry.argtypes = [ctypes.c_int]
+milleC.reset_mille.restype = None  
+milleC.reset_mille.argtypes = [ctypes.c_int]
+milleC.skip_mille.restype = None  
+milleC.skip_mille.argtypes = [ctypes.c_int]
 
-milleC.openMilleOut.restype = None  
-milleC.openMilleOut.argtypes = [ctypes.c_char_p, ctypes.c_int, ctypes.c_int, ctypes.c_bool, ctypes.c_bool, ctypes.c_int]
-milleC.addMilleData.restype = None  
-milleC.addMilleData.argtypes = [ctypes.c_double, ctypes.c_double, ctypes.c_uint, 
+milleC.open_mille_out.restype = None  
+milleC.open_mille_out.argtypes = [ctypes.c_char_p, ctypes.c_int, ctypes.c_int, ctypes.c_bool, ctypes.c_bool, ctypes.c_int]
+milleC.add_mille_data.restype = None  
+milleC.add_mille_data.argtypes = [ctypes.c_double, ctypes.c_double, ctypes.c_uint, 
                                     ndpointer(ctypes.c_uint, flags="C_CONTIGUOUS"),
                                     ndpointer(ctypes.c_double, flags="C_CONTIGUOUS"),
                                     ctypes.c_int, 
                                     ndpointer(ctypes.c_int, flags="C_CONTIGUOUS"),
                                     ndpointer(ctypes.c_double, flags="C_CONTIGUOUS"),
                                     ctypes.c_int]
-milleC.addMilleSpecial.restype = None  
-milleC.addMilleSpecial.argtypes = [ctypes.c_int, 
+milleC.add_mille_special.restype = None  
+milleC.add_mille_special.argtypes = [ctypes.c_int, 
                                     ndpointer(ctypes.c_double, flags="C_CONTIGUOUS"),
                                     ndpointer(ctypes.c_int, flags="C_CONTIGUOUS"),
                                     ctypes.c_int]
-milleC.copyToMilleBuffer.restype = None  
-milleC.copyToMilleBuffer.argtypes = [ctypes.c_uint, 
+milleC.copy_to_mille_buffer.restype = None  
+milleC.copy_to_mille_buffer.argtypes = [ctypes.c_uint, 
                                     ndpointer(ctypes.c_int, flags="C_CONTIGUOUS"),
                                     ndpointer(ctypes.c_double, flags="C_CONTIGUOUS"),
                                     ctypes.c_int]
-milleC.abortMilleRecord.restype = None  
-milleC.abortMilleRecord.argtypes = [ctypes.c_int]
-milleC.flushMilleOutput.restype = None  
-milleC.flushMilleOutput.argtypes = [ctypes.c_int]
-milleC.resetMilleOutput.restype = None  
-milleC.resetMilleOutput.argtypes = [ctypes.c_int]
-milleC.lastMilleOutFileIndex.restype = None  
-milleC.lastMilleOutFileIndex.argtypes = [ctypes.POINTER(ctypes.c_int)]
-milleC.closeMilleOutput.restype = None  
-milleC.closeMilleOutput.argtypes = [ctypes.c_int]
+milleC.abort_mille_record.restype = None  
+milleC.abort_mille_record.argtypes = [ctypes.c_int]
+milleC.flush_mille_output.restype = None  
+milleC.flush_mille_output.argtypes = [ctypes.c_int]
+milleC.reset_mille_output.restype = None  
+milleC.reset_mille_output.argtypes = [ctypes.c_int]
+milleC.last_mille_out_file_index.restype = None  
+milleC.last_mille_out_file_index.argtypes = [ctypes.POINTER(ctypes.c_int)]
+milleC.close_mille_output.restype = None  
+milleC.close_mille_output.argtypes = [ctypes.c_int]

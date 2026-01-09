@@ -46,18 +46,18 @@ class milleReader:
         fstr = fname.encode(encoding="utf8")
         fsize = len(fname) 
         # open the file - will spawn a MilleReader in the background
-        milleC.openMille(fstr, fsize, err, -1)
+        milleC.open_mille(fstr, fsize, err, -1)
         # find out the index assigned to "our" reader in the C-interface, 
         # and keep track of it internally 
         newIndex = ctypes.c_int(0)
-        milleC.lastMilleInFileIndex(ctypes.pointer(newIndex))
+        milleC.last_mille_in_file_index(ctypes.pointer(newIndex))
         self.fileIndex = newIndex.value
         # finally, return the status code 
         return err.value
     
     # Closes the attached file 
     def close (self):
-        milleC.closeMille(ctypes.c_int(self.fileIndex))
+        milleC.close_mille(ctypes.c_int(self.fileIndex))
 
     # read the next record from the file to the user- supplied buffers.
     # @param doubleBuffer: An array of type float64 
@@ -72,7 +72,7 @@ class milleReader:
     def readRecordToBuffers(self, doubleBuffer: np.array, floatBuffer: np.array, intBuffer:np.array):
         stat = ctypes.c_int(0)
         nRecords = ctypes.c_int(len(doubleBuffer)) 
-        milleC.readMille(doubleBuffer, floatBuffer, intBuffer, nRecords, stat, self.fileIndex)
+        milleC.read_mille(doubleBuffer, floatBuffer, intBuffer, nRecords, stat, self.fileIndex)
         return stat.value, nRecords.value
 
     # read the next record from the file - automatically generated buffers. 
@@ -90,7 +90,7 @@ class milleReader:
 
         # for undersized buffers, re-read with enlarged buffers
         if (stat == -4):
-            milleC.resetMilleEntry(self.fileIndex)
+            milleC.reset_mille_entry(self.fileIndex)
             # the nRec value from the failed attempt tells us the minimum
             # required buffer size. 
             dnp.resize(nRec)
@@ -102,15 +102,15 @@ class milleReader:
     
     # rewind the file to the first entry 
     def skipRecord(self):
-        return milleC.skipMille(self.fileIndex)
+        return milleC.skip_mille(self.fileIndex)
     
     # rewind the file to the first entry 
     def rewindToStart(self):
-        return milleC.resetMille(self.fileIndex)
+        return milleC.reset_mille(self.fileIndex)
     
     # rewind the file to the start of the previously accessed entry. 
     def rewindLastEntry(self):
-        return milleC.resetMilleEntry(self.fileIndex)
+        return milleC.reset_mille_entry(self.fileIndex)
 
 
 if __name__ == "__main__":

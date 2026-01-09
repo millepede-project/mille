@@ -36,12 +36,12 @@ extern "C"
 /// @param doublePrec: Enable double-precision floating point storage 
 /// @param keepZeros: Write zero-derivatives to the output. Not tested in pede 
 /// @param recordLengthHint: Initial write buffer size - will grow if needed. 
-void openMilleOut(const char *fileName, int lengthFileName, int nFileOut=-1, bool doublePrec=false, bool keepZeros=false,
+void open_mille_out(const char *fileName, int lengthFileName, int nFileOut=-1, bool doublePrec=false, bool keepZeros=false,
 			    int recordLengthHint = 2000); 
 
 /// @brief Completes the current Mille record, writes it to the file, and then prepares the next one
 /// @param nFileOut Index of the file to apply the operation to 
-void writeMilleOut(int nFileOut=-1);
+void write_mille_out(int nFileOut=-1);
 
 /// @brief Add a measurement to the current Mille record
 /// @param aMeas The measurement
@@ -53,7 +53,7 @@ void writeMilleOut(int nFileOut=-1);
 /// @param labGlobal Labels of global parameters
 /// @param derGlobal Global derivatives
 /// @param nFileOut Index of the file to apply the operation to  
-void addMilleData( double aMeas, double aErr, unsigned int numLocal,
+void add_mille_data( double aMeas, double aErr, unsigned int numLocal,
         const unsigned int* indLocal, const double* derLocal,
         int nGlobal, 
         const int* labGlobal,
@@ -64,7 +64,7 @@ void addMilleData( double aMeas, double aErr, unsigned int numLocal,
 /// @param indices The integer elements to copy
 /// @param derivatives The derivatives to copy 
 /// @param nFileOut Index of the file to apply the operation to  
-void copyToMilleBuffer(unsigned int nEntries,
+void copy_to_mille_buffer(unsigned int nEntries,
         const int* indices, const double* derivatives,
         int nFileOut=-1);
 
@@ -73,27 +73,27 @@ void copyToMilleBuffer(unsigned int nEntries,
 /// @param specialFlot: Floating point entries of the block 
 /// @param specialInt: Integer entries of the block 
 /// @param nFileOut Index of the file to apply the operation to  
-void addMilleSpecial(int nSpecial, const double* specialFloat, const int* specialInt, int nFileOut=-1);
+void add_mille_special(int nSpecial, const double* specialFloat, const int* specialInt, int nFileOut=-1);
 
 /// @brief Abort the current record, discarding measurements
 /// @param nFileOut Index of the file to apply the operation to  
-void abortMilleRecord(int nFileOut=-1);
+void abort_mille_record(int nFileOut=-1);
 
 /// @brief flush the file to disk 
 /// @param nFileOut Index of the file to apply the operation to  
-void flushMilleOutput(int nFileOut=-1); 
+void flush_mille_output(int nFileOut=-1); 
 
 /// @brief Close and re-open the file. Discard previous content.  
 /// @param nFileOut Index of the file to apply the operation to  
-void resetMilleOutput(int nFileOut=-1); 
+void reset_mille_output(int nFileOut=-1); 
 
-/// @brief retrieve the index of the last file added via openMilleOut. 
+/// @brief retrieve the index of the last file added via open_mille_out. 
 /// @param[out] index Will be populated with the index of the file   
-void lastMilleOutFileIndex(int* index); 
+void last_mille_out_file_index(int* index); 
 
 /// @brief close the output file and write to disk. 
 /// @param nFileOut Index of the file to apply the operation to  
-void closeMilleOutput(int nFileOut = -1); 
+void close_mille_output(int nFileOut = -1); 
 
 
 #ifdef __cplusplus

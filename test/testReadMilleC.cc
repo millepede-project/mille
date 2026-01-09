@@ -34,7 +34,7 @@ int main(int, char**){
 
     // open using C-bindings
     int errFlag = 0; 
-    openMille("milleTest.dat", std::string("milleTest.dat").size(),&errFlag,1);
+    open_mille("milleTest.dat", std::string("milleTest.dat").size(),&errFlag,1);
     TEST_CONDITION(errFlag, 0, "Successful file open"); 
 
 
@@ -45,13 +45,13 @@ int main(int, char**){
     // test catching invalid buffers 
     errFlag = 0; 
     int bufSize = ints.size(); 
-    readMille(nullptr, floats.data(), ints.data(),&bufSize,&errFlag,1); 
+    read_mille(nullptr, floats.data(), ints.data(),&bufSize,&errFlag,1); 
     TEST_CONDITION(errFlag, -1, "Invalid buffer: Exit code"); 
 
     // pass undersized buffers
     bufSize = ints.size();
     errFlag = 0; 
-    readMille(doubles.data(), floats.data(), ints.data(),&bufSize,&errFlag,1); 
+    read_mille(doubles.data(), floats.data(), ints.data(),&bufSize,&errFlag,1); 
     TEST_CONDITION(errFlag, int(-4), "Too short buffers: Exit code"); 
     TEST_CONDITION(bufSize, int(3 + inputs.localLabels.size() + inputs.globalLabels.size()), "Too short buffers: Length output");
     // resize our read buffer - should give successful read after next rewind
@@ -62,24 +62,24 @@ int main(int, char**){
     // should now be at EOF and yield exit code 0 - regardless of buffer size
     bufSize = ints.size();
     errFlag = 0; 
-    readMille(doubles.data(), floats.data(), ints.data(),&bufSize,&errFlag,1); 
+    read_mille(doubles.data(), floats.data(), ints.data(),&bufSize,&errFlag,1); 
     TEST_CONDITION(errFlag, 0, "EOF: Exit code"); 
 
     // rewind the file and start over 
-    resetMille(1);
+    reset_mille(1);
     // should now return an errFlag of 4 and the correct number of read bytes
     bufSize = ints.size();
     errFlag = 0; 
-    readMille(doubles.data(), floats.data(), ints.data(),&bufSize,&errFlag,1); 
+    read_mille(doubles.data(), floats.data(), ints.data(),&bufSize,&errFlag,1); 
     TEST_CONDITION(errFlag, 4, "Status for successful read"); 
     TEST_CONDITION(bufSize, ints.size(), "bufSize for successful read"); 
 
     // this should allow us to read the same entry again, without hitting EoF
-    resetMilleEntry(1);
+    reset_mille_entry(1);
     // should return an errFlag of 4 and the correct number of read bytes
     bufSize = ints.size();
     errFlag = 0; 
-    readMille(doubles.data(), floats.data(), ints.data(),&bufSize,&errFlag,1); 
+    read_mille(doubles.data(), floats.data(), ints.data(),&bufSize,&errFlag,1); 
     TEST_CONDITION(errFlag, 4, "Status for successful read after rewind"); 
     TEST_CONDITION(bufSize, ints.size(), "bufSize for successful read after rewind"); 
 

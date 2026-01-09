@@ -39,15 +39,15 @@ int main(int, char**){
 
     // default version of tester with single floating point precision
     {
-        openMilleOut("milleTest.root",std::string("milleTest.root").size());
+        open_mille_out("milleTest.root",std::string("milleTest.root").size());
         // add an entry
-        addMilleData(residual, deltaResidual, 
+        add_mille_data(residual, deltaResidual, 
                     localDeriv.size(), localLabels.data(),
                     localDeriv.data(), globalLabels.size(), globalLabels.data(),
                     globalDeriv.data()); 
-        writeMilleOut();
-        flushMilleOutput();  
-        closeMilleOutput();
+        write_mille_out();
+        flush_mille_output();  
+        close_mille_output();
     }
 
     
