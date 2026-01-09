@@ -29,7 +29,7 @@ bool MilleReaderCcompressed::open(const std::string & fname){
     std::string fToOpen = fname; 
     if (fToOpen.empty()) fToOpen = fname_; // allow using pre-configured file name (from c-tor call)
     if (infile_ != nullptr){
-        std::cerr << " Careful, calling open() on an already active file handler!"<<std::endl;
+        std::cerr << " Careful, calling open() on an already active file handler (was connected to "<<fname_<<", now requesting connection to "<<fToOpen<<")."<<std::endl;
         close(); 
     }
     fname_ = fToOpen; 
