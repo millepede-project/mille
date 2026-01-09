@@ -40,16 +40,45 @@ void MilleRecordCSV::writeRecord(){
 	const int recordLength =
 			(buffer_.doublePrecision) ? -buffer_.size() *2 : buffer_.size() *2;
     // header word indicating record size and type 
-    myOutFile_ << recordLength << "  ! record length (times 2 for backward compatibility)"<<std::endl; 
-    myOutFile_ << "! Start of record " <<std::endl; 
+    myOutFile_ << std::endl <<"#######  Start of record  #####" <<std::endl; 
+    myOutFile_ << std::setw(10)<<recordLength << "  "<< std::setw(17)<<" "<< "     # record length (times 2 for backward compatibility)"<<std::endl; 
+    int nextMeasurement = 0; // for extra printout - 0 = measurement, 1 = first local, 2 = inside local, 3 = uncertainty, 4 = first global, 5 = in global
     for (size_t k = 0; k < buffer_.size(); ++k){
+        if (k > 0 && buffer_.intBuffer[k] == 0 && (nextMeasurement == 0 || nextMeasurement > 3)){
+            myOutFile_ << std::endl;    
+        }
         if (buffer_.doublePrecision)
-            myOutFile_<< buffer_.intBuffer[k]<<"  "<<std::setprecision(10)<<buffer_.doubleBuffer[k]; 
+            myOutFile_<< std::setw(10)<< buffer_.intBuffer[k]<<"  "<<std::setw(17)<<std::setprecision(10)<<buffer_.doubleBuffer[k]; 
         else 
-            myOutFile_<< buffer_.intBuffer[k]<<"  "<<std::setprecision(10)<<buffer_.floatBuffer[k];
+            myOutFile_<< std::setw(10)<< buffer_.intBuffer[k]<<"  "<<std::setw(17)<<std::setprecision(10)<<buffer_.floatBuffer[k];
+        
+        // add some extra verbosity, as the CSV format is mainly intended for pedagogical purposes 
+        if (k == 0){
+            myOutFile_ << "     # Header"; 
+        }
+        else if (buffer_.intBuffer[k] ==0){
+            if (nextMeasurement == 0 || nextMeasurement > 3){
+                myOutFile_ << "     # Measurement";
+                nextMeasurement = 1; 
+            }
+            else if (nextMeasurement > 0){
+                myOutFile_ << "     # Uncertainty" ;
+                nextMeasurement = 4; 
+            }
+        }
+        else {
+            if (nextMeasurement < 2){
+                myOutFile_ << "     # local derivatives";
+                nextMeasurement = 2; 
+            }
+            else if (nextMeasurement == 4) {
+                myOutFile_ << "     # global derivatives";
+                nextMeasurement = 5; 
+            }
+        }
         myOutFile_ << std::endl; 
     }
-    myOutFile_ << "! End of record " <<std::endl<<std::endl; 
+    myOutFile_ << "# End of record " <<std::endl<<std::endl; 
 
     // prepare for next record 
     resetBuffers();
