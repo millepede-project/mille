@@ -52,15 +52,15 @@
     template<class T> class MilleArrayView{
         public:
         MilleArrayView(const std::vector<T> & s): arr_(s.data()),n_(s.size()){}
-        MilleArrayView(const T* arr, size_t size):arr_(arr),n_(size){}
-        template <size_t N> MilleArrayView(const std::array<T,N> & arr): arr_(arr.data()),n_(N){}
+        MilleArrayView(const T* arr, unsigned int size):arr_(arr),n_(size){}
+        template <unsigned int N> MilleArrayView(const std::array<T,N> & arr): arr_(arr.data()),n_(N){}
 
-        const T & operator[](size_t n) const {return arr_[n];}
-        size_t size() const {return n_;}
+        const T & operator[](unsigned int n) const {return arr_[n];}
+        unsigned int size() const {return n_;}
 
         private: 
         const T* arr_;
-        size_t n_; 
+        unsigned int n_; 
 
     };
 #endif
