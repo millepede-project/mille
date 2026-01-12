@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 ## \file
 #  Example for Mille format conversion in python 
 #
@@ -26,7 +28,7 @@ import milleWriter, milleReader
 if __name__ == "__main__":
     from argparse import ArgumentParser 
 
-    parser = ArgumentParser("hi")
+    parser = ArgumentParser("convertMille.py")
     parser.add_argument("outFile",type=str, help="Output Mille file to write")
     parser.add_argument("inFiles",type=str,nargs="+",help="One or many input Mille files")
     parser.add_argument("-n",dest="maxRecords",type=int, default=-1, help="max. number of records to copy")

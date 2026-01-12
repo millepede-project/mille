@@ -110,3 +110,9 @@ install (
     )
 add_test(NAME TestMilleF90 COMMAND testMilleF)
 
+add_test (NAME TestMillePy3 
+  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/../python/testMillePy.py
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
+set_tests_properties(TestMillePy3
+    PROPERTIES ENVIRONMENT "PYTHONPATH=${PROJECT_SOURCE_DIR}/python/:$ENV{PYTHONPATH}")

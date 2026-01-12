@@ -72,8 +72,8 @@ class milleWriter:
 
 
     # Add a special data segment to the current record
-    # @param specialFloat: List of floating point values (type: float64)
     # @param specialInt: List of integer values (type: int32)
+    # @param specialFloat: List of floating point values (type: float64)
     # Both arrays are expected to be of the same size. 
     def addSpecial(self, specialInt: np.array,  specialFloat: np.array):
         milleC.add_mille_special(len(specialInt), specialInt, specialFloat, self.fileIndex) 

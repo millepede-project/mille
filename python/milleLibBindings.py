@@ -36,9 +36,9 @@ milleC.add_mille_data.argtypes = [ctypes.c_double, ctypes.c_double, ctypes.c_uin
                                     ctypes.c_int]
 milleC.add_mille_special.restype = None  
 milleC.add_mille_special.argtypes = [ctypes.c_int, 
-                                    ndpointer(ctypes.c_double, flags="C_CONTIGUOUS"),
-                                    ndpointer(ctypes.c_int, flags="C_CONTIGUOUS"),
-                                    ctypes.c_int]
+                                     ndpointer(ctypes.c_int, flags="C_CONTIGUOUS"),
+                                     ndpointer(ctypes.c_double, flags="C_CONTIGUOUS"),
+                                     ctypes.c_int]
 milleC.copy_to_mille_buffer.restype = None  
 milleC.copy_to_mille_buffer.argtypes = [ctypes.c_uint, 
                                     ndpointer(ctypes.c_int, flags="C_CONTIGUOUS"),
