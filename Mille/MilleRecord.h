@@ -109,7 +109,7 @@ class MilleRecord{
     /// @param nSpecial: Length of the special block 
     /// @param specialFloat: Floating point entries 
     /// @param specialInt: Integer entries 
-    void addSpecial(int nSpecial, MilleArrayView<double> specialFloat, MilleArrayView<int> specialInt);
+    void addSpecial(MilleArrayView<int> specialInt, MilleArrayView<double> specialFloat );
 
     /// @brief Quickly copies encoded buffers for next record from a reader.
     ///        Used to quickly translate Mille formats. 

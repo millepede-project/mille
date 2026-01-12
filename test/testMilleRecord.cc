@@ -124,7 +124,7 @@ int main(int, char**){
     ); 
 
     // check for internal state after special data addition 
-    tester.addSpecial(globalDeriv.size(), globalDeriv, globalLabels); 
+    tester.addSpecial(globalLabels,globalDeriv); 
 
     TEST_CONDITION(
         my_ssize(tester.floatBuffer()), 

@@ -135,11 +135,6 @@ install(
 )
 install (FILES ${CMAKE_Fortran_MODULE_DIRECTORY}/millef.mod DESTINATION modules )
 
-add_executable(TestMilleF)
-target_sources(TestMilleF PRIVATE Fortran/TestMilleF.f90)
-target_link_libraries(TestMilleF PUBLIC MilleF MilleC)
-install(TARGETS TestMilleF DESTINATION bin)
-
 # Unit tests 
 if (BUILD_TESTS)
     subdirs(test)

@@ -76,7 +76,7 @@ void reset_mille_entry(int nFileIn=-1);
  * \param[in]     nFileIn       File number (1 .. maxNumFiles)
  * \param[out]    errorFlag     error flag:
  *      *  -1: pointer to a buffer or lengthBuffers are null
- *      *  -2: problem reading record length
+ *      *  -2: problem reading record length - will set lengthBuffers to required value
  *      *  -4: given buffers too short for record
  *      *  -8: problem with stream or EOF reading floats
  *      * -16: problem with stream or EOF reading ints
@@ -98,7 +98,7 @@ void read_mille(double *bufferDouble, float *bufferFloat, int *bufferInt,
 void skip_mille(int nFileIn = -1); 
 
 // get the index of the last file added (useful if passing "-1") to openMille
-void last_mille_file_index(int* index); 
+void last_mille_in_file_index(int* index); 
 
 
 #ifdef __cplusplus

@@ -88,15 +88,15 @@ void copy_to_mille_buffer(unsigned int nEntries,
 }
 
         
-void add_mille_special(int nSpecial, 
-                     const double* specialFloat, const int* specialInt, 
+void add_mille_special(int nSpecial, const int* specialInt, 
+                     const double* specialFloat, 
                      int nFileOut){
     if (nFileOut < 0) nFileOut = g_lastOutFileIndex; 
     int fileIndex = nFileOut - 1; 
     if (fileIndex < g_writeFileHandles.size() && g_writeFileHandles[fileIndex] != nullptr){
-        g_writeFileHandles[fileIndex]->addSpecial(nSpecial, 
-            MilleArrayView<double>(specialFloat, nSpecial),
-            MilleArrayView<int>(specialInt, nSpecial)
+        g_writeFileHandles[fileIndex]->addSpecial( 
+            MilleArrayView<int>(specialInt, nSpecial),
+            MilleArrayView<double>(specialFloat, nSpecial)
         ); 
     }
 }

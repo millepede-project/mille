@@ -135,7 +135,7 @@ void read_mille(double *bufferDouble, float *bufferFloat, int *bufferInt,
     *lengthBuffers = readResult.first; 
 }
 
-void last_mille_file_index(int* index){
+void last_mille_in_file_index(int* index){
     if (!index) return; 
     *index = g_lastInFileIndex; 
 }

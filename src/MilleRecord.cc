@@ -36,6 +36,14 @@ void MilleRecord::addData(double aMeas, double aErr,
 			MilleArrayView<unsigned int> indLocal, MilleArrayView<double> derLocal,
 			MilleArrayView<int> labGlobal,
 			MilleArrayView<double> derGlobal){
+    if (indLocal.size() != derLocal.size()){
+        std::cerr << " MilleRecord::addData expects local labels and derivatives to have same size, but received "<<indLocal.size()<<" int and "<<derLocal.size()<<" float. Will not add entry. "<<std::endl; 
+        return ;   
+    }
+    if (labGlobal.size() != derGlobal.size()){
+        std::cerr << " MilleRecord::addData expects global labels and derivatives to have same size, but received "<<labGlobal.size()<<" int and "<<derGlobal.size()<<" float. Will not add entry. "<<std::endl; 
+        return ;   
+    }
     // ensure the header is in place 
     newSetIfNeeded(); 
     // add measurement
@@ -63,8 +71,12 @@ void MilleRecord::copyToBuffer(MilleArrayView<int> integers, MilleArrayView<doub
     }
 }
 
-void MilleRecord::addSpecial(int nSpecial, MilleArrayView<double> specialFloat, MilleArrayView<int> specialInt){
-    if (!nSpecial) return;  // trivial empty special block 
+void MilleRecord::addSpecial( MilleArrayView<int> specialInt, MilleArrayView<double> specialFloat){
+    if (!specialInt.size()) return;  // trivial empty special block 
+    if (specialInt.size() != specialFloat.size()){
+        std::cerr << " MilleRecord::addSpecial expects int and float lists to have same size, but received "<<specialInt.size()<<" int and "<<specialFloat.size()<<" float. Will not add entry. "<<std::endl; 
+        return ;   
+    }
     newSetIfNeeded(); // header 
     if (hasSpecialInRecord_){
         std::cerr << "MilleRecord::addSpecial: Special values already stored for this record."
@@ -75,8 +87,8 @@ void MilleRecord::addSpecial(int nSpecial, MilleArrayView<double> specialFloat, 
     // A special record is indicated by:
     buffer_.fill(0,0.); // a zero measurement, 
                     // followed by no local derivatives,
-    buffer_.fill(0, -1. * nSpecial);  // and a negative uncertainty, with the magnitude nSpecial 
-    for (int i = 0; i < nSpecial; ++i){
+    buffer_.fill(0, -1. * specialInt.size());  // and a negative uncertainty, with the magnitude nSpecial 
+    for (int i = 0; i < specialInt.size(); ++i){
         buffer_.fill(specialInt[i],specialFloat[i]); 
     }
 }

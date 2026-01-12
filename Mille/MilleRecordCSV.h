@@ -58,6 +58,8 @@
     void openCSV();  /// Open the text file in write mode 
     void closeCSV(); 
 
+    void annotateCurrentLine(size_t k, int & nextMeasurement, int & ispecial);  
+
     /// Data members
     
     std::string fname_ = "mille.csv"; ///< File name for the output binary  

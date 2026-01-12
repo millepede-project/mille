@@ -75,8 +75,8 @@ class milleWriter:
     # @param specialFloat: List of floating point values (type: float64)
     # @param specialInt: List of integer values (type: int32)
     # Both arrays are expected to be of the same size. 
-    def addSpecial(self,  specialFloat: np.array, specialInt: np.array):
-        milleC.add_mille_special(len(specialInt), specialFloat, specialInt, self.fileIndex) 
+    def addSpecial(self, specialInt: np.array,  specialFloat: np.array):
+        milleC.add_mille_special(len(specialInt), specialInt, specialFloat, self.fileIndex) 
 
     # Directly copy (encoded) data into the Mille buffer
     # @param ints: Content for the integer buffer (type: int32)

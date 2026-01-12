@@ -32,6 +32,7 @@
 
 #include <vector>
 #include <stddef.h>
+#include <iostream>
 
 /// @brief Helper to represent decoded Mille data. 
 ///        This stands for a single measurement (equation). 
@@ -127,6 +128,14 @@ struct MilleBuffer{
         intBuffer.push_back(label);
         if (doublePrecision) doubleBuffer.push_back(value);
         else floatBuffer.push_back(value); 
+    }
+
+    std::pair<int, double> query(size_t k){
+        if (k > intBuffer.size()){
+            std::cerr << " out of range query of mille buffer ("<<k<<" out of "<<intBuffer.size()<<")";
+            return {0,0.};
+        }
+        return {intBuffer[k], (doublePrecision ? doubleBuffer[k] : floatBuffer[k])};
     }
 
     /// @brief Utility function - report if the buffer is empty 

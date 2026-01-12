@@ -73,7 +73,7 @@ void copy_to_mille_buffer(unsigned int nEntries,
 /// @param specialFlot: Floating point entries of the block 
 /// @param specialInt: Integer entries of the block 
 /// @param nFileOut Index of the file to apply the operation to  
-void add_mille_special(int nSpecial, const double* specialFloat, const int* specialInt, int nFileOut=-1);
+void add_mille_special(int nSpecial, const int* specialInt, const double* specialFloat,  int nFileOut=-1);
 
 /// @brief Abort the current record, discarding measurements
 /// @param nFileOut Index of the file to apply the operation to  

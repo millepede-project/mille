@@ -34,6 +34,8 @@ struct MilleTestInputs{
     std::vector<double> localDeriv{1.0, -0.3, 1.2}; 
     std::vector<int> globalLabels{42,345}; 
     std::vector<double> globalDeriv{-1.,1.}; 
+    std::vector<int> specialInt{99,101}; 
+    std::vector<double> specialFloat{-42.,11.4}; 
     double residual = -0.033;
     double deltaResidual = 1.e-3; 
     /// helper function to write the test data into an 
@@ -44,6 +46,7 @@ struct MilleTestInputs{
                     localDeriv, 
                     globalLabels,
                     globalDeriv); 
+        mille.addSpecial(specialInt, specialFloat); 
 
         mille.writeRecord();
         mille.flushOutputFile(); 
@@ -71,7 +74,7 @@ int MilleReaderTestSuite(IMilleReader & reader, MilleTestInputs & inputs, int ex
     auto res = reader.readToBuffer(doubles.data(), floats.data(), ints.data(),1); 
     nRead=res.first; status=res.second; 
     TEST_CONDITION(status, -4, "Too short buffers: Exit code"); 
-    TEST_CONDITION(nRead, 3 + inputs.localLabels.size() + inputs.globalLabels.size(), "Too short buffers: Length output");
+    TEST_CONDITION(nRead, 3 + inputs.localLabels.size() + inputs.globalLabels.size() + 2 + inputs.specialFloat.size(), "Too short buffers: Length output");
     // resize our read buffer - should give successful read after next rewind
     doubles.resize(nRead,0);
     ints.resize(nRead,0);
@@ -115,6 +118,11 @@ int MilleReaderTestSuite(IMilleReader & reader, MilleTestInputs & inputs, int ex
     for (size_t i =0; i < inputs.globalDeriv.size(); ++i){
         TEST_CONDITION((float)doubles[ix++],inputs.globalDeriv[i], "Global derivative index "<<i); 
     }
+    TEST_CONDITION((float)doubles[ix++],0, "Special header word"); 
+    TEST_CONDITION((int)(-1 * doubles[ix++]),inputs.specialInt.size(), "nSpecial"); 
+    for (size_t i =0; i < inputs.specialFloat.size(); ++i){
+        TEST_CONDITION((float)doubles[ix++],inputs.specialFloat[i], "Special float  index "<<i); 
+    }
 
     // check the ints 
     ix = 0; 
@@ -126,6 +134,11 @@ int MilleReaderTestSuite(IMilleReader & reader, MilleTestInputs & inputs, int ex
     TEST_CONDITION(ints[ix++],0, "Uncertainty label"); 
     for (size_t i =0; i < inputs.globalLabels.size(); ++i){
         TEST_CONDITION(ints[ix++],inputs.globalLabels[i], "Global label index "<<i); 
+    }
+    TEST_CONDITION(ints[ix++], 0, "Special header word"); 
+    TEST_CONDITION(ints[ix++], 0, "nSpecial int"); 
+    for (size_t i =0; i < inputs.specialInt.size(); ++i){
+        TEST_CONDITION(ints[ix++],inputs.specialInt[i], "Special int  index "<<i); 
     }
     return 0; 
 }

@@ -80,7 +80,7 @@ int main(int, char**){
         inputs.localLabels, inputs.localDeriv,
         inputs.globalLabels, inputs.globalDeriv);
 
-        mille.addSpecial(specialInt.size(), specialDouble, specialInt); 
+        mille.addSpecial(specialInt, specialDouble ); 
 
         mille.writeRecord();
 

@@ -101,3 +101,12 @@ install (
         DESTINATION bin
     )
 add_test(NAME TestWriteMilleC COMMAND testWriteMilleC)
+
+add_executable(testMilleF testMilleF.f90)
+target_link_libraries(testMilleF PUBLIC MilleF MilleC)    
+install (
+        TARGETS testMilleF
+        DESTINATION bin
+    )
+add_test(NAME TestMilleF90 COMMAND testMilleF)
+

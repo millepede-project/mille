@@ -53,7 +53,7 @@ int main(int, char**){
     errFlag = 0; 
     read_mille(doubles.data(), floats.data(), ints.data(),&bufSize,&errFlag,1); 
     TEST_CONDITION(errFlag, int(-4), "Too short buffers: Exit code"); 
-    TEST_CONDITION(bufSize, int(3 + inputs.localLabels.size() + inputs.globalLabels.size()), "Too short buffers: Length output");
+    TEST_CONDITION(bufSize, int(3 + inputs.localLabels.size() + inputs.globalLabels.size() + 2 + inputs.specialFloat.size()), "Too short buffers: Length output");
     // resize our read buffer - should give successful read after next rewind
     doubles.resize(bufSize,0);
     ints.resize(bufSize,0);
@@ -100,6 +100,11 @@ int main(int, char**){
     for (size_t i =0; i < inputs.globalDeriv.size(); ++i){
         TEST_CONDITION((float)doubles[ix++],inputs.globalDeriv[i], "Global derivative index "<<i); 
     }
+    TEST_CONDITION((float)doubles[ix++],0, "Special header"); 
+    TEST_CONDITION((float)doubles[ix++],-1. * inputs.specialFloat.size(), "nSpecial"); 
+    for (size_t i =0; i < inputs.specialFloat.size(); ++i){
+        TEST_CONDITION((float)doubles[ix++],inputs.specialFloat[i], "Special float "<<i); 
+    }
 
     // check the ints 
     ix = 0; 
@@ -111,6 +116,11 @@ int main(int, char**){
     TEST_CONDITION(ints[ix++],0, "Uncertainty label"); 
     for (size_t i =0; i < inputs.globalLabels.size(); ++i){
         TEST_CONDITION(ints[ix++],inputs.globalLabels[i], "Global label index "<<i); 
+    }
+    TEST_CONDITION(ints[ix++],0, "Special header"); 
+    TEST_CONDITION(ints[ix++],0, "nSpecial (int entry)"); 
+    for (size_t i =0; i < inputs.specialInt.size(); ++i){
+        TEST_CONDITION(ints[ix++],inputs.specialInt[i], "Special integer "<<i); 
     }
 
     return 0; 
