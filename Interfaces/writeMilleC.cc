@@ -31,10 +31,26 @@
 std::vector<std::unique_ptr<MilleRecord>> g_writeFileHandles; 
 std::atomic<int> g_lastOutFileIndex = 0; 
 
+/// helper to derive last opened file index
+namespace{
+    int resolveFileIndex(int nFileOut){
+        if (nFileOut <= 0){
+            return g_lastOutFileIndex - 1;
+        }
+        else return nFileOut - 1; 
+    }
+    bool validFileIndex(int fileIndex){
+        if (fileIndex < 0) return false;
+        if (fileIndex > (int)g_writeFileHandles.size()) return false;
+        if (!g_writeFileHandles.at(fileIndex)) return false;
+        return true; 
+    }
+};
+
 
 void open_mille_out(const char *fileName, int lengthFileName, int nFileOut, bool doublePrec, bool keepZeros,
 			    int recordLengthHint){
-    if (nFileOut < 0) nFileOut = g_writeFileHandles.size()+1; 
+    if (nFileOut <= 0) nFileOut = g_writeFileHandles.size()+1; 
     int fileIndex = nFileOut - 1; 
 
     // some sanitation of the output file name
@@ -43,7 +59,7 @@ void open_mille_out(const char *fileName, int lengthFileName, int nFileOut, bool
     fname[lengthFileName] = '\0';
 
     // now access the file 
-    if (fileIndex >= g_writeFileHandles.size()) g_writeFileHandles.resize(fileIndex+1); 
+    if (fileIndex >= (int)g_writeFileHandles.size()) g_writeFileHandles.resize(fileIndex+1); 
     g_writeFileHandles.at(fileIndex) = std::move(spawnMilleRecord(fname,doublePrec,keepZeros,recordLengthHint)); 
     if (!g_writeFileHandles.at(fileIndex)){
         std::cerr << "FAILED to open output file!" <<std::endl;
@@ -53,11 +69,9 @@ void open_mille_out(const char *fileName, int lengthFileName, int nFileOut, bool
 }
 
 void write_mille_out(int nFileOut){
-    if (nFileOut < 0) nFileOut = g_lastOutFileIndex; 
-    int fileIndex = nFileOut - 1; 
-    if (fileIndex < g_writeFileHandles.size() && g_writeFileHandles[fileIndex] != nullptr){
-        g_writeFileHandles[fileIndex]->writeRecord(); 
-    }
+    int fileIndex = resolveFileIndex(nFileOut); 
+    if (!validFileIndex(fileIndex)) return; 
+    g_writeFileHandles[fileIndex]->writeRecord(); 
 }
 
 void add_mille_data( double aMeas, double aErr, 
@@ -66,64 +80,53 @@ void add_mille_data( double aMeas, double aErr,
         int nGlobal, 
         const int* labGlobal, const double* derGlobal, 
         int nFileOut){
-    if (nFileOut < 0) nFileOut = g_lastOutFileIndex; 
-    int fileIndex = nFileOut - 1; 
-    if (fileIndex < g_writeFileHandles.size() && g_writeFileHandles[fileIndex] != nullptr){
-        g_writeFileHandles[fileIndex]->addData(aMeas, aErr, 
-            MilleArrayView<unsigned int>(indLocal,numLocal), 
-            MilleArrayView<double>(derLocal,numLocal),
-            MilleArrayView<int>(labGlobal, nGlobal), 
-            MilleArrayView<double>(derGlobal, nGlobal));
-    }
+    int fileIndex = resolveFileIndex(nFileOut);  
+    if (!validFileIndex(fileIndex)) return; 
+    
+    g_writeFileHandles[fileIndex]->addData(aMeas, aErr, 
+        MilleArrayView<unsigned int>(indLocal,numLocal), 
+        MilleArrayView<double>(derLocal,numLocal),
+        MilleArrayView<int>(labGlobal, nGlobal), 
+        MilleArrayView<double>(derGlobal, nGlobal));
 }
 void copy_to_mille_buffer(unsigned int nEntries,
         const int* indices, const double* derivatives,
         int nFileOut){
-    if (nFileOut < 0) nFileOut = g_lastOutFileIndex; 
-    int fileIndex = nFileOut - 1; 
-    if (fileIndex < g_writeFileHandles.size() && g_writeFileHandles[fileIndex] != nullptr){
-        g_writeFileHandles[fileIndex]->copyToBuffer(MilleArrayView<int>(indices, nEntries), 
-                                                    MilleArrayView<double>(derivatives, nEntries)); 
-    }
+    int fileIndex = resolveFileIndex(nFileOut);  
+    if (!validFileIndex(fileIndex)) return; 
+    g_writeFileHandles[fileIndex]->copyToBuffer(MilleArrayView<int>(indices, nEntries), 
+                                                MilleArrayView<double>(derivatives, nEntries)); 
 }
 
         
 void add_mille_special(int nSpecial, const int* specialInt, 
                      const double* specialFloat, 
                      int nFileOut){
-    if (nFileOut < 0) nFileOut = g_lastOutFileIndex; 
-    int fileIndex = nFileOut - 1; 
-    if (fileIndex < g_writeFileHandles.size() && g_writeFileHandles[fileIndex] != nullptr){
-        g_writeFileHandles[fileIndex]->addSpecial( 
-            MilleArrayView<int>(specialInt, nSpecial),
-            MilleArrayView<double>(specialFloat, nSpecial)
-        ); 
-    }
+    int fileIndex = resolveFileIndex(nFileOut);  
+    if (!validFileIndex(fileIndex)) return; 
+    g_writeFileHandles[fileIndex]->addSpecial( 
+        MilleArrayView<int>(specialInt, nSpecial),
+        MilleArrayView<double>(specialFloat, nSpecial)
+    ); 
 }
 
 
 void abort_mille_record(int nFileOut){
-    if (nFileOut < 0) nFileOut = g_lastOutFileIndex; 
-    int fileIndex = nFileOut - 1; 
-    if (fileIndex < g_writeFileHandles.size() && g_writeFileHandles[fileIndex] != nullptr){
-        g_writeFileHandles[fileIndex]->abort();
-    }
+    int fileIndex = resolveFileIndex(nFileOut);  
+    if (!validFileIndex(fileIndex)) return; 
+    g_writeFileHandles[fileIndex]->abort();
 }
 
 void flush_mille_output(int nFileOut){
-    if (nFileOut < 0) nFileOut = g_lastOutFileIndex; 
-    int fileIndex = nFileOut - 1; 
-    if (fileIndex < g_writeFileHandles.size() && g_writeFileHandles[fileIndex] != nullptr){
-        g_writeFileHandles[fileIndex]->flushOutputFile();
-    }
+    int fileIndex = resolveFileIndex(nFileOut);  
+    if (!validFileIndex(fileIndex)) return; 
+    g_writeFileHandles[fileIndex]->flushOutputFile();
 }
 
 void reset_mille_output(int nFileOut){
-    if (nFileOut < 0) nFileOut = g_lastOutFileIndex; 
-    int fileIndex = nFileOut - 1; 
-    if (fileIndex < g_writeFileHandles.size() && g_writeFileHandles[fileIndex] != nullptr){
-        g_writeFileHandles[fileIndex]->resetOutputFile();
-    }
+    int fileIndex = resolveFileIndex(nFileOut);  
+    if (!validFileIndex(fileIndex)) return; 
+    g_writeFileHandles[fileIndex]->resetOutputFile();
 }
 
 void last_mille_out_file_index(int* index){
@@ -131,9 +134,7 @@ void last_mille_out_file_index(int* index){
 }
 
 void close_mille_output(int nFileOut){
-    if (nFileOut < 0) nFileOut = g_lastOutFileIndex; 
-    int fileIndex = nFileOut - 1; 
-    if (fileIndex < g_writeFileHandles.size() && g_writeFileHandles[fileIndex] != nullptr){
-        g_writeFileHandles[fileIndex].reset(nullptr);
-    }
+    int fileIndex = resolveFileIndex(nFileOut);  
+    if (!validFileIndex(fileIndex)) return; 
+    g_writeFileHandles[fileIndex].reset(nullptr);
 }

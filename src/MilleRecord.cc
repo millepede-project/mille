@@ -88,7 +88,7 @@ void MilleRecord::addSpecial( MilleArrayView<int> specialInt, MilleArrayView<dou
     buffer_.fill(0,0.); // a zero measurement, 
                     // followed by no local derivatives,
     buffer_.fill(0, -1. * specialInt.size());  // and a negative uncertainty, with the magnitude nSpecial 
-    for (int i = 0; i < specialInt.size(); ++i){
+    for (size_t i = 0; i < specialInt.size(); ++i){
         buffer_.fill(specialInt[i],specialFloat[i]); 
     }
 }

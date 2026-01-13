@@ -71,7 +71,7 @@ void MilleReaderCSV::skipEntry(){
     std::stringstream sst(line); 
     sst >> recordLength; 
     recordLength /=2; 
-    for (size_t nentries = 0; nentries < recordLength; ++nentries){
+    for (int nentries = 0; nentries < recordLength; ++nentries){
         line = nextLine(infile_); 
     }
 }
@@ -104,7 +104,7 @@ std::pair<int,int> MilleReaderCSV::readToBuffer(  double *bufferDouble,
     /// catch if we exceed the buffer size 
     if (recordLength > bufferSize){
         // skip forward
-        for (size_t k = 0; k < recordLength; ++k){
+        for (int k = 0; k < recordLength; ++k){
             (void)nextLine(infile_);
         }
         if (infile_.bad()){
@@ -113,7 +113,7 @@ std::pair<int,int> MilleReaderCSV::readToBuffer(  double *bufferDouble,
         }
         return {recordLength, -4};
     }
-    for (size_t entry = 0; entry < recordLength; ++entry){
+    for (int entry = 0; entry < recordLength; ++entry){
         line = nextLine(infile_); 
         if (infile_.bad()){
             std::cerr << "Problem with stream or EOF reading CSV entries"<<std::endl;

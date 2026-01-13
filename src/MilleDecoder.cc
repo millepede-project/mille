@@ -88,7 +88,7 @@ bool MilleDecoder::nextMeasurement(long int current, long int & startLocal, long
     startLocal = -1;
     startGlobal = -1;
     lastGlobal = -1; 
-    for (long int index = current; index < buffer_.intBuffer.size(); ++index){
+    for (size_t index = current; index < buffer_.intBuffer.size(); ++index){
         if (buffer_.intBuffer[index] == 0 && startLocal < 0) startLocal = index; 
         else if (buffer_.intBuffer[index] == 0 && startLocal >=0 && startGlobal < 0) startGlobal = index;
         else if (buffer_.intBuffer[index] == 0 && startLocal >=0 && startGlobal >=0) {

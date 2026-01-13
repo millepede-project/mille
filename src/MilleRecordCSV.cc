@@ -103,7 +103,7 @@ void MilleRecordCSV::annotateCurrentLine(size_t k, int & nextMeasurement, int & 
     }
     else if (buffer_.intBuffer[k] ==0){
         // detect head of measurement or special block 
-        if (k > 0 && nextMeasurement == 0 || nextMeasurement > 3){
+        if (k > 0 && (nextMeasurement == 0 || nextMeasurement > 3)){
             if (!last && nextInt == 0 && nextFloat < 0){
                 myOutFile_ << "     # Special block"; 
                 iSpecial = -1; 

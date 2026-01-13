@@ -117,14 +117,14 @@ std::pair<int,int> MilleReaderCcompressed::readToBuffer(  double *bufferDouble,
 
     if (doublePrecision){
         int nRead = gzread(infile_,reinterpret_cast<char*>(bufferDouble), sizeof(double) * recordLength); 
-        if (nRead != recordLength * sizeof(double)){
+        if (nRead != recordLength * (int)sizeof(double)){
             std::cerr << "Problem with stream or EOF reading doubles"<<std::endl;
             return {recordLength,-32}; 
         }
     }
     else{
         int nRead = gzread(infile_,reinterpret_cast<char*>(bufferFloat), sizeof(float) * recordLength); 
-        if (nRead != recordLength * sizeof(float)){
+        if (nRead != recordLength * (int)sizeof(float)){
             std::cerr << "Problem with stream or EOF reading floats"<<std::endl;
             return {recordLength,-8}; 
         }
@@ -134,7 +134,7 @@ std::pair<int,int> MilleReaderCcompressed::readToBuffer(  double *bufferDouble,
         }
     }
     int nread = gzread(infile_,reinterpret_cast<char*>(bufferInt), sizeof(int) * recordLength); 
-    if (nread != sizeof(int)*recordLength){
+    if (nread != (int)sizeof(int)*recordLength){
         std::cerr << "Problem with stream or EOF reading ints"<<std::endl;
         return {recordLength,-16}; 
     }

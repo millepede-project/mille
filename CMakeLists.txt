@@ -43,12 +43,12 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/modules)
 
-
 if (DEBUG)
     message("Setting flags for debug build")    
-    set(CMAKE_C_FLAGS "-Wall -Wno-unused-function -O3")
+    set(CMAKE_CXX_FLAGS "-Wall -Wno-unused-function -O3 -g ")  
+
 else()
-    set(CMAKE_C_FLAGS "-Wall -Wno-unused-function -O3")
+    set(CMAKE_CXX_FLAGS "-Wall -Wno-unused-function -O3")
 endif()
 
 # add our main targets 
@@ -123,9 +123,9 @@ install(
   DESTINATION include
 )
 # F90-bindings
-add_library(MilleF SHARED)
+add_library(MilleF INTERFACE)
 target_sources(MilleF PRIVATE Fortran/MilleF.f90)
-target_link_libraries(MilleF PUBLIC MilleC )
+target_link_libraries(MilleF INTERFACE MilleC )
 
 # install F90-bindings
 install(
