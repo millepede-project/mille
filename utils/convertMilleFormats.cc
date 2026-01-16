@@ -107,7 +107,7 @@ int main(int argc, char** argv){
         std::cerr <<" Failed to deduce output file format - bailing out "<<std::endl; 
         return 1; 
     }
-    for (size_t i = iarg; i < argc; ++i){
+    for (int i = iarg; i < argc; ++i){
         std::unique_ptr<IMilleReader> reader = spawnMilleReader(std::string(argv[i])); 
         if (!reader){
             std::cout <<" Unable to deduce file type for " <<argv[i]<<std::endl; 

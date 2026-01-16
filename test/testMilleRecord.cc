@@ -144,7 +144,7 @@ int main(int, char**){
 
     /// also try double precision
 
-    MilleRecordTester testerDouble("double.dat", true);
+    MilleRecordTester testerDouble( true);
     testerDouble.addData(residual, deltaResidual, 
                         localLabels, localDeriv, 
                         globalLabels, globalDeriv); 

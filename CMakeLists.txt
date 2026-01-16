@@ -123,16 +123,17 @@ install(
   DESTINATION include
 )
 # F90-bindings
-add_library(MilleF INTERFACE)
-target_sources(MilleF PRIVATE Fortran/MilleF.f90)
+add_library(MilleF OBJECT Fortran/MilleF.f90)
+# target_sources(MilleF PRIVATE )
+target_include_directories(MilleF INTERFACE ${CMAKE_Fortran_MODULE_DIRECTORY}/)
 target_link_libraries(MilleF INTERFACE MilleC )
 
 # install F90-bindings
-install(
-  TARGETS MilleF
-  EXPORT mille-targets
-  LIBRARY DESTINATION lib
-)
+# install(
+#   TARGETS MilleF
+#   EXPORT mille-targets
+#   LIBRARY DESTINATION lib
+# )
 install (FILES ${CMAKE_Fortran_MODULE_DIRECTORY}/millef.mod DESTINATION modules )
 
 # Unit tests 

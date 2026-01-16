@@ -103,7 +103,7 @@ install (
 add_test(NAME TestWriteMilleC COMMAND testWriteMilleC)
 
 add_executable(testMilleF testMilleF.f90)
-target_link_libraries(testMilleF PUBLIC MilleF MilleC)    
+target_link_libraries(testMilleF PUBLIC MilleF)    
 install (
         TARGETS testMilleF
         DESTINATION bin
