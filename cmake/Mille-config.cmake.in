@@ -16,7 +16,8 @@ if("@build_ROOT_comps@")
 endif()
 
 # Import the targets.
-include("${_dir}/mille-targets.cmake")
+include("${_dir}/Mille-targets.cmake")
 
 # Report other information.
-set(mille_INCLUDE_DIRS "${_prefix}/include/")
+set(Mille_INCLUDE_DIRS "${_prefix}/include/")
+set(Mille_MODULE_DIRS "${_prefix}/modules/")

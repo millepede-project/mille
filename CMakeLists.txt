@@ -8,9 +8,13 @@ set(CMAKE_C_COMPILER ${gcc_loc})
 set(CMAKE_CXX_COMPILER ${gpp_loc})
 set(CMAKE_Fortran_COMPILER ${gf_loc})
 
-PROJECT(mille LANGUAGES Fortran CXX)
-set(mille_VERSION 00.01.00)
+PROJECT(Mille LANGUAGES Fortran CXX)
+set(Mille_VERSION 00.01.00)
 include(CTest)
+
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  set_property(CACHE CMAKE_INSTALL_PREFIX PROPERTY VALUE "MilleInstall")
+endif()
 
 # Arguments for CMake
 option(DEBUG "Debug" OFF)
@@ -117,7 +121,7 @@ target_link_libraries(MilleC PUBLIC Mille2 )
 # install C-bindings
 install(
   TARGETS MilleC
-  EXPORT mille-targets
+  EXPORT Mille-targets
   LIBRARY DESTINATION lib
   FILE_SET HEADERS 
   DESTINATION include
@@ -125,15 +129,10 @@ install(
 # F90-bindings
 add_library(MilleF OBJECT Fortran/MilleF.f90)
 # target_sources(MilleF PRIVATE )
-target_include_directories(MilleF INTERFACE ${CMAKE_Fortran_MODULE_DIRECTORY}/)
+target_include_directories(MilleF 
+                        INTERFACE  $<BUILD_INTERFACE:${CMAKE_Fortran_MODULE_DIRECTORY}/>  $<INSTALL_INTERFACE:${Mille_MODULE_DIRS})
 target_link_libraries(MilleF INTERFACE MilleC )
 
-# install F90-bindings
-# install(
-#   TARGETS MilleF
-#   EXPORT mille-targets
-#   LIBRARY DESTINATION lib
-# )
 install (FILES ${CMAKE_Fortran_MODULE_DIRECTORY}/millef.mod DESTINATION modules )
 
 # Unit tests 
@@ -145,7 +144,7 @@ endif()
 # install components for Mille
 install(
   TARGETS Mille2
-  EXPORT mille-targets
+  EXPORT Mille-targets
   LIBRARY DESTINATION lib
   FILE_SET HEADERS 
   DESTINATION include
@@ -156,19 +155,19 @@ install (FILES python/milleLibBindings.py python/milleReader.py python/milleWrit
         DESTINATION python/Mille)
         
 
-install (EXPORT mille-targets
+install (EXPORT Mille-targets
         DESTINATION cmake 
 )
 
 # Create and install package configuration and version files.
 configure_file(
-${mille_SOURCE_DIR}/cmake/mille-config.cmake.in
-${mille_BINARY_DIR}/cmake/milleConfig.cmake @ONLY)
+${Mille_SOURCE_DIR}/cmake/Mille-config.cmake.in
+${Mille_BINARY_DIR}/cmake/MilleConfig.cmake @ONLY)
 
 configure_file(
-${mille_SOURCE_DIR}/cmake/mille-config-version.cmake.in
-${mille_BINARY_DIR}/cmake/milleConfig-version.cmake @ONLY)
+${Mille_SOURCE_DIR}/cmake/Mille-config-version.cmake.in
+${Mille_BINARY_DIR}/cmake/MilleConfig-version.cmake @ONLY)
 
-install(FILES ${mille_BINARY_DIR}/cmake/milleConfig.cmake
-        ${mille_BINARY_DIR}/cmake/milleConfig-version.cmake
+install(FILES ${Mille_BINARY_DIR}/cmake/MilleConfig.cmake
+        ${Mille_BINARY_DIR}/cmake/MilleConfig-version.cmake
         DESTINATION cmake/)
