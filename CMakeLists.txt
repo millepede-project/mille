@@ -130,10 +130,14 @@ install(
 add_library(MilleF OBJECT Fortran/MilleF.f90)
 # target_sources(MilleF PRIVATE )
 target_include_directories(MilleF 
-                        INTERFACE  $<BUILD_INTERFACE:${CMAKE_Fortran_MODULE_DIRECTORY}/>  $<INSTALL_INTERFACE:${Mille_MODULE_DIRS})
+                        INTERFACE  $<BUILD_INTERFACE:${CMAKE_Fortran_MODULE_DIRECTORY}/> $<INSTALL_INTERFACE:${Mille_MODULE_DIRS}>)
 target_link_libraries(MilleF INTERFACE MilleC )
 
 install (FILES ${CMAKE_Fortran_MODULE_DIRECTORY}/millef.mod DESTINATION modules )
+install (
+    TARGETS MilleF
+    EXPORT Mille-targets
+)
 
 # Unit tests 
 if (BUILD_TESTS)
@@ -158,6 +162,16 @@ install (FILES python/milleLibBindings.py python/milleReader.py python/milleWrit
 install (EXPORT Mille-targets
         DESTINATION cmake 
 )
+
+if (NOT MILLE_AS_SUBDIR)
+    # configure and install a setup script for standalone Mille 
+    configure_file(
+        ${Mille_SOURCE_DIR}/cmake/setup.sh.cmake.in
+        ${Mille_BINARY_DIR}/milleStandaloneSetup.sh @ONLY)
+
+    install(FILES ${Mille_BINARY_DIR}/milleStandaloneSetup.sh
+            DESTINATION . )
+endif()
 
 # Create and install package configuration and version files.
 configure_file(
