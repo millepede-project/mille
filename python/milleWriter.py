@@ -22,7 +22,15 @@
 
 import ctypes 
 import numpy as np 
-from milleLibBindings import milleC
+# In the CI, we do not have the Mille module in place yet 
+try: 
+    from milleLibBindings import milleC
+except ModuleNotFoundError:
+    # this is the import expected to happen outside the CI! 
+    try: 
+        from Mille.milleLibBindings import milleC
+    except ModuleNotFoundError:
+        raise
 
 ## Class to wrap the C-Mille interface back into 
 # object-oriented behaviour at the python level. 

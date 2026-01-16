@@ -13,7 +13,7 @@ set(Mille_VERSION 00.01.00)
 include(CTest)
 
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-  set_property(CACHE CMAKE_INSTALL_PREFIX PROPERTY VALUE "MilleInstall")
+  set_property(CACHE CMAKE_INSTALL_PREFIX PROPERTY VALUE "${CMAKE_BINARY_DIR}/MilleInstall")
 endif()
 
 # Arguments for CMake
