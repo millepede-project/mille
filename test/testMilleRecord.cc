@@ -21,6 +21,7 @@
 
 #include "testUtils.h"
 #include "Mille/MilleRecord.h"
+using namespace Mille; 
 /// @brief Test class - expose internal storage for testing. 
 class MilleRecordTester: public MilleRecord{
     public: 

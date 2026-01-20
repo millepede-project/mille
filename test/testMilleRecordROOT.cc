@@ -31,6 +31,7 @@
 #include "TFile.h"
 #include "TTree.h"
 
+using namespace Mille; 
 
 int main(int, char**){
     using ::my_ssize; 

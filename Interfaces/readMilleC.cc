@@ -26,12 +26,14 @@
 #include <vector>
 #include <iostream>
 #include <atomic>
+
+using Mille::spawnMilleReader; 
+
 /* ________ global variables used for file handling __________ */
 
-std::vector<std::unique_ptr<IMilleReader>> g_readFileHandles;   ///< pointer to list of pointers to opened binary files
+std::vector<std::unique_ptr<Mille::IMilleReader>> g_readFileHandles;   ///< pointer to list of pointers to opened binary files
 std::atomic<int> g_lastInFileIndex = 0;                         ///< index of the last opened file handle
 /*______________________________________________________________*/
-
 
 /// helper to derive last opened file index
 namespace{
@@ -47,8 +49,7 @@ namespace{
         if (!g_readFileHandles.at(fileIndex)) return false;
         return true; 
     }
-};
-
+}
 
 /// Initialises the 'global' variables used for file handling.
 void initMille() {
@@ -122,18 +123,18 @@ void read_mille(double *bufferDouble, float *bufferFloat, int *bufferInt,
         *nFileIn: number of the file the record is read from,
         starting from 1 (not 0)
         */
-	if (!errorFlag)
-		return;
-	*errorFlag = 0;
+    if (!errorFlag)
+        return;
+    *errorFlag = 0;
 
-	int fileIndex = resolveFileIndex(nFileIn); /* index of current file */
+    int fileIndex = resolveFileIndex(nFileIn); /* index of current file */
     if (!validFileIndex(fileIndex)){
         std::cerr <<" File index " <<fileIndex<<" from nFileIn "<<nFileIn<<" is either invalid or points to invalid reader instance. Will not read anything."<<std::endl;
-		*errorFlag = -3; 
+        *errorFlag = -3; 
         return; 
     }
     // access the requested handler 
-    IMilleReader* reader = g_readFileHandles.at(fileIndex).get(); 
+    Mille::IMilleReader* reader = g_readFileHandles.at(fileIndex).get(); 
     // read the next record via the IMilleReader
     std::pair<int,int> readResult = reader->readToBuffer(bufferDouble, bufferFloat, bufferInt, *lengthBuffers); 
     *errorFlag = readResult.second; 
@@ -144,5 +145,3 @@ void last_mille_in_file_index(int* index){
     if (!index) return; 
     *index = g_lastInFileIndex; 
 }
-
-

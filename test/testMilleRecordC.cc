@@ -27,6 +27,7 @@
 #include <fstream>
 #include <filesystem>
 
+using namespace Mille; 
 
 int main(int, char**){
 

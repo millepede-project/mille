@@ -21,116 +21,118 @@
 #include "Mille/MilleRecord.h"
 #include <iostream> 
 
-MilleRecord::MilleRecord(bool doublePrecision, bool writeZero, std::size_t recordLengthHint):
-    globalDerKeepZeros_(writeZero),
-    recordLengthHint_(recordLengthHint){
-        buffer_.doublePrecision = doublePrecision;
-        buffer_.reserve(recordLengthHint); 
-}
+namespace Mille{
+    MilleRecord::MilleRecord(bool doublePrecision, bool writeZero, std::size_t recordLengthHint):
+        globalDerKeepZeros_(writeZero),
+        recordLengthHint_(recordLengthHint){
+            buffer_.doublePrecision = doublePrecision;
+            buffer_.reserve(recordLengthHint); 
+    }
 
-MilleRecord::~MilleRecord(){
+    MilleRecord::~MilleRecord(){
 
-}
+    }
 
-void MilleRecord::addData(double aMeas, double aErr, 
-			MilleArrayView<unsigned int> indLocal, MilleArrayView<double> derLocal,
-			MilleArrayView<int> labGlobal,
-			MilleArrayView<double> derGlobal){
-    if (indLocal.size() != derLocal.size()){
-        std::cerr << " MilleRecord::addData expects local labels and derivatives to have same size, but received "<<indLocal.size()<<" int and "<<derLocal.size()<<" float. Will not add entry. "<<std::endl; 
-        return ;   
+    void MilleRecord::addData(double aMeas, double aErr, 
+                MilleArrayView<unsigned int> indLocal, MilleArrayView<double> derLocal,
+                MilleArrayView<int> labGlobal,
+                MilleArrayView<double> derGlobal){
+        if (indLocal.size() != derLocal.size()){
+            std::cerr << " MilleRecord::addData expects local labels and derivatives to have same size, but received "<<indLocal.size()<<" int and "<<derLocal.size()<<" float. Will not add entry. "<<std::endl; 
+            return ;   
+        }
+        if (labGlobal.size() != derGlobal.size()){
+            std::cerr << " MilleRecord::addData expects global labels and derivatives to have same size, but received "<<labGlobal.size()<<" int and "<<derGlobal.size()<<" float. Will not add entry. "<<std::endl; 
+            return ;   
+        }
+        // ensure the header is in place 
+        newSetIfNeeded(); 
+        // add measurement
+        buffer_.fill(0, aMeas);
+        // add local derivative block
+        for (unsigned int i = 0; i < derLocal.size(); ++i){
+            buffer_.fill(indLocal[i], derLocal[i]); 
+        }
+        // add uncertainty 
+        buffer_.fill(0, aErr); 
+        // add global derivative block 
+        for (std::size_t k = 0; k < derGlobal.size(); ++k){
+            if (derGlobal[k] != 0 or globalDerKeepZeros_){
+                buffer_.fill(labGlobal[k], derGlobal[k]);
+            } 
+        }
     }
-    if (labGlobal.size() != derGlobal.size()){
-        std::cerr << " MilleRecord::addData expects global labels and derivatives to have same size, but received "<<labGlobal.size()<<" int and "<<derGlobal.size()<<" float. Will not add entry. "<<std::endl; 
-        return ;   
+    void MilleRecord::copyToBuffer(MilleArrayView<int> integers, MilleArrayView<double> floats){
+        if (integers.size() != floats.size()){
+            std::cerr << " MilleRecord::copyToBuffer expects both arrays to have same size, but received "<<integers.size()<<" int and "<<floats.size()<<" float. "<<std::endl; 
+            return ;   
+        }
+        for (size_t k = 0; k < integers.size(); ++k){
+            buffer_.fill(integers[k], floats[k]);
+        }
     }
-    // ensure the header is in place 
-    newSetIfNeeded(); 
-    // add measurement
-    buffer_.fill(0, aMeas);
-    // add local derivative block
-    for (unsigned int i = 0; i < derLocal.size(); ++i){
-        buffer_.fill(indLocal[i], derLocal[i]); 
-    }
-    // add uncertainty 
-    buffer_.fill(0, aErr); 
-    // add global derivative block 
-    for (std::size_t k = 0; k < derGlobal.size(); ++k){
-        if (derGlobal[k] != 0 or globalDerKeepZeros_){
-            buffer_.fill(labGlobal[k], derGlobal[k]);
-        } 
-    }
-}
-void MilleRecord::copyToBuffer(MilleArrayView<int> integers, MilleArrayView<double> floats){
-    if (integers.size() != floats.size()){
-        std::cerr << " MilleRecord::copyToBuffer expects both arrays to have same size, but received "<<integers.size()<<" int and "<<floats.size()<<" float. "<<std::endl; 
-        return ;   
-    }
-    for (size_t k = 0; k < integers.size(); ++k){
-        buffer_.fill(integers[k], floats[k]);
-    }
-}
 
-void MilleRecord::addSpecial( MilleArrayView<int> specialInt, MilleArrayView<double> specialFloat){
-    if (!specialInt.size()) return;  // trivial empty special block 
-    if (specialInt.size() != specialFloat.size()){
-        std::cerr << " MilleRecord::addSpecial expects int and float lists to have same size, but received "<<specialInt.size()<<" int and "<<specialFloat.size()<<" float. Will not add entry. "<<std::endl; 
-        return ;   
+    void MilleRecord::addSpecial( MilleArrayView<int> specialInt, MilleArrayView<double> specialFloat){
+        if (!specialInt.size()) return;  // trivial empty special block 
+        if (specialInt.size() != specialFloat.size()){
+            std::cerr << " MilleRecord::addSpecial expects int and float lists to have same size, but received "<<specialInt.size()<<" int and "<<specialFloat.size()<<" float. Will not add entry. "<<std::endl; 
+            return ;   
+        }
+        newSetIfNeeded(); // header 
+        if (hasSpecialInRecord_){
+            std::cerr << "MilleRecord::addSpecial: Special values already stored for this record."
+                << std::endl; 
+            return;
+        }
+        hasSpecialInRecord_ = true; 
+        // A special record is indicated by:
+        buffer_.fill(0,0.); // a zero measurement, 
+                        // followed by no local derivatives,
+        buffer_.fill(0, -1. * specialInt.size());  // and a negative uncertainty, with the magnitude nSpecial 
+        for (size_t i = 0; i < specialInt.size(); ++i){
+            buffer_.fill(specialInt[i],specialFloat[i]); 
+        }
     }
-    newSetIfNeeded(); // header 
-    if (hasSpecialInRecord_){
-        std::cerr << "MilleRecord::addSpecial: Special values already stored for this record."
-            << std::endl; 
-        return;
-    }
-    hasSpecialInRecord_ = true; 
-    // A special record is indicated by:
-    buffer_.fill(0,0.); // a zero measurement, 
-                    // followed by no local derivatives,
-    buffer_.fill(0, -1. * specialInt.size());  // and a negative uncertainty, with the magnitude nSpecial 
-    for (size_t i = 0; i < specialInt.size(); ++i){
-        buffer_.fill(specialInt[i],specialFloat[i]); 
-    }
-}
 
-void MilleRecord::abort(){
-    // clear the current content
-    resetBuffers(); 
-    // and write a fresh header 
-    newSetIfNeeded(); 
-}
-void MilleRecord::newSetIfNeeded(){
-    /// if we are in an active record, do not add a new header
-    if (!buffer_.empty()){
-        return; 
+    void MilleRecord::abort(){
+        // clear the current content
+        resetBuffers(); 
+        // and write a fresh header 
+        newSetIfNeeded(); 
     }
-    /// The header of a new record is a pair (0,0) 
-    buffer_.fill(0,0.); 
-}
-void MilleRecord::resetBuffers(){
-    buffer_.clear(); 
-    buffer_.reserve(recordLengthHint_); 
-    hasSpecialInRecord_ = false; 
-}
+    void MilleRecord::newSetIfNeeded(){
+        /// if we are in an active record, do not add a new header
+        if (!buffer_.empty()){
+            return; 
+        }
+        /// The header of a new record is a pair (0,0) 
+        buffer_.fill(0,0.); 
+    }
+    void MilleRecord::resetBuffers(){
+        buffer_.clear(); 
+        buffer_.reserve(recordLengthHint_); 
+        hasSpecialInRecord_ = false; 
+    }
 
-bool MilleRecord::copyRecord(IMilleReader & source){
-    buffer_.clear(); 
-    const size_t defaultBuffer = 5000; 
-    buffer_.resize(defaultBuffer,true); 
-    auto [nRead, status] = source.readToBuffer(buffer_); 
-    if (status == -4){
-        buffer_.resize(nRead,true); 
-        source.rewindEntry();
-        auto try2 = source.readToBuffer(buffer_); 
-        nRead = try2.first;
-        status = try2.second;
+    bool MilleRecord::copyRecord(IMilleReader & source){
+        buffer_.clear(); 
+        const size_t defaultBuffer = 5000; 
+        buffer_.resize(defaultBuffer,true); 
+        auto [nRead, status] = source.readToBuffer(buffer_); 
+        if (status == -4){
+            buffer_.resize(nRead,true); 
+            source.rewindEntry();
+            auto try2 = source.readToBuffer(buffer_); 
+            nRead = try2.first;
+            status = try2.second;
+        }
+        if (status < 0){
+            std::cerr <<" Read error "<<std::endl;
+            return false;
+        }
+        if (status == 0) return false; 
+        buffer_.resize(nRead); 
+        buffer_.clearUnused();  
+        return true; 
     }
-    if (status < 0){
-        std::cerr <<" Read error "<<std::endl;
-        return false;
-    }
-    if (status == 0) return false; 
-    buffer_.resize(nRead); 
-    buffer_.clearUnused();  
-    return true; 
 }

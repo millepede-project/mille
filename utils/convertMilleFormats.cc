@@ -21,7 +21,7 @@
 #include "Mille/MilleFactory.h"
 #include <iostream>
 
-int decodeFile(IMilleReader & reader, MilleRecord & writer, const std::string & fname, long long int & nRecords, long long int & nSkip){
+int decodeFile(Mille::IMilleReader & reader, Mille::MilleRecord & writer, const std::string & fname, long long int & nRecords, long long int & nSkip){
     int nentries = 0; 
     if(!reader.open(fname)){
         std::cerr <<" Failed to import "<<fname<<" due to open errors"<<std::endl;    
@@ -46,6 +46,11 @@ int decodeFile(IMilleReader & reader, MilleRecord & writer, const std::string & 
 }
 
 int main(int argc, char** argv){
+    using Mille::MilleFormat; 
+    using Mille::MilleRecord; 
+    using Mille::spawnMilleRecord; 
+    using Mille::spawnMilleReader; 
+    using Mille::IMilleReader; 
 
     if (argc < 3){
         std::cerr << "Usage: convertMilleFormats [-r / -c / -z / -t to force input file format to ROOT / C / zipped C / plain text]"

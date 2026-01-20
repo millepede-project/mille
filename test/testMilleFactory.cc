@@ -37,6 +37,7 @@
 
 #include "testUtils.h"
 
+using namespace Mille; 
 
 int main(int, char**){
     TEST_CONDITION(dynamic_cast<MilleReaderC*>(spawnMilleReader("MyCoolFile.dat").get()) != nullptr, true, "Detection of C binary as .dat - reader"); 

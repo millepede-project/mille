@@ -46,7 +46,7 @@ void initMille();
  *      * 2: if file could not be opened
  *      * 3: if file opened, but with error (can that happen?)
  */
- void open_mille(const char *fileName, int lengthFileName, int *errorFlag, int nFileIn=-1); 
+void open_mille(const char *fileName, int lengthFileName, int *errorFlag, int nFileIn=-1); 
 /*______________________________________________________________*/
 /// Close file.
 /**
@@ -92,14 +92,13 @@ void reset_mille_entry(int nFileIn=-1);
     starting from 1 (not 0)
     */
 void read_mille(double *bufferDouble, float *bufferFloat, int *bufferInt,
-		int *lengthBuffers, int *errorFlag, int nFileIn=-1);
+        int *lengthBuffers, int *errorFlag, int nFileIn=-1);
 
 /// skip the next record 
 void skip_mille(int nFileIn = -1); 
 
 // get the index of the last file added (useful if passing "-1") to openMille
 void last_mille_in_file_index(int* index); 
-
 
 #ifdef __cplusplus
 }

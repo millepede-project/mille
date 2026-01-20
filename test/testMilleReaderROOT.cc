@@ -27,6 +27,7 @@
 #include <iostream>
 #include <limits>
 
+using namespace Mille; 
 
 int main(int, char**){
 

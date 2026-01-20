@@ -22,55 +22,57 @@
 #include "Mille/MilleRecordROOT.h"
 #include <iostream>
 
-MilleRecordROOT::MilleRecordROOT( const std::string & fname, 
-                bool doublePrecision, 
-                bool writeZero, 
-                std::size_t recordLengthHint):
-    MilleRecord(doublePrecision, writeZero, recordLengthHint),
-    fname_(fname){
-    open(); 
+namespace Mille{
+    MilleRecordROOT::MilleRecordROOT( const std::string & fname, 
+                    bool doublePrecision, 
+                    bool writeZero, 
+                    std::size_t recordLengthHint):
+        MilleRecord(doublePrecision, writeZero, recordLengthHint),
+        fname_(fname){
+        open(); 
+    }
+    /// @brief Destructor 
+    MilleRecordROOT::~MilleRecordROOT(){
+        close();     
+    } 
+    void MilleRecordROOT::writeRecord(){
+        floatingPointFormat_ = 4; 
+        if (buffer_.doublePrecision) floatingPointFormat_ = 8;
+        // skip empty records 
+        if (buffer_.empty()) return;
+        outTree_->Fill(); 
+
+        // prepare for next record 
+        resetBuffers();
+        newSetIfNeeded();     
+    }
+
+    void MilleRecordROOT::flushOutputFile(){
+        file_->Flush(); 
+    } 
+
+    void MilleRecordROOT::resetOutputFile(){
+        close();
+        open();
+    } 
+
+    void MilleRecordROOT::open(){
+    file_.reset(TFile::Open(fname_.c_str(),"RECREATE")); 
+    if (!file_ || !file_->IsOpen()){
+        std::cerr << "Mille::openRoot: Could not open " << fname_ 
+            << " as output file." << std::endl;
+    }
+    outTree_ = new TTree("MilleRecords","MilleRecords");
+    outTree_->SetDirectory(file_.get()); 
+    outTree_->Branch("floats",&(buffer_.floatBuffer)); 
+    outTree_->Branch("ints",&(buffer_.intBuffer)); 
+    outTree_->Branch("doubles",&(buffer_.doubleBuffer)); 
+    outTree_->Branch("floatingPointFormat",&floatingPointFormat_); 
+    outTree_->SetAutoFlush(100); 
+
+    } 
+    void MilleRecordROOT::close(){
+    file_->Write(); 
+    file_->Close();
+    } 
 }
-/// @brief Destructor 
-MilleRecordROOT::~MilleRecordROOT(){
-    close();     
-} 
-void MilleRecordROOT::writeRecord(){
-    floatingPointFormat_ = 4; 
-    if (buffer_.doublePrecision) floatingPointFormat_ = 8;
-    // skip empty records 
-    if (buffer_.empty()) return;
-    outTree_->Fill(); 
-
-    // prepare for next record 
-    resetBuffers();
-    newSetIfNeeded();     
-}
-
-void MilleRecordROOT::flushOutputFile(){
-    file_->Flush(); 
-} 
-
-void MilleRecordROOT::resetOutputFile(){
-    close();
-    open();
-} 
-
-void MilleRecordROOT::open(){
-  file_.reset(TFile::Open(fname_.c_str(),"RECREATE")); 
-  if (!file_ || !file_->IsOpen()){
-    std::cerr << "Mille::openRoot: Could not open " << fname_ 
-	      << " as output file." << std::endl;
-  }
-  outTree_ = new TTree("MilleRecords","MilleRecords");
-  outTree_->SetDirectory(file_.get()); 
-  outTree_->Branch("floats",&(buffer_.floatBuffer)); 
-  outTree_->Branch("ints",&(buffer_.intBuffer)); 
-  outTree_->Branch("doubles",&(buffer_.doubleBuffer)); 
-  outTree_->Branch("floatingPointFormat",&floatingPointFormat_); 
-  outTree_->SetAutoFlush(100); 
-
-} 
-void MilleRecordROOT::close(){
-  file_->Write(); 
-  file_->Close();
-} 

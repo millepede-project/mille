@@ -26,6 +26,7 @@
 #include "Mille/MilleRecord.h"
 #include "testUtils.h"
 
+
 // standardised test inputs
 struct MilleTestInputs{
 
@@ -40,7 +41,7 @@ struct MilleTestInputs{
     double deltaResidual = 1.e-3; 
     /// helper function to write the test data into an 
     /// arbitraty type of Mille record. 
-    void writeTo(MilleRecord & mille){
+    void writeTo(Mille::MilleRecord & mille){
         mille.addData(residual, deltaResidual, 
                     localLabels,
                     localDeriv, 
@@ -59,7 +60,7 @@ struct MilleTestInputs{
 /// @param inputs: Set of test inputs to use
 /// @param expectedPrecision: 4 (for float) or 8 (for double) internal precision
 /// @return 0 if success, else 1
-int MilleReaderTestSuite(IMilleReader & reader, MilleTestInputs & inputs, int expectedPrecision=4){
+int MilleReaderTestSuite(Mille::IMilleReader & reader, MilleTestInputs & inputs, int expectedPrecision=4){
 
     // buffers 
     std::vector<double> doubles(1,0.);

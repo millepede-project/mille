@@ -30,6 +30,7 @@
 #include <fstream>
 #include <filesystem>
 
+using namespace Mille; 
 
 int compareExpectMeasurement(const MilleMeasurement & meas, const MilleTestInputs & inputs){
 

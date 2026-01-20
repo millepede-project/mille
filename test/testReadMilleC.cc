@@ -24,7 +24,10 @@
 #include "milleReaderTests.h"
 #include "Mille/MilleFactory.h"
 
+using namespace Mille; 
+
 int main(int, char**){
+
     /// dummy data for testing 
     MilleTestInputs inputs; 
     {

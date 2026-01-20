@@ -34,43 +34,45 @@
 #ifndef MILLE__DECODER__H
 #define MILLE__DECODER__H
 
-/// @brief Helper class to decode a Mille record 
-class MilleDecoder{
-    public:
-        enum class ReadResult{
-            OK=0,
-            atEof=1,
-            error=2
-        };
+namespace Mille{
+    /// @brief Helper class to decode a Mille record 
+    class MilleDecoder{
+        public:
+            enum class ReadResult{
+                OK=0,
+                atEof=1,
+                error=2
+            };
 
-        /// @brief constructor
-        MilleDecoder()=default;
-        /// @brief accessor - retrieve the next record 
-        /// @param[in] reader: A reader connected to a file to read from 
-        /// @param[out] record: A vector to be filled with the measurements from the next record 
-        /// @return A status code indicating the outcome of the operation 
-        ReadResult decode (IMilleReader & reader, std::vector<MilleMeasurement> & record);  
+            /// @brief constructor
+            MilleDecoder()=default;
+            /// @brief accessor - retrieve the next record 
+            /// @param[in] reader: A reader connected to a file to read from 
+            /// @param[out] record: A vector to be filled with the measurements from the next record 
+            /// @return A status code indicating the outcome of the operation 
+            ReadResult decode (IMilleReader & reader, std::vector<MilleMeasurement> & record);  
 
-    private:
-        /// @brief Find the next measurement in the buffer. 
-        /// @param [in] current Starting index in the buffer to search 
-        /// @param [out] startLocal Will be set to the index storing the measured value
-        /// @param [out] startGlobal Will be set to the index storing the uncertainty on the measurement
-        /// @param [out] lastGlobal Will be set to the index storing the last entry of this measurement (last global derivative or uncertainty if no such)
-        /// @return a bool - true indicates a new measurement was found, false indicates we are done with the buffer 
-        bool nextMeasurement(long int current, long int & startLocal, long int  & startGlobal, long int & lastGlobal); 
-        
-        /// @brief Decodes an entry and extracts a measurement.
-        ///        Expects the indices to be determined by a prior call to nextMeasurement. 
-        /// @param [out] startLocal Index storing the measured value
-        /// @param [out] startGlobal Index storing the uncertainty on the measurement
-        /// @param [out] lastGlobal Index storing the last entry of this measurement (last global derivative or uncertainty if no such)
-        MilleMeasurement decodeEntry(long int startLocal, long int startGlobal, long int lastGlobal); 
+        private:
+            /// @brief Find the next measurement in the buffer. 
+            /// @param [in] current Starting index in the buffer to search 
+            /// @param [out] startLocal Will be set to the index storing the measured value
+            /// @param [out] startGlobal Will be set to the index storing the uncertainty on the measurement
+            /// @param [out] lastGlobal Will be set to the index storing the last entry of this measurement (last global derivative or uncertainty if no such)
+            /// @return a bool - true indicates a new measurement was found, false indicates we are done with the buffer 
+            bool nextMeasurement(long int current, long int & startLocal, long int  & startGlobal, long int & lastGlobal); 
+            
+            /// @brief Decodes an entry and extracts a measurement.
+            ///        Expects the indices to be determined by a prior call to nextMeasurement. 
+            /// @param [out] startLocal Index storing the measured value
+            /// @param [out] startGlobal Index storing the uncertainty on the measurement
+            /// @param [out] lastGlobal Index storing the last entry of this measurement (last global derivative or uncertainty if no such)
+            MilleMeasurement decodeEntry(long int startLocal, long int startGlobal, long int lastGlobal); 
 
-        MilleBuffer buffer_; 
-        const size_t defaultBufferSize_ = 5000;  ///< starting buffer size
+            MilleBuffer buffer_; 
+            const size_t defaultBufferSize_ = 5000;  ///< starting buffer size
 
-};
+    };
+}
 
 
 

@@ -22,107 +22,109 @@
 #include <iostream>
 
 
-bool MilleReaderROOT::open(const std::string & fname){
-    if (fname.empty() && fname_.empty()){
-        std::cerr << "Empty file name passed to MilleReaderC::open"<<std::endl;
-        return false; 
-    }
-    std::string fToOpen = fname; 
-    if (fToOpen.empty()) fToOpen = fname_; // allow using pre-configured file name (from c-tor call)
-    if (file_ && file_->IsOpen()){
-        std::cerr << " Careful, calling open() on an already active file handler!"<<std::endl;
-        close(); 
-    }
-    fname_ = fToOpen; 
-    // Access the ROOT file. 
-    file_.reset(TFile::Open(fToOpen.c_str(),"READ")); 
-    if (!file_ || !file_->IsOpen()){
-        std::cerr << "could not open file "<<fToOpen<<std::endl;
-        return false; 
-    }
-    // Load the tree
-    file_->GetObject<TTree>("MilleRecords",tree_);
-    if (!tree_){
-        std::cerr << "could not read the tree 'MilleRecords' from file "<<fToOpen<<std::endl;
-        return false; 
-    }
-    // connect our branches 
-    tree_->SetBranchAddress("doubles",&doubles_); 
-    tree_->SetBranchAddress("ints",	  &ints_); 
-    tree_->SetBranchAddress("floats",	  &floats_); 
-    tree_->SetBranchAddress("floatingPointFormat",	  &floatingPointFormat_); 
-
-    // configure TTreeCache 
-    tree_->SetCacheSize(100000000);	// 100 MB
-    tree_->AddBranchToCache("*",true); 
-    tree_->StopCacheLearningPhase();
-    // check number of entries 
-    nentries_ = tree_->GetEntries();
-    // ensure valid status of internal pointers 
-    ints_ = nullptr;
-    doubles_ = nullptr; 
-    floats_ = nullptr; 
-    return true; 
-}
-void MilleReaderROOT::close(){
-    if (file_ && file_->IsOpen()){
-        file_->Close(); 
-    }
-    file_.release(); 
-    fname_ = ""; 
-    tree_ = nullptr;
-    doubles_ = nullptr;
-    ints_ = nullptr;
-    floats_ = nullptr;
-    entryNumber_ = 0; 
-    nentries_ = 0; 
-}
-void MilleReaderROOT::reset(){
-    entryNumber_ = 0; 
-}
-void MilleReaderROOT::rewindEntry(){
-    entryNumber_ = lastEntry_; 
-}
-void MilleReaderROOT::skipEntry(){
-    lastEntry_ = entryNumber_; 
-    ++entryNumber_; 
-}
-std::pair<int,int> MilleReaderROOT::readToBuffer(  double *bufferDouble, 
-                            float * bufferFloat, 
-                            int *bufferInt,
-                            int bufferSize){
-    if (!bufferDouble || !bufferFloat || !bufferInt || !bufferSize) {
-        return {0,-1};
-    }
-    lastEntry_ = entryNumber_; 
-    // the equivalent of EOF with a root tree 
-    if (entryNumber_ >= nentries_){
-        return {0,0}; 
-    }
-    // read the next entry, increment internal entry counter
-    int got = tree_->GetEntry(entryNumber_++);
-    // if we read nothing, we are at the end of the file - return EOF
-    if (!got) return {0,0}; 
-    // check the length of the label array for this record 
-    int recordLength = ints_->size();
-    bool doublePrecision = (floatingPointFormat_  == 8); 
-    
-    /// catch if we exceed the buffer size 
-    if (recordLength > bufferSize){
-        // skip forward
-        return {recordLength, -4};
-    }
-    // copy label info into buffer
-    std::memcpy(bufferInt, 	  ints_->data(),   recordLength*sizeof(ints_->front()   )); 
-    if (doublePrecision){
-        std::memcpy(bufferDouble, doubles_->data(),recordLength*sizeof(doubles_->front())); 
-    }
-    else{
-        std::memcpy(bufferFloat, floats_->data(),recordLength*sizeof(floats_->front())); 
-        // convert and populate double array 
-        for (size_t k = 0; k < floats_->size(); ++k){
-            bufferDouble[k] = bufferFloat[k]; 
+namespace Mille{
+    bool MilleReaderROOT::open(const std::string & fname){
+        if (fname.empty() && fname_.empty()){
+            std::cerr << "Empty file name passed to MilleReaderC::open"<<std::endl;
+            return false; 
         }
+        std::string fToOpen = fname; 
+        if (fToOpen.empty()) fToOpen = fname_; // allow using pre-configured file name (from c-tor call)
+        if (file_ && file_->IsOpen()){
+            std::cerr << " Careful, calling open() on an already active file handler!"<<std::endl;
+            close(); 
+        }
+        fname_ = fToOpen; 
+        // Access the ROOT file. 
+        file_.reset(TFile::Open(fToOpen.c_str(),"READ")); 
+        if (!file_ || !file_->IsOpen()){
+            std::cerr << "could not open file "<<fToOpen<<std::endl;
+            return false; 
+        }
+        // Load the tree
+        file_->GetObject<TTree>("MilleRecords",tree_);
+        if (!tree_){
+            std::cerr << "could not read the tree 'MilleRecords' from file "<<fToOpen<<std::endl;
+            return false; 
+        }
+        // connect our branches 
+        tree_->SetBranchAddress("doubles",&doubles_); 
+        tree_->SetBranchAddress("ints",	  &ints_); 
+        tree_->SetBranchAddress("floats",	  &floats_); 
+        tree_->SetBranchAddress("floatingPointFormat",	  &floatingPointFormat_); 
+
+        // configure TTreeCache 
+        tree_->SetCacheSize(100000000);	// 100 MB
+        tree_->AddBranchToCache("*",true); 
+        tree_->StopCacheLearningPhase();
+        // check number of entries 
+        nentries_ = tree_->GetEntries();
+        // ensure valid status of internal pointers 
+        ints_ = nullptr;
+        doubles_ = nullptr; 
+        floats_ = nullptr; 
+        return true; 
     }
-    return {recordLength, floatingPointFormat_}; 
+    void MilleReaderROOT::close(){
+        if (file_ && file_->IsOpen()){
+            file_->Close(); 
+        }
+        file_.release(); 
+        fname_ = ""; 
+        tree_ = nullptr;
+        doubles_ = nullptr;
+        ints_ = nullptr;
+        floats_ = nullptr;
+        entryNumber_ = 0; 
+        nentries_ = 0; 
+    }
+    void MilleReaderROOT::reset(){
+        entryNumber_ = 0; 
+    }
+    void MilleReaderROOT::rewindEntry(){
+        entryNumber_ = lastEntry_; 
+    }
+    void MilleReaderROOT::skipEntry(){
+        lastEntry_ = entryNumber_; 
+        ++entryNumber_; 
+    }
+    std::pair<int,int> MilleReaderROOT::readToBuffer(  double *bufferDouble, 
+                                float * bufferFloat, 
+                                int *bufferInt,
+                                int bufferSize){
+        if (!bufferDouble || !bufferFloat || !bufferInt || !bufferSize) {
+            return {0,-1};
+        }
+        lastEntry_ = entryNumber_; 
+        // the equivalent of EOF with a root tree 
+        if (entryNumber_ >= nentries_){
+            return {0,0}; 
+        }
+        // read the next entry, increment internal entry counter
+        int got = tree_->GetEntry(entryNumber_++);
+        // if we read nothing, we are at the end of the file - return EOF
+        if (!got) return {0,0}; 
+        // check the length of the label array for this record 
+        int recordLength = ints_->size();
+        bool doublePrecision = (floatingPointFormat_  == 8); 
+        
+        /// catch if we exceed the buffer size 
+        if (recordLength > bufferSize){
+            // skip forward
+            return {recordLength, -4};
+        }
+        // copy label info into buffer
+        std::memcpy(bufferInt, 	  ints_->data(),   recordLength*sizeof(ints_->front()   )); 
+        if (doublePrecision){
+            std::memcpy(bufferDouble, doubles_->data(),recordLength*sizeof(doubles_->front())); 
+        }
+        else{
+            std::memcpy(bufferFloat, floats_->data(),recordLength*sizeof(floats_->front())); 
+            // convert and populate double array 
+            for (size_t k = 0; k < floats_->size(); ++k){
+                bufferDouble[k] = bufferFloat[k]; 
+            }
+        }
+        return {recordLength, floatingPointFormat_}; 
+    }
 }

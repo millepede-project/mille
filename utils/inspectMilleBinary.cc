@@ -24,6 +24,11 @@
 
 
 int main(int argc, char** argv){
+    using Mille::MilleFormat;
+    using Mille::IMilleReader;
+    using Mille::spawnMilleReader;
+    using Mille::MilleDecoder;
+    using Mille::MilleMeasurement;
 
     if (argc < 2){
         std::cerr << "Usage: inspectMilleBinary [-r / -c / -z / -t to force file format to ROOT / C / zipped C / plain text] <file name> [first record to print][last record to print] "<<std::endl;

@@ -30,40 +30,42 @@
  #include <fstream> 
 
 
- class MilleRecordCSV: public MilleRecord{
-    public:
-    /// @brief  Constructor
-    /// @param fname Name of the file to write 
-    /// @param writeZero If enabled, will write entries with global derivatives of 0 into the output array. Note that using these within pede has not been tested. 
-    /// @param doublePrecision: ignored for this specialisation
-    /// @param recordLengthHint: Hint for expected record length (will reserve buffer space). 
-    MilleRecordCSV(   const std::string & fname="mille.csv", 
-                    bool doublePrecision = false, 
-                    bool writeZero = false, 
-                    std::size_t recordLengthHint = 2000); 
-    /// @brief Destructor 
-    virtual ~MilleRecordCSV(); 
-    /// @brief Interface for writing out the current entry 
-    virtual void writeRecord() override final;
+namespace Mille{
+   class MilleRecordCSV: public MilleRecord{
+      public:
+      /// @brief  Constructor
+      /// @param fname Name of the file to write 
+      /// @param writeZero If enabled, will write entries with global derivatives of 0 into the output array. Note that using these within pede has not been tested. 
+      /// @param doublePrecision: ignored for this specialisation
+      /// @param recordLengthHint: Hint for expected record length (will reserve buffer space). 
+      MilleRecordCSV(   const std::string & fname="mille.csv", 
+                     bool doublePrecision = false, 
+                     bool writeZero = false, 
+                     std::size_t recordLengthHint = 2000); 
+      /// @brief Destructor 
+      virtual ~MilleRecordCSV(); 
+      /// @brief Interface for writing out the current entry 
+      virtual void writeRecord() override final;
 
-    /// @brief Interface for flushing the current file to disk 
-    virtual void flushOutputFile() override final; 
+      /// @brief Interface for flushing the current file to disk 
+      virtual void flushOutputFile() override final; 
 
-    /// @brief Interface for closing and reopening the current file 
-    virtual void resetOutputFile() override final; 
+      /// @brief Interface for closing and reopening the current file 
+      virtual void resetOutputFile() override final; 
 
-    private:
-    
-    /// Functions 
-    void openCSV();  /// Open the text file in write mode 
-    void closeCSV(); 
+      private:
+      
+      /// Functions 
+      void openCSV();  /// Open the text file in write mode 
+      void closeCSV(); 
 
-    void annotateCurrentLine(size_t k, int & nextMeasurement, int & ispecial);  
+      void annotateCurrentLine(size_t k, int & nextMeasurement, int & ispecial);  
 
-    /// Data members
-    
-    std::string fname_ = "mille.csv"; ///< File name for the output binary  
-    std::ofstream myOutFile_; ///< text file for output
- }; 
+      /// Data members
+      
+      std::string fname_ = "mille.csv"; ///< File name for the output binary  
+      std::ofstream myOutFile_; ///< text file for output
+   }; 
+}
 
 #endif // MILLERECORD__CSV__H

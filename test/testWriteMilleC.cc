@@ -26,8 +26,10 @@
 #include "TTree.h"
 #include "TFile.h"
 
+using namespace Mille; 
+
 int main(int, char**){
-   
+
     using ::my_ssize; 
     /// dummy data for testing 
     std::vector<unsigned int> localLabels{1,2,4}; 

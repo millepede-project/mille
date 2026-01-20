@@ -27,12 +27,19 @@
 #include <atomic>
 #include <iostream>
 #include <cstring>
+
+
+
+using Mille::MilleArrayView; 
+using Mille::spawnMilleRecord; 
+
+
 /// global variables used for file handling 
-std::vector<std::unique_ptr<MilleRecord>> g_writeFileHandles; 
+std::vector<std::unique_ptr<Mille::MilleRecord>> g_writeFileHandles; 
 std::atomic<int> g_lastOutFileIndex = 0; 
 
 /// helper to derive last opened file index
-namespace{
+namespace {
     int resolveFileIndex(int nFileOut){
         if (nFileOut <= 0){
             return g_lastOutFileIndex - 1;
@@ -45,11 +52,12 @@ namespace{
         if (!g_writeFileHandles.at(fileIndex)) return false;
         return true; 
     }
-};
+}
+
 
 
 void open_mille_out(const char *fileName, int lengthFileName, int nFileOut, bool doublePrec, bool keepZeros,
-			    int recordLengthHint){
+                int recordLengthHint){
     if (nFileOut <= 0) nFileOut = g_writeFileHandles.size()+1; 
     int fileIndex = nFileOut - 1; 
 
@@ -100,8 +108,8 @@ void copy_to_mille_buffer(unsigned int nEntries,
 
         
 void add_mille_special(int nSpecial, const int* specialInt, 
-                     const double* specialFloat, 
-                     int nFileOut){
+                    const double* specialFloat, 
+                    int nFileOut){
     int fileIndex = resolveFileIndex(nFileOut);  
     if (!validFileIndex(fileIndex)) return; 
     g_writeFileHandles[fileIndex]->addSpecial( 

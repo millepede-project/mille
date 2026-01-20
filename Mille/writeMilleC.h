@@ -37,7 +37,7 @@ extern "C"
 /// @param keepZeros: Write zero-derivatives to the output. Not tested in pede 
 /// @param recordLengthHint: Initial write buffer size - will grow if needed. 
 void open_mille_out(const char *fileName, int lengthFileName, int nFileOut=-1, bool doublePrec=false, bool keepZeros=false,
-			    int recordLengthHint = 2000); 
+                        int recordLengthHint = 2000); 
 
 /// @brief Completes the current Mille record, writes it to the file, and then prepares the next one
 /// @param nFileOut Index of the file to apply the operation to 
@@ -94,7 +94,6 @@ void last_mille_out_file_index(int* index);
 /// @brief close the output file and write to disk. 
 /// @param nFileOut Index of the file to apply the operation to  
 void close_mille_output(int nFileOut = -1); 
-
 
 #ifdef __cplusplus
 }

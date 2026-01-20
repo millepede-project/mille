@@ -21,54 +21,56 @@
 #include "Mille/MilleRecordC.h"
 #include <iostream> 
 
-MilleRecordC::MilleRecordC( const std::string & fname, 
-                bool doublePrecision, 
-                bool writeZero, 
-                std::size_t recordLengthHint):
-    MilleRecord(doublePrecision, writeZero, recordLengthHint),
-    fname_(fname){
-    openC(); 
+namespace Mille{
+    MilleRecordC::MilleRecordC( const std::string & fname, 
+                    bool doublePrecision, 
+                    bool writeZero, 
+                    std::size_t recordLengthHint):
+        MilleRecord(doublePrecision, writeZero, recordLengthHint),
+        fname_(fname){
+        openC(); 
+    }
+    /// @brief Destructor 
+    MilleRecordC::~MilleRecordC(){
+        closeC();     
+    } 
+    void MilleRecordC::writeRecord(){
+        // skip empty records 
+        if (buffer_.empty()) return;
+        const int recordLength =
+                (buffer_.doublePrecision) ? -buffer_.size() * 2 : buffer_.size() * 2;
+        // header word indicating record size and type 
+        myOutFile_.write(reinterpret_cast<const char*>(&recordLength),
+                sizeof(recordLength));
+        // floating point content 
+        if (buffer_.doublePrecision)
+            myOutFile_.write(reinterpret_cast<char*>(buffer_.doubleBuffer.data()),
+                    buffer_.size() * sizeof(double));
+        else
+            myOutFile_.write(reinterpret_cast<char*>(buffer_.floatBuffer.data()),
+                    buffer_.size() * sizeof(float));
+        // integer content 
+        myOutFile_.write(reinterpret_cast<char*>(buffer_.intBuffer.data()),
+                buffer_.size() * sizeof(int));
+
+        // prepare for next record 
+        resetBuffers();
+        newSetIfNeeded();     
+    }
+
+    void MilleRecordC::flushOutputFile(){
+        myOutFile_.flush(); 
+    } 
+
+    void MilleRecordC::resetOutputFile(){
+        closeC();
+        openC();
+    } 
+
+    void MilleRecordC::openC(){
+        myOutFile_.open(fname_, std::ios::binary | std::ios::out); 
+    } 
+    void MilleRecordC::closeC(){
+        myOutFile_.close(); 
+    } 
 }
-/// @brief Destructor 
-MilleRecordC::~MilleRecordC(){
-    closeC();     
-} 
-void MilleRecordC::writeRecord(){
-    // skip empty records 
-    if (buffer_.empty()) return;
-	const int recordLength =
-			(buffer_.doublePrecision) ? -buffer_.size() * 2 : buffer_.size() * 2;
-    // header word indicating record size and type 
-    myOutFile_.write(reinterpret_cast<const char*>(&recordLength),
-			sizeof(recordLength));
-    // floating point content 
-	if (buffer_.doublePrecision)
-		myOutFile_.write(reinterpret_cast<char*>(buffer_.doubleBuffer.data()),
-				buffer_.size() * sizeof(double));
-	else
-		myOutFile_.write(reinterpret_cast<char*>(buffer_.floatBuffer.data()),
-				buffer_.size() * sizeof(float));
-    // integer content 
-	myOutFile_.write(reinterpret_cast<char*>(buffer_.intBuffer.data()),
-			buffer_.size() * sizeof(int));
-
-    // prepare for next record 
-    resetBuffers();
-    newSetIfNeeded();     
-}
-
-void MilleRecordC::flushOutputFile(){
-    myOutFile_.flush(); 
-} 
-
-void MilleRecordC::resetOutputFile(){
-    closeC();
-    openC();
-} 
-
-void MilleRecordC::openC(){
-    myOutFile_.open(fname_, std::ios::binary | std::ios::out); 
-} 
-void MilleRecordC::closeC(){
-    myOutFile_.close(); 
-} 

@@ -41,6 +41,7 @@ endif()
 if (SUPPORT_ZLIB)
     find_package(ZLIB  REQUIRED)
 endif()
+
 # Destination targets for build results
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
