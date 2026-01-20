@@ -43,9 +43,9 @@
             template<class T> using MilleArrayView = std::span<const T>; 
     }
 #else 
+    #include <vector>
+    #include <array>
     namespace Mille{
-        #include <vector>
-        #include <array>
         /// @brief Helper class to emulate a needed subset of std::span featurs
         ///        in older C++ releases.
         ///        Wraps a C-array, std::array or std::vector into a read-only view 
