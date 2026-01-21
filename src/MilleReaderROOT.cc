@@ -20,10 +20,15 @@
 
 #include "Mille/MilleReaderROOT.h"
 #include <iostream>
-
+#include "TROOT.h"
 
 namespace Mille{
+
     bool MilleReaderROOT::open(const std::string & fname){
+        // need to enable ROOT's thread safety features, as we concurrently
+        // call the open / close methods in the OpenMP-parallelised 
+        // components of Pede. 
+        ROOT::EnableThreadSafety();
         if (fname.empty() && fname_.empty()){
             std::cerr << "Empty file name passed to MilleReaderC::open"<<std::endl;
             return false; 
