@@ -69,14 +69,14 @@ target_sources(Mille2
 
 
 add_executable(inspectMilleBinary)
-target_sources(inspectMilleBinary PRIVATE utils/inspectMilleBinary.cc)
+target_sources(inspectMilleBinary PRIVATE util/inspectMilleBinary.cc)
 target_link_libraries(inspectMilleBinary PUBLIC Mille2)
 install(TARGETS inspectMilleBinary 
         DESTINATION bin )
 
 
 add_executable(convertMilleFormats)
-target_sources(convertMilleFormats PRIVATE utils/convertMilleFormats.cc)
+target_sources(convertMilleFormats PRIVATE util/convertMilleFormats.cc)
 target_link_libraries(convertMilleFormats PUBLIC Mille2)
 install(TARGETS convertMilleFormats 
         DESTINATION bin )
