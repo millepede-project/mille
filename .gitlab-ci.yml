@@ -39,18 +39,22 @@ build-job:       # This job runs in the build stage, which runs first.
       - install/
       - build/ 
 
-# doc-job:     
-#   image: gitlab.desy.de:5555/millepede/millepede-ii/mp2dev_base
-#   stage: build
-#   script:
-#     - doxygen Doxyfile   
-#     - echo "Doc complete."
-#     - cp -r buildDoc/html public
-#   artifacts: 
-#     name: "Doc"
-#     paths:
-#       - public/
-#     expose_as: "Documentation"
+doc-job:     
+  image: ${CI_REGISTRY_IMAGE}/mp2dev_base 
+  stage: build
+  script:
+    - mkdir build
+    - cd build  
+    - cmake -DCMAKE_INSTALL_PREFIX=../install ../ 
+    - make doc   
+    - echo "Doc complete."
+    - cp -r doc/buildDoc/html ../public
+  artifacts: 
+    name: "Doc"
+    paths:
+      - public/
+    expose_as: "Documentation"
+
 
 unit-tests: 
   stage: test
@@ -62,14 +66,14 @@ unit-tests:
     - cd build 
     - ctest -V
 
-# pages:
-#   stage: deploy
-#   needs: 
-#     - doc-job
-#   script:
-#     - ls -l public
-#   artifacts:
-#     paths:
-#       - public
-#   only:
-#     - main
+pages:
+  stage: deploy
+  needs: 
+    - doc-job
+  script:
+    - ls -l public
+  artifacts:
+    paths:
+      - public
+  only:
+    - main
