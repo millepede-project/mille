@@ -36,7 +36,7 @@ except ModuleNotFoundError:
 # object-oriented behaviour at the python level. 
 class milleWriter:
 
-    # Constructor - will directly open the output file. 
+    ## Constructor - will directly open the output file. 
     # @param fname: Desired file name 
     # @param doublePrec: Enable double-precision storage of floats
     # @param keepZeros: Store zero-derivatives (not tested in pede) 
@@ -59,12 +59,12 @@ class milleWriter:
         milleC.last_mille_out_file_index(ctypes.pointer(newIndex))
         self.fileIndex = newIndex.value
     
-    # Close the attached file
+    ## Close the attached file
     def close (self):
         milleC.close_mille_output(ctypes.c_int(self.fileIndex))
         self.fileIndex = -1
 
-    # Add data (a measurement) to the current record
+    ## Add data (a measurement) to the current record
     # @param measurement: The measurement
     # @param error: The uncertainty associated to the measurement
     # @param localLabels: List of local parameter labels (type: unit32)
@@ -79,33 +79,33 @@ class milleWriter:
         milleC.add_mille_data(measurement, error, len(localLabels), localLabels, localDerivatives, len(globalDerivatives), globalLabels, globalDerivatives, self.fileIndex)
 
 
-    # Add a special data segment to the current record
+    ## Add a special data segment to the current record
     # @param specialInt: List of integer values (type: int32)
     # @param specialFloat: List of floating point values (type: float64)
     # Both arrays are expected to be of the same size. 
     def addSpecial(self, specialInt: np.array,  specialFloat: np.array):
         milleC.add_mille_special(len(specialInt), specialInt, specialFloat, self.fileIndex) 
 
-    # Directly copy (encoded) data into the Mille buffer
+    ## Directly copy (encoded) data into the Mille buffer
     # @param ints: Content for the integer buffer (type: int32)
     # @param floats: Content for the integer buffer  (type: float64)
     # Both arrays are expected to be of the same size. 
     def copyToBuffer(self,  ints: np.array, floats: np.array):
         milleC.copy_to_mille_buffer(len(ints), ints, floats, self.fileIndex) 
 
-    # Finish the current record, write to storage, and prepare next record
+    ## Finish the current record, write to storage, and prepare next record
     def write(self):
         milleC.write_mille_out(self.fileIndex)
     
-    # Abort the current record
+    ## Abort the current record
     def abort(self):
         milleC.abort_mille_record(self.fileIndex)
 
-    # Flush the file to disk 
+    ## Flush the file to disk 
     def flush(self):
         milleC.flush_mille_output(self.fileIndex)
 
-    # Close and re-open the output file. 
+    ## Close and re-open the output file. 
     # This will discard existing content. 
     def reset(self):
         milleC.reset_mille_output(self.fileIndex)

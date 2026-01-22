@@ -37,12 +37,12 @@ except ModuleNotFoundError:
 # object-oriented behaviour at the python level. 
 class milleReader:
 
-    # Construct an (empty) instance. File opening 
+    ## Construct an (empty) instance. File opening 
     # happens separately to be able to check the outcome. 
     def __init__(self):
         self.fileIndex = -1
 
-    # Open a file for reading. Mille will try to 
+    ## Open a file for reading. Mille will try to 
     # instantiate an appropriate reader class in the background,
     # based on the extension of the file. 
     # The return code will indicate the outcome. A value of 0 
@@ -63,11 +63,11 @@ class milleReader:
         # finally, return the status code 
         return err.value
     
-    # Closes the attached file 
+    ## Closes the attached file 
     def close (self):
         milleC.close_mille(ctypes.c_int(self.fileIndex))
 
-    # read the next record from the file to the user- supplied buffers.
+    ## read the next record from the file to the user- supplied buffers.
     # @param doubleBuffer: An array of type float64 
     # @param floatBuffer: An array of type float32 
     # @param intBuffer: An array of type int32 
@@ -83,7 +83,7 @@ class milleReader:
         milleC.read_mille(doubleBuffer, floatBuffer, intBuffer, nRecords, stat, self.fileIndex)
         return stat.value, nRecords.value
 
-    # read the next record from the file - automatically generated buffers. 
+    ## read the next record from the file - automatically generated buffers. 
     # @param bufferSize: Default buffer size to try. 
     # Will return a 3-tuple: Status code, integer content, floating-point content. 
     def readRecord(self, bufferSize=1000):
@@ -108,15 +108,15 @@ class milleReader:
         # truncate buffers to the number of read entries when returning
         return (stat, inp[:nRec],  dnp[:nRec] )
     
-    # rewind the file to the first entry 
+    ## rewind the file to the first entry 
     def skipRecord(self):
         return milleC.skip_mille(self.fileIndex)
     
-    # rewind the file to the first entry 
+    ## rewind the file to the first entry 
     def rewindToStart(self):
         return milleC.reset_mille(self.fileIndex)
     
-    # rewind the file to the start of the previously accessed entry. 
+    ## rewind the file to the start of the previously accessed entry. 
     def rewindLastEntry(self):
         return milleC.reset_mille_entry(self.fileIndex)
 
