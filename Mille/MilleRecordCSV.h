@@ -31,6 +31,8 @@
 
 
 namespace Mille{
+
+   /// @brief MilleRecord implementation for plain text output. 
    class MilleRecordCSV: public MilleRecord{
       public:
       /// @brief  Constructor

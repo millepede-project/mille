@@ -34,6 +34,7 @@
  #include "fstream" 
 
 namespace Mille{
+    
     /// @brief Reader for uncompressed C binaries. 
     class MilleReaderC : public IMilleReader{
         public: 

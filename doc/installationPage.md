@@ -8,7 +8,8 @@ At least Fortran90 and C++17 are recommended.
 
 ### Optional: ROOT
 
-Optionally, if you have ROOT available on your system, the package will be built to support ROOT file storage / reading. 
+Optionally, if you have ROOT available on your system, the package will by default be built to support ROOT file storage / reading. 
+In this case, the C++ standard will automatically be set to the one that was used to build ROOT, to ensure compatibility. 
 
 ### Optional: libZ 
 
@@ -27,7 +28,7 @@ This is for example available in the `gitlab.desy.de:5555/millepede/millepede-ii
 Download the software package from the DESY \c gitlab server to
     \a source directory (in the following, assumed to be "Mille"), e.g.:
 
-         git clone --depth 1  \
+         git clone   \
              https://gitlab.desy.de/millepede/Mille.git Mille
 
 Then compile using the following steps:
@@ -35,6 +36,18 @@ Then compile using the following steps:
 - navigate into `build` and invoke `cmake <path_to_Mille>`. Here you can set additional options (see next sub-section) to configure the build.  
 - then compile the sources by calling `make` followed by `make install`. 
 - If you wish to compile the documentation, additionally do `make doc`. 
+
+For example, a full clone and build with the default settings might look like the following,
+```
+git clone https://gitlab.desy.de/millepede/Mille.git Mille
+mkdir build     # outside Mille, here in same folder as the Mille sources. 
+cd build
+cmake ../Mille 
+make
+make install
+source MilleInstall/milleStandaloneSetup.sh   # see below for info
+```
+
 
 #### Configuring the CMake build
 You can pass additional options / flags to CMake: 
@@ -46,9 +59,11 @@ You can pass additional options / flags to CMake:
 
 #### Bonus: Setup script
 The build will place a `milleStandaloneSetup.sh` script in your chosen installation folder.
-If this is not a folder on the default path, you can call this script to make Mille and its programs visible to the system. 
+You can call this script to make Mille and its programs visible to the system. It will update
+`PATH`, `LD_LIBRARY_PATH`, `PYTHONPATH`, and `CMAKE_PREFIX_PATH`, as well as exporting `Mille_DIR` (can be used by CMake projects with `find_package(Mille)`. 
 This removes the need to point by hand to the `Mille` location. 
-Note that when Mille is automatically built as part of `Millepede-II`, the setup for `Mille` will instead be added to the `mp2setup.sh` script from Millepede.
+Of course, you are free to manually configure the environment if that is better suited to your workflow. 
+Note that if Mille is automatically built as part of `Millepede-II`, the setup for `Mille` will instead be added to the `mp2setup.sh` script from Millepede.
 
 ### Testing your build
 

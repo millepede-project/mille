@@ -34,6 +34,7 @@
  #include <zlib.h> 
 
 namespace Mille{
+    
     /// @brief Reader for zlib-compressed C-binaries
     class MilleReaderCcompressed : public IMilleReader{
         public: 

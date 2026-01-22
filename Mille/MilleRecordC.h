@@ -29,6 +29,8 @@
  #include <fstream> 
 
 namespace Mille{
+
+   /// @brief MilleRecord implementation for C-binary output. 
    class MilleRecordC: public MilleRecord{
       public:
       /// @brief  Constructor

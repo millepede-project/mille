@@ -24,13 +24,15 @@
 #ifndef MILLERECORD__ROOT__H
 #define MILLERECORD__ROOT__H
 
- #include "Mille/MilleRecord.h"
- #include <string> 
+#include "Mille/MilleRecord.h"
+#include <string> 
 #include <memory>
- #include "TTree.h" 
- #include "TFile.h" 
+#include "TTree.h" 
+#include "TFile.h" 
 
 namespace Mille{
+
+   /// @brief MilleRecord implementation for ROOT-binary output. 
    class MilleRecordROOT: public MilleRecord{
       public:
       /// @brief  Constructor
@@ -57,7 +59,7 @@ namespace Mille{
       
       /// Functions 
       void open();  /// Open the ROOT binary file in write mode 
-      void close(); 
+      void close(); /// Close the ROOT binary file. 
 
       /// Data members
       

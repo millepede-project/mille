@@ -75,6 +75,7 @@
 
 
 namespace Mille{
+    
     /// @brief  Base class for a writeable Mille record. 
     ///         Defines the data payload and the abstract 
     ///         I/O interface methods. 
