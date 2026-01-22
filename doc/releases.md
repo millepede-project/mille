@@ -2,6 +2,10 @@
  
 ## Version history
 
-### Version V00-00-01 (new)
+### Version V00-01-01 (new)
+
+Add float interface to MilleRecord::addData
+
+### Version V00-01-00 
 
 Initial release
