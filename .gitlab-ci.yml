@@ -40,7 +40,7 @@ build-job:       # This job runs in the build stage, which runs first.
       - build/ 
 
 doc-job:     
-  image: ${CI_REGISTRY_IMAGE}/mp2dev_base 
+  image: gitlab.desy.de:5555/millepede/millepede-ii/mp2dev_base 
   stage: build
   script:
     - mkdir build
