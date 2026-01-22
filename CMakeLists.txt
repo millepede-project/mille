@@ -64,7 +64,7 @@ target_sources(Mille2
             PRIVATE src/MilleRecord.cc src/MilleRecordCSV.cc src/MilleRecordC.cc src/MilleReaderC.cc src/MilleReaderCSV.cc src/MilleDecoder.cc src/MilleFactory.cc
             PUBLIC 
                 FILE_SET HEADERS 
-                FILES Mille/MilleDataStructures.h Mille/MilleRecord.h Mille/MilleRecordC.h Mille/MilleRecordCSV.h Mille/MilleReaderC.h Mille/MilleReaderCSV.h Mille/IMilleReader.h Mille/MilleDecoder.h  Mille/MilleFactory.h 
+                FILES Mille/MilleDataStructures.h Mille/MilleRecord.h Mille/MilleRecord.ixx  Mille/MilleRecordC.h Mille/MilleRecordCSV.h Mille/MilleReaderC.h Mille/MilleReaderCSV.h Mille/IMilleReader.h Mille/MilleDecoder.h  Mille/MilleFactory.h 
                  )
 
 

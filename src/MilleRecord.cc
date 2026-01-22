@@ -32,36 +32,6 @@ namespace Mille{
     MilleRecord::~MilleRecord(){
 
     }
-
-    void MilleRecord::addData(double aMeas, double aErr, 
-                MilleArrayView<unsigned int> indLocal, MilleArrayView<double> derLocal,
-                MilleArrayView<int> labGlobal,
-                MilleArrayView<double> derGlobal){
-        if (indLocal.size() != derLocal.size()){
-            std::cerr << " MilleRecord::addData expects local labels and derivatives to have same size, but received "<<indLocal.size()<<" int and "<<derLocal.size()<<" float. Will not add entry. "<<std::endl; 
-            return ;   
-        }
-        if (labGlobal.size() != derGlobal.size()){
-            std::cerr << " MilleRecord::addData expects global labels and derivatives to have same size, but received "<<labGlobal.size()<<" int and "<<derGlobal.size()<<" float. Will not add entry. "<<std::endl; 
-            return ;   
-        }
-        // ensure the header is in place 
-        newSetIfNeeded(); 
-        // add measurement
-        buffer_.fill(0, aMeas);
-        // add local derivative block
-        for (unsigned int i = 0; i < derLocal.size(); ++i){
-            buffer_.fill(indLocal[i], derLocal[i]); 
-        }
-        // add uncertainty 
-        buffer_.fill(0, aErr); 
-        // add global derivative block 
-        for (std::size_t k = 0; k < derGlobal.size(); ++k){
-            if (derGlobal[k] != 0 or globalDerKeepZeros_){
-                buffer_.fill(labGlobal[k], derGlobal[k]);
-            } 
-        }
-    }
     void MilleRecord::copyToBuffer(MilleArrayView<int> integers, MilleArrayView<double> floats){
         if (integers.size() != floats.size()){
             std::cerr << " MilleRecord::copyToBuffer expects both arrays to have same size, but received "<<integers.size()<<" int and "<<floats.size()<<" float. "<<std::endl; 

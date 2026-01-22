@@ -102,7 +102,29 @@ namespace Mille{
         void addData(double aMeas, double aErr,
                 MilleArrayView<unsigned int> indLocal, MilleArrayView<double> derLocal,
                 MilleArrayView<int>    labGlobal,
-                MilleArrayView<double> derGlobal);
+                MilleArrayView<double> derGlobal){
+                    addData_impl<unsigned int, double, int, double>(aMeas, aErr, 
+                        indLocal, derLocal, 
+                        labGlobal, derGlobal); 
+                }
+
+        /// @brief Interface to add an entry to the current record. 
+        /// @brief Adapted for float vectors preferred by some clients. 
+        /// @param aMeas Measured residual (or other measurement) 
+        /// @param aErr Uncertainty of the measurement
+        /// @param numLocal Number of local parameters / derivatives 
+        /// @param indLocal Indices for local derivatives 
+        /// @param derLocal Local derivatives 
+        /// @param labGlobal Labels for global parameters
+        /// @param derGlobal  Global derivatives 
+        void addData(double aMeas, double aErr,
+                MilleArrayView<unsigned int> indLocal, MilleArrayView<float> derLocal,
+                MilleArrayView<int>    labGlobal,
+                MilleArrayView<float> derGlobal){
+                    addData_impl<unsigned int, float, int, float>(aMeas, aErr, 
+                        indLocal, derLocal, 
+                        labGlobal, derGlobal); 
+                }
 
         /// @brief Interface to directly set the buffer content,
         ///        without relying on the internal data encoding.
@@ -138,6 +160,25 @@ namespace Mille{
 
         protected: 
 
+            /// @brief Interface to add an entry to the current record. 
+            /// @tparam indLocType: Type of the local indices
+            /// @tparam derLocalType: Type of the local derivatives
+            /// @tparam indGlobalType: Type of the global indices
+            /// @tparam derGlobalType: Type of the global derivatives
+            /// @param aMeas Measured residual (or other measurement) 
+            /// @param aErr Uncertainty of the measurement
+            /// @param numLocal Number of local parameters / derivatives 
+            /// @param indLocal Indices for local derivatives 
+            /// @param derLocal Local derivatives 
+            /// @param labGlobal Labels for global parameters
+            /// @param derGlobal  Global derivatives 
+            template <typename indLocalType, typename derLocalType, typename indGlobalType, typename derGlobalType> 
+            void addData_impl(double aMeas, double aErr,
+                    MilleArrayView<indLocalType> indLocal, MilleArrayView<derLocalType> derLocal,
+                    MilleArrayView<indGlobalType>    labGlobal,
+                    MilleArrayView<derGlobalType> derGlobal);
+
+
             /// ==== Helper functions  === 
             /// @brief Add header for a new record if buffers are empty.
             ///        Will not do anything if buffers are populated. 
@@ -155,7 +196,7 @@ namespace Mille{
     };
 }
 
-
-
+#include "MilleRecord.ixx"
 
 #endif // MILLERECORD__H
+
