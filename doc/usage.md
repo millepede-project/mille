@@ -108,8 +108,8 @@ The buffer size variable should be set by the user to the size of the passed buf
 When reading a `Mille` record, the following outcomes are possible. As a general rule of thumb, a negative return code means something went wrong. 
 
 #### Successful read
-- the **status code** is either 4 (single-precision real array detected) or 8 (double-precision real array detected) 
-- the returned **buffer size** is the number of entries `recordLength` that were written into the buffers (<= the value passed by the user). 
+- the **status code** is either **4** (single-precision real array detected) or **8** (double-precision real array detected) 
+- the returned **buffer size** (`recordLength` in the following) is the number of entries that were written into the buffers (smaller than or equal to the value passed by the user). 
 - the first `recordLength` elements of the **integer buffer** will be populated with the encoded integer array representing the record 
 - the first `recordLength` elements of the **double-precision float buffer** will always be populated with the encoded real array representing the record. This is the array recommended for use to process the real-value information, as it is guaranteed to always be populated. 
 - Only if the status code is 4, the first `recordLength` elements of the **single-precision float buffer** will also be populated with the encoded real array representing the record. For double-precision float storage, this buffer will not be touched. 
@@ -118,9 +118,9 @@ After the successful read, the internal record counter of the file is incremente
 
 #### End-of-file 
 
-If the end of the file has been reached, a **status code of 0** will be returned. 
+If the end of the file has been reached, a **status code of 0** will be returned. The buffers will not be touched, and the output buffer size will be reported as 0. 
 
-#### Undersized buffer
+#### Undersized buffers
 
 If the buffers passed by the user (capacity indicated by the value of the **buffer size** when calling the read function) are smaller than the number of entries in the current record, 
 - the **status code** will be set to **-4** 
