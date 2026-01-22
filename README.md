@@ -6,6 +6,8 @@
 
 It is used to store the equations defining a linear(ised) least squares problem into binary files that can then be processed within Millepede-II.
 
+In addition to the brief summary below, please check out the extended [documentation page](https://millepede.pages.desy.de/mille/). 
+
 
 ## Availability 
 
