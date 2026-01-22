@@ -68,15 +68,16 @@ class milleReader:
         milleC.close_mille(ctypes.c_int(self.fileIndex))
 
     ## read the next record from the file to the user- supplied buffers.
+    # The Buffers need to have sufficent size to fit the record. 
     # @param doubleBuffer: An array of type float64 
     # @param floatBuffer: An array of type float32 
     # @param intBuffer: An array of type int32 
-    # The Buffers need to have sufficent size to fit the record. 
-    # The integer record will be written into intBuffer, and the 
-    # floating point record into doubleBuffer. 
-    # The function returns a status code and the number of read entries. 
+    # @return a pair with the status code and number of read entries. 
     # For status code -4 (buffers too small), the second return value
     # indicates the minimum required buffer size. 
+    # For a succesful read, the integer record will be written into intBuffer, and the 
+    # floating point record into doubleBuffer. The buffers will not be resized,
+    # use the second return value to slice as needed. 
     def readRecordToBuffers(self, doubleBuffer: np.array, floatBuffer: np.array, intBuffer:np.array):
         stat = ctypes.c_int(0)
         nRecords = ctypes.c_int(len(doubleBuffer)) 
@@ -85,7 +86,7 @@ class milleReader:
 
     ## read the next record from the file - automatically generated buffers. 
     # @param bufferSize: Default buffer size to try. 
-    # Will return a 3-tuple: Status code, integer content, floating-point content. 
+    # @return a 3-tuple: Status code (int), integer content (numpy array), floating-point content (numpy array). 
     def readRecord(self, bufferSize=1000):
 
         stat = ctypes.c_int(0)
