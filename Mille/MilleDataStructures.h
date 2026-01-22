@@ -131,6 +131,9 @@ namespace Mille{
             else floatBuffer.push_back(value); 
         }
 
+        /// @brief Helper function to read an element of the buffer. 
+        /// @param k Index of the element. Should be less or equal to buffer size. 
+        /// @return std::pair<int,double>, with the first element containing the integer and the second element the real entry of the element. 
         std::pair<int, double> query(size_t k){
             if (k > intBuffer.size()){
                 std::cerr << " out of range query of mille buffer ("<<k<<" out of "<<intBuffer.size()<<")";
