@@ -9,7 +9,7 @@ set(CMAKE_CXX_COMPILER ${gpp_loc})
 set(CMAKE_Fortran_COMPILER ${gf_loc})
 
 PROJECT(Mille LANGUAGES Fortran CXX)
-set(Mille_VERSION 00.01.00)
+set(Mille_VERSION 00.01.02)
 include(CTest)
 
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)

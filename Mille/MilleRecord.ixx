@@ -19,13 +19,15 @@ void Mille::MilleRecord::addData_impl(double aMeas, double aErr,
     buffer_.fill(0, aMeas);
     // add local derivative block
     for (unsigned int i = 0; i < derLocal.size(); ++i){
-        buffer_.fill(indLocal[i], derLocal[i]); 
+        if (derLocal[i] != 0 or writeZeroDerivatives_){
+            buffer_.fill(indLocal[i], derLocal[i]); 
+        }
     }
     // add uncertainty 
     buffer_.fill(0, aErr); 
     // add global derivative block 
     for (std::size_t k = 0; k < derGlobal.size(); ++k){
-        if (derGlobal[k] != 0 or globalDerKeepZeros_){
+        if (derGlobal[k] != 0 or writeZeroDerivatives_){
             buffer_.fill(labGlobal[k], derGlobal[k]);
         } 
     }
