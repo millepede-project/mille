@@ -82,7 +82,7 @@ namespace Mille{
     class MilleRecord{
         public:
         /// @brief  Constructor
-        /// @param writeZero If enabled, will write entries with global derivatives of 0 into the output array. Note that using these within pede has not been tested. 
+        /// @param writeZero If enabled, will write entries with derivatives of 0 into the output array. Note that using these within pede has not been tested. 
         /// @param doublePrecision: Store derivatives with double precision. 
         /// @param recordLengthHint: Hint for expected record length (will reserve buffer space). 
         MilleRecord(bool doublePrecision = false, bool writeZero = false,
@@ -189,7 +189,7 @@ namespace Mille{
 
             /// ==== Data members - accessible to derived classes === 
             MilleBuffer buffer_; 
-            bool globalDerKeepZeros_ = false;   ///< Flag to write global derivatives with value zero
+            bool writeZeroDerivatives_ = false;   ///< Flag to write global derivatives with value zero
             bool hasSpecialInRecord_ = false;   ///< Flag whether we already have a 'special' block in the current record
             std::size_t recordLengthHint_ = 2000; /// < expected record length 
 

@@ -23,7 +23,7 @@
 
 namespace Mille{
     MilleRecord::MilleRecord(bool doublePrecision, bool writeZero, std::size_t recordLengthHint):
-        globalDerKeepZeros_(writeZero),
+        writeZeroDerivatives_(writeZero),
         recordLengthHint_(recordLengthHint){
             buffer_.doublePrecision = doublePrecision;
             buffer_.reserve(recordLengthHint); 

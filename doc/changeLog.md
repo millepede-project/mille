@@ -4,6 +4,9 @@
 
 Changes are presented in reverse chronological order.
 
+2026-01-23: 
+- Enable skipping of zero derivatives also for the local parameters
+
 2026-01-22: 
 - Improve doc, add float signature to MilleRecord::addData
 
