@@ -22,7 +22,17 @@
 #  675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-import milleWriter, milleReader 
+
+# In the CI, we do not have the Mille module in place yet 
+try: 
+    import milleWriter, milleReader 
+except ModuleNotFoundError:
+    # this is the import expected to happen outside the CI
+    try: 
+        from Mille import milleWriter, milleReader 
+    except ModuleNotFoundError:
+        raise
+
 import numpy as np 
 from pprint import pprint 
 

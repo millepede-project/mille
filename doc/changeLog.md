@@ -4,6 +4,9 @@
 
 Changes are presented in reverse chronological order.
 
+2026-01-26: 
+- Fix import in python example script
+
 2026-01-23: 
 - Enable skipping of zero derivatives also for the local parameters
 
