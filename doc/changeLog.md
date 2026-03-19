@@ -5,6 +5,7 @@
 Changes are presented in reverse chronological order.
 
 2026-03-19: 
+- Clean up ROOT configuration in CMakeLists
 - Fix missing include in unit test
 
 2026-01-26: 

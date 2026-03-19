@@ -39,6 +39,38 @@ build-job:       # This job runs in the build stage, which runs first.
       - install/
       - build/ 
 
+build-noROOT:       
+  image: gitlab.desy.de:5555/millepede/millepede-ii/mp2dev_base
+  stage: build
+  script:
+    - mkdir build install
+    - cd build  
+    - cmake -DCMAKE_INSTALL_PREFIX=../install -DSUPPORT_ROOT=off -DBUILD_TESTS=on ../ 
+    - make 
+    - make install
+    - echo "Compile complete."
+  artifacts: 
+    name: "mille_installation_noROOT"
+    paths:
+      - install/
+      - build/ 
+
+build-noROOT-noLZ:       
+  image: gitlab.desy.de:5555/millepede/millepede-ii/mp2dev_base
+  stage: build
+  script:
+    - mkdir build install
+    - cd build  
+    - cmake -DCMAKE_INSTALL_PREFIX=../install -DSUPPORT_ROOT=off -DSUPPORT_ZLIB=off -DBUILD_TESTS=on ../ 
+    - make 
+    - make install
+    - echo "Compile complete."
+  artifacts: 
+    name: "mille_installation_noROOT_noLZ"
+    paths:
+      - install/
+      - build/ 
+
 doc-job:     
   image: gitlab.desy.de:5555/millepede/millepede-ii/mp2dev_base 
   stage: build
@@ -61,6 +93,26 @@ unit-tests:
   image: gitlab.desy.de:5555/millepede/millepede-ii/mp2dev_base
   needs: 
     - build-job
+  script: 
+    - ls 
+    - cd build 
+    - ctest -V
+
+unit-tests-noROOT: 
+  stage: test
+  image: gitlab.desy.de:5555/millepede/millepede-ii/mp2dev_base
+  needs: 
+    - build-noROOT
+  script: 
+    - ls 
+    - cd build 
+    - ctest -V
+
+unit-tests-noROOT-noLZ: 
+  stage: test
+  image: gitlab.desy.de:5555/millepede/millepede-ii/mp2dev_base
+  needs: 
+    - build-noROOT-noLZ
   script: 
     - ls 
     - cd build 

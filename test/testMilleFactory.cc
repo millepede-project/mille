@@ -24,13 +24,12 @@
 #include "Mille/MilleRecordC.h"
 #include "Mille/MilleReaderCSV.h"
 #include "Mille/MilleRecordCSV.h"
-#include "Mille/MilleReaderCcompressed.h"
 #ifdef SUPPORT_ROOTIO
     #include "Mille/MilleReaderROOT.h"
     #include "Mille/MilleRecordROOT.h"
 #endif
 #ifdef SUPPORT_LZ
-    #include "Mille/MilleReaderROOT.h"
+#include "Mille/MilleReaderCcompressed.h"
 #endif
 #include <iostream>
 #include <memory>

@@ -85,7 +85,7 @@ def checkEpsi(left, right, testName, epsilon = 1e-6):
 
 if __name__ == "__main__": 
     test = testPayload()
-    writer = milleWriter.milleWriter("testFromPy3.root")
+    writer = milleWriter.milleWriter("testFromPy3.csv")
     writer.addData(test.meas, test.sigma, 
                     test.localLabels,
                     test.localDeriv,
@@ -96,7 +96,7 @@ if __name__ == "__main__":
     writer.close()
 
     reader = milleReader.milleReader()
-    stat = reader.open("testFromPy3.root") 
+    stat = reader.open("testFromPy3.csv") 
     success = checkExact(stat,0,"Reader open return code")
     
     stat, ints, doubles = reader.readRecord()
