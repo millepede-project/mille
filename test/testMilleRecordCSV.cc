@@ -27,6 +27,7 @@
 #include <limits>
 #include <fstream>
 #include <filesystem>
+#include <sstream>
 
 using namespace Mille; 
 
