@@ -9,7 +9,7 @@ set(CMAKE_CXX_COMPILER ${gpp_loc})
 set(CMAKE_Fortran_COMPILER ${gf_loc})
 
 PROJECT(Mille LANGUAGES Fortran CXX)
-set(Mille_VERSION 01.00.01)
+set(Mille_VERSION 01.00.02)
 include(CTest)
 
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
@@ -20,7 +20,7 @@ endif()
 option(DEBUG "Debug" OFF)
 option(SUPPORT_ROOT "build ROOT file I/O and root plotting scripts" ON)
 option(SUPPORT_ZLIB "support Z lib for file compression" ON)
-option(BUILD_TESTS "compile unit tests" ON)
+option(BUILD_TESTS "compile unit tests" OFF)
 
 set(build_ROOT_comps false)
 if(SUPPORT_ROOT)
@@ -60,6 +60,8 @@ endif()
 
 # ===== Mille2 ======= 
 add_library(Mille2 SHARED)
+# Require at least C++17
+target_compile_features(Mille2 PUBLIC cxx_std_17)
 target_sources(Mille2 
             PRIVATE src/MilleRecord.cc src/MilleRecordCSV.cc src/MilleRecordC.cc src/MilleReaderC.cc src/MilleReaderCSV.cc src/MilleDecoder.cc src/MilleFactory.cc
             PUBLIC 
@@ -95,8 +97,6 @@ endif()
 
 if (build_ROOT_comps)
     message ("Found ROOT - will build ROOT I/O lib") 
-
-    set(CMAKE_CXX_STANDARD ${ROOT_CXX_STANDARD})
 
     # enable ROOT support in Mille2
     target_compile_definitions(Mille2 PUBLIC SUPPORT_ROOTIO)

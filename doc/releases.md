@@ -2,7 +2,11 @@
  
 ## Version history
 
-### Version V01-00-01 (new)
+### Version V01-00-02 (new)
+
+Clean up ROOT dependency - safe build / tests without ROOT, no enforced ROOT C++ standard 
+
+### Version V01-00-01
 
 Fix a missing header in a unit test 
 
