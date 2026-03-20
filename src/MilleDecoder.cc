@@ -42,62 +42,64 @@ namespace Mille{
             std::cerr << "MilleDecoder: Failed to read the next entry " <<std::endl;
             return ReadResult::error; 
         }
-        // read was OK, now we decode the content and populate the passed data object 
+        return decode(buffer_, nRead, record); 
+    }
+    MilleDecoder::ReadResult MilleDecoder::decode (const MilleBuffer & buffer, int recordLength, std::vector<MilleMeasurement> & record) const{
         long int current = 1;   // skip record header
         long int startLocal = 0; 
         long int startGlobal = 0; 
         long int lastGlobal = 0; 
-        while (nextMeasurement(current, startLocal, startGlobal, lastGlobal) && current < nRead){
-            record.push_back(decodeEntry(startLocal, startGlobal, lastGlobal)); 
+        while (nextMeasurement(buffer, current, startLocal, startGlobal, lastGlobal) && current < recordLength){
+            record.push_back(decodeEntry(buffer, startLocal, startGlobal, lastGlobal)); 
             current = lastGlobal+1;
         }
         return ReadResult::OK; 
     }
     
-    MilleMeasurement MilleDecoder::decodeEntry(long int startLocal, long int startGlobal, long int lastGlobal){
+    MilleMeasurement MilleDecoder::decodeEntry(const MilleBuffer & buffer,long int startLocal, long int startGlobal, long int lastGlobal) const {
         MilleMeasurement meas; 
         // special blocks
-        if (    buffer_.doubleBuffer.at(startLocal) == 0 
-                && buffer_.doubleBuffer.at(startGlobal) < 0 
+        if (    buffer.doubleBuffer.at(startLocal) == 0 
+                && buffer.doubleBuffer.at(startGlobal) < 0 
                 && startGlobal == startLocal + 1 ){
             std::cout <<" reading a special block" <<std::endl; 
-            int nSpecial = int(-buffer_.doubleBuffer.at(startGlobal)); 
+            int nSpecial = int(-buffer.doubleBuffer.at(startGlobal)); 
             for (int k = startGlobal+1; k <= startGlobal+nSpecial; ++k){
-                meas.specialInts.push_back(buffer_.intBuffer[k]);
-                meas.specialFloat.push_back(buffer_.doubleBuffer[k]); 
+                meas.specialInts.push_back(buffer.intBuffer[k]);
+                meas.specialFloat.push_back(buffer.doubleBuffer[k]); 
             }
             return meas; 
         }
         // normal blocks 
-        meas.measurement = buffer_.doubleBuffer.at(startLocal); 
-        meas.uncertainty = buffer_.doubleBuffer.at(startGlobal); 
+        meas.measurement = buffer.doubleBuffer.at(startLocal); 
+        meas.uncertainty = buffer.doubleBuffer.at(startGlobal); 
         if (startGlobal > startLocal + 1){
             for (int ix = startLocal+1; ix < startGlobal; ++ix){
-                meas.localLabels.push_back(buffer_.intBuffer[ix]);
-                meas.localDerivatives.push_back(buffer_.doubleBuffer[ix]);
+                meas.localLabels.push_back(buffer.intBuffer[ix]);
+                meas.localDerivatives.push_back(buffer.doubleBuffer[ix]);
             }
         }
         if (lastGlobal > startGlobal){
             for (int ix = startGlobal+1; ix <= lastGlobal; ++ix){
-                meas.globalLabels.push_back(buffer_.intBuffer[ix]);
-                meas.globalDerivatives.push_back(buffer_.doubleBuffer[ix]);
+                meas.globalLabels.push_back(buffer.intBuffer[ix]);
+                meas.globalDerivatives.push_back(buffer.doubleBuffer[ix]);
             }
         }
         return meas; 
     }
-    bool MilleDecoder::nextMeasurement(long int current, long int & startLocal, long int  & startGlobal, long int & lastGlobal){
+    bool MilleDecoder::nextMeasurement(const MilleBuffer & buffer,long int current, long int & startLocal, long int  & startGlobal, long int & lastGlobal) const {
         startLocal = -1;
         startGlobal = -1;
         lastGlobal = -1; 
-        for (size_t index = current; index < buffer_.intBuffer.size(); ++index){
-            if (buffer_.intBuffer[index] == 0 && startLocal < 0) startLocal = index; 
-            else if (buffer_.intBuffer[index] == 0 && startLocal >=0 && startGlobal < 0) startGlobal = index;
-            else if (buffer_.intBuffer[index] == 0 && startLocal >=0 && startGlobal >=0) {
+        for (size_t index = current; index < buffer.intBuffer.size(); ++index){
+            if (buffer.intBuffer[index] == 0 && startLocal < 0) startLocal = index; 
+            else if (buffer.intBuffer[index] == 0 && startLocal >=0 && startGlobal < 0) startGlobal = index;
+            else if (buffer.intBuffer[index] == 0 && startLocal >=0 && startGlobal >=0) {
                 lastGlobal = index - 1;
                 break;
             }
         }
-        if (startLocal >= 0 && startGlobal >=0 && lastGlobal < 0) lastGlobal = buffer_.intBuffer.size() - 1; 
+        if (startLocal >= 0 && startGlobal >=0 && lastGlobal < 0) lastGlobal = buffer.intBuffer.size() - 1; 
         return (startLocal >=0 && startGlobal >=0 && lastGlobal >=0);
     }
 }
