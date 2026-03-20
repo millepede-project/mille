@@ -105,4 +105,5 @@ namespace Mille{
         buffer_.clearUnused();  
         return true; 
     }
+    MilleBuffer & MilleRecord::getBuffer(){return buffer_;}
 }

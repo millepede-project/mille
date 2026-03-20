@@ -158,6 +158,10 @@ namespace Mille{
         /// @brief Interface for closing and reopening the current file 
         virtual void resetOutputFile() = 0; 
 
+        /// @brief Expose the internal buffer. 
+        /// Mainly for debugging purposes. 
+        MilleBuffer & getBuffer();
+
         protected: 
 
             /// @brief Interface to add an entry to the current record. 
