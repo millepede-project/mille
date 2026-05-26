@@ -4,6 +4,9 @@
 
 Changes are presented in reverse chronological order.
 
+2026-05-26: 
+- Change install location for MilleF module file 
+
 2026-03-19: 
 - Clean up ROOT configuration in CMakeLists
 - Fix missing include in unit test
