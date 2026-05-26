@@ -2,7 +2,11 @@
  
 ## Version history
 
-### Version V01-00-02 (new)
+### Version V01-00-03 (new)
+
+Change install location for MilleF fortran module - supports latest (V05-01-02 and later) MP-II versions
+
+### Version V01-00-02
 
 Clean up ROOT dependency - safe build / tests without ROOT, no enforced ROOT C++ standard 
 
