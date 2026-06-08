@@ -2,6 +2,10 @@
  
 ## Version history
 
+### Version V01-00-04
+
+Update CMakeLists - do not touch `CMAKE_CXX_COMPILER` 
+
 ### Version V01-00-03 (new)
 
 Change install location for MilleF fortran module - supports latest (V05-01-02 and later) MP-II versions
