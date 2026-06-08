@@ -72,7 +72,7 @@ void open_mille(const char *fileName, int lengthFileName, int *errorFlag, int nF
 
     // now access the file 
     if (fileIndex >= (int)g_readFileHandles.size()) g_readFileHandles.resize(fileIndex+1); 
-    g_readFileHandles.at(fileIndex) = std::move(spawnMilleReader(fname)); 
+    g_readFileHandles.at(fileIndex) = spawnMilleReader(fname); 
     if (!g_readFileHandles.at(fileIndex) || !g_readFileHandles.at(fileIndex)->open(fname)){
         *errorFlag = 2;     // failed to open file 
         return; 

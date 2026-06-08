@@ -2,6 +2,10 @@
  
 ## Version history
 
+### Version V01-00-05
+
+Fix clang-warnings
+
 ### Version V01-00-04
 
 Update CMakeLists - do not touch `CMAKE_CXX_COMPILER` 

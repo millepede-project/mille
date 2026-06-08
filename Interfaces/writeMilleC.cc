@@ -68,7 +68,7 @@ void open_mille_out(const char *fileName, int lengthFileName, int nFileOut, bool
 
     // now access the file 
     if (fileIndex >= (int)g_writeFileHandles.size()) g_writeFileHandles.resize(fileIndex+1); 
-    g_writeFileHandles.at(fileIndex) = std::move(spawnMilleRecord(fname,doublePrec,keepZeros,recordLengthHint)); 
+    g_writeFileHandles.at(fileIndex) = spawnMilleRecord(fname,doublePrec,keepZeros,recordLengthHint); 
     if (!g_writeFileHandles.at(fileIndex)){
         std::cerr << "FAILED to open output file!" <<std::endl;
         return; 
