@@ -4,6 +4,9 @@
 
 Changes are presented in reverse chronological order.
 
+2026-06-08: 
+- Remove manual compiler lookup from CMakeLists
+
 2026-05-26: 
 - Change install location for MilleF module file 
 
