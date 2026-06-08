@@ -1,13 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.26.5)
 
-# discover the compilers from PATH (when system install is overridden)
-find_program(gcc_loc gcc)
-find_program(gpp_loc g++)
-
-set(CMAKE_C_COMPILER ${gcc_loc})
-set(CMAKE_CXX_COMPILER ${gpp_loc})
-set(CMAKE_Fortran_COMPILER ${gf_loc})
-
 PROJECT(Mille LANGUAGES Fortran CXX)
 set(Mille_VERSION 01.00.03)
 include(CTest)
