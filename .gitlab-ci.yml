@@ -27,6 +27,8 @@ stages:          # List of stages for jobs, and their order of execution
 ls-job:       # This job runs in the build stage, which runs first.
   image: gitlab.desy.de:5555/millepede/millepede-ii/mp2dev_base
   stage: build
+  tags: 
+    - cvmfs
   script:
     - ls /cvmfs/sft.cern.ch/
 
