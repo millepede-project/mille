@@ -130,11 +130,18 @@ namespace Mille{
             if (doublePrecision) doubleBuffer.push_back(value);
             else floatBuffer.push_back(value); 
         }
+        void integrate(const MilleBuffer & other){
+            reserve(size() + other.size()); 
+            for (std::size_t k = 0; k < other.size(); ++k){
+                const auto & [index, val] = other.query(k);
+                fill(index,val); 
+            }
+        }
 
         /// @brief Helper function to read an element of the buffer. 
         /// @param k Index of the element. Should be less or equal to buffer size. 
         /// @return std::pair<int,double>, with the first element containing the integer and the second element the real entry of the element. 
-        std::pair<int, double> query(size_t k){
+        std::pair<int, double> query(size_t k) const {
             if (k > intBuffer.size()){
                 std::cerr << " out of range query of mille buffer ("<<k<<" out of "<<intBuffer.size()<<")";
                 return {0,0.};

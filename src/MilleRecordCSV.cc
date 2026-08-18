@@ -36,6 +36,7 @@ namespace Mille{
         closeCSV();     
     } 
     void MilleRecordCSV::writeRecord(){
+        std::lock_guard g(m_mx_milleIO); 
         // skip empty records 
         if (buffer_.empty()) return;
         const int recordLength =
@@ -53,13 +54,13 @@ namespace Mille{
             myOutFile_ << std::endl; 
         }
         myOutFile_ << "# End of record " <<std::endl<<std::endl; 
-
         // prepare for next record 
         resetBuffers();
         newSetIfNeeded();     
     }
 
     void MilleRecordCSV::flushOutputFile(){
+        std::lock_guard g(m_mx_milleIO); 
         myOutFile_.flush(); 
     } 
 
@@ -69,9 +70,11 @@ namespace Mille{
     } 
 
     void MilleRecordCSV::openCSV(){
+        std::lock_guard g(m_mx_milleIO); 
         myOutFile_.open(fname_, std::ios::out); 
     } 
     void MilleRecordCSV::closeCSV(){
+        std::lock_guard g(m_mx_milleIO); 
         myOutFile_.close(); 
     } 
 

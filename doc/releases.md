@@ -2,6 +2,10 @@
  
 ## Version history
 
+### Version V01-01-00
+
+Add MilleRecordLocalBuffer class to support thread-local Mille accumulation in multi-threaded environments
+
 ### Version V01-00-05
 
 Fix clang-warnings
