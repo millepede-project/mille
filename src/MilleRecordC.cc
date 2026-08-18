@@ -35,6 +35,7 @@ namespace Mille{
         closeC();     
     } 
     void MilleRecordC::writeRecord(){
+        std::lock_guard g(m_mx_milleIO); 
         // skip empty records 
         if (buffer_.empty()) return;
         const int recordLength =
@@ -59,6 +60,7 @@ namespace Mille{
     }
 
     void MilleRecordC::flushOutputFile(){
+        std::lock_guard g(m_mx_milleIO); 
         myOutFile_.flush(); 
     } 
 
@@ -68,9 +70,11 @@ namespace Mille{
     } 
 
     void MilleRecordC::openC(){
+        std::lock_guard g(m_mx_milleIO); 
         myOutFile_.open(fname_, std::ios::binary | std::ios::out); 
     } 
     void MilleRecordC::closeC(){
+        std::lock_guard g(m_mx_milleIO); 
         myOutFile_.close(); 
     } 
 }

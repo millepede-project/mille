@@ -28,6 +28,10 @@ add_executable(testMilleFactory testMilleFactory.cc)
 target_link_libraries(testMilleFactory PUBLIC Mille2)    
 add_test(NAME TestMilleFactory COMMAND testMilleFactory)
 
+add_executable(testMilleThreadBuffer testMilleThreadBuffer.cc)
+target_link_libraries(testMilleThreadBuffer PUBLIC Mille2)    
+add_test(NAME TestMilleThreadBuffer COMMAND testMilleThreadBuffer)
+
 if (build_ROOT_comps)
     add_executable(testMilleRecordROOT testMilleRecordROOT.cc)
     target_link_libraries(testMilleRecordROOT PUBLIC Mille2 )    

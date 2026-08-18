@@ -69,7 +69,8 @@
     }
 #endif
 
-
+#include <mutex>
+#include <memory>
 #include "Mille/MilleDataStructures.h"
 #include "Mille/IMilleReader.h"
 
@@ -161,6 +162,24 @@ namespace Mille{
         /// @brief Expose the internal buffer. 
         /// Mainly for debugging purposes. 
         MilleBuffer & getBuffer();
+        
+        /// @brief spawns a local buffer instance that fulfills the MilleRecord
+        /// interface and can be used to collect measurements
+        /// in a thread-local context. When it goes out of scope,
+        /// the local buffer will copy its entries into the buffer
+        /// of the parent record in a thread-safe way. 
+        /// It can also forward calls to writeRecord/flushOutput/resetOutput
+        /// to the parent, where writeRecord will trigger a copy of the buffer
+        /// content prior to the write op. 
+        std::unique_ptr<MilleRecord> spawnLocalBuffer(); 
+        
+        /// @brief reads back the buffer content of another instance, non-destructively.
+        /// The content of the other instance's buffer will be appended to ours, 
+        /// respecting our choice for double-versus-float storage. 
+        /// Intended mainly for use by the local buffer mechanism,
+        /// and automatically called from there via MilleRecordLocalBuffer::integrateToParent
+        /// and by MilleRecordLocalBuffer::writeRecord
+        void consumeBuffer(MilleRecord* other);
 
         protected: 
 
@@ -196,6 +215,7 @@ namespace Mille{
             bool writeZeroDerivatives_ = false;   ///< Flag to write global derivatives with value zero
             bool hasSpecialInRecord_ = false;   ///< Flag whether we already have a 'special' block in the current record
             std::size_t recordLengthHint_ = 2000; /// < expected record length 
+            std::mutex m_mx_milleIO;        /// < Mutex to protect thread-unsafe operations on this instance
 
     };
 }

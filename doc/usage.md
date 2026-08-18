@@ -65,7 +65,10 @@ This functionality is identical across all target languages, only the interfaces
  
  For the MilleRecord, closing the output is achieved by the destructor of the object - for example by `resetting` the `unique_ptr` or letting it go out of scope. 
 
- To have multiple in-progress files simultaneously, simply instantiate multiple readers / writers. 
+ To have multiple in-progress files simultaneously, simply instantiate multiple readers / writers.
+
+ If you wish to run in a multi-threaded environment, where each thread accumulates tracks, it is advisable to call `spawnLocalBuffer` on your record in the multi-threaded function to spawn a thread-local copy of the buffer, into which insertion can then be made efficiently without lock contention. If you call the `writeRecord` function on the local buffer instance, it will copy its content back to the parent and trigger a write operation there.
+ It will also copy any remaining content back to the parent when it gets destroyed by going out of scope.  
 
  ### C 
 

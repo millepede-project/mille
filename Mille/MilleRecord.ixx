@@ -5,6 +5,7 @@ void Mille::MilleRecord::addData_impl(double aMeas, double aErr,
                 MilleArrayView<indLocalType> indLocal, MilleArrayView<derLocalType> derLocal,
                 MilleArrayView<indGlobalType>    labGlobal,
                 MilleArrayView<derGlobalType> derGlobal){
+    std::lock_guard g(m_mx_milleIO); 
     if (indLocal.size() != derLocal.size()){
         std::cerr << " MilleRecord::addData expects local labels and derivatives to have same size, but received "<<indLocal.size()<<" int and "<<derLocal.size()<<" float. Will not add entry. "<<std::endl; 
         return ;   

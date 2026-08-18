@@ -19,7 +19,9 @@
  */
 
 #include "Mille/MilleRecord.h"
+#include "Mille/MilleRecordLocalBuffer.h"
 #include <iostream> 
+#include <memory>
 
 namespace Mille{
     MilleRecord::MilleRecord(bool doublePrecision, bool writeZero, std::size_t recordLengthHint):
@@ -33,6 +35,7 @@ namespace Mille{
 
     }
     void MilleRecord::copyToBuffer(MilleArrayView<int> integers, MilleArrayView<double> floats){
+        std::lock_guard g(m_mx_milleIO); 
         if (integers.size() != floats.size()){
             std::cerr << " MilleRecord::copyToBuffer expects both arrays to have same size, but received "<<integers.size()<<" int and "<<floats.size()<<" float. "<<std::endl; 
             return ;   
@@ -43,6 +46,7 @@ namespace Mille{
     }
 
     void MilleRecord::addSpecial( MilleArrayView<int> specialInt, MilleArrayView<double> specialFloat){
+        std::lock_guard g(m_mx_milleIO); 
         if (!specialInt.size()) return;  // trivial empty special block 
         if (specialInt.size() != specialFloat.size()){
             std::cerr << " MilleRecord::addSpecial expects int and float lists to have same size, but received "<<specialInt.size()<<" int and "<<specialFloat.size()<<" float. Will not add entry. "<<std::endl; 
@@ -85,6 +89,7 @@ namespace Mille{
     }
 
     bool MilleRecord::copyRecord(IMilleReader & source){
+        std::lock_guard g(m_mx_milleIO); 
         buffer_.clear(); 
         const size_t defaultBuffer = 5000; 
         buffer_.resize(defaultBuffer,true); 
@@ -105,5 +110,15 @@ namespace Mille{
         buffer_.clearUnused();  
         return true; 
     }
-    MilleBuffer & MilleRecord::getBuffer(){return buffer_;}
+    MilleBuffer & MilleRecord::getBuffer(){return buffer_;}     
+
+    std::unique_ptr<MilleRecord> MilleRecord::spawnLocalBuffer(){
+        return std::make_unique<MilleRecordLocalBuffer>(this, buffer_.doublePrecision, writeZeroDerivatives_,recordLengthHint_);
+    }
+    
+    void MilleRecord::consumeBuffer(MilleRecord* other){
+        std::lock_guard g(m_mx_milleIO); 
+        buffer_.integrate(other->getBuffer());
+    }
+
 }
