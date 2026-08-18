@@ -50,9 +50,10 @@ namespace Mille{
         MilleRecord(doublePrecision, writeZero, recordLengthHint),
         m_parent(parent){}
          
-      /// @brief Destructor 
+      /// @brief Destructor. If anything left to integrate to the parent,
+      /// will do so. 
       virtual ~MilleRecordLocalBuffer(){
-        //  if (buffer_.size() > 0) integrateToParent();
+         if (buffer_.size() > 0) integrateToParent();
       }
       /// @brief Interface for writing out the current entry.
       /// Will forward the call to the parent, and copy buffer 
@@ -63,17 +64,19 @@ namespace Mille{
       }
 
       /// @brief Interface for flushing the current file to disk 
+      /// Delegates to the parent instance 
       virtual void flushOutputFile() override final{
         m_parent->flushOutputFile(); 
       }
 
       /// @brief Interface for closing and reopening the current file 
+      /// Delegates to the parent instance 
       virtual void resetOutputFile() override final{
         m_parent->resetOutputFile(); 
       }
       
       /// @brief copies the current buffer into a (persistifiable) other 
-      /// MilleRecord instance. 
+      /// MilleRecord instance. Clears our buffer. 
       void integrateToParent(){
         m_parent->consumeBuffer(this); 
         // prepare for next record 

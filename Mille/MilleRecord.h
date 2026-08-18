@@ -163,18 +163,22 @@ namespace Mille{
         /// Mainly for debugging purposes. 
         MilleBuffer & getBuffer();
         
-        /// spawns a local buffer instance that fulfills the MilleRecord
+        /// @brief spawns a local buffer instance that fulfills the MilleRecord
         /// interface and can be used to collect measurements
         /// in a thread-local context. When it goes out of scope,
         /// the local buffer will copy its entries into the buffer
         /// of the parent record in a thread-safe way. 
+        /// It can also forward calls to writeRecord/flushOutput/resetOutput
+        /// to the parent, where writeRecord will trigger a copy of the buffer
+        /// content prior to the write op. 
         std::unique_ptr<MilleRecord> spawnLocalBuffer(); 
         
-        /// reads back a local buffer 
-        /// interface and can be used to collect measurements
-        /// in a thread-local context. When it goes out of scope,
-        /// the local buffer will copy its entries into the buffer
-        /// of the parent record in a thread-safe way. 
+        /// @brief reads back the buffer content of another instance, non-destructively.
+        /// The content of the other instance's buffer will be appended to ours, 
+        /// respecting our choice for double-versus-float storage. 
+        /// Intended mainly for use by the local buffer mechanism,
+        /// and automatically called from there via MilleRecordLocalBuffer::integrateToParent
+        /// and by MilleRecordLocalBuffer::writeRecord
         void consumeBuffer(MilleRecord* other);
 
         protected: 
