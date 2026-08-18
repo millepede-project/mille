@@ -25,8 +25,6 @@
 #include <Mille/MilleReaderC.h>
 #include <Mille/MilleRecordC.h>
 #include <test/milleReaderTests.h>
-#include "TFile.h"
-#include "TTree.h"
 
 using namespace Mille; 
 
