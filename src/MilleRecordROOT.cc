@@ -36,6 +36,7 @@ namespace Mille{
         close();     
     } 
     void MilleRecordROOT::writeRecord(){
+        std::lock_guard g(m_mx_milleIO); 
         floatingPointFormat_ = 4; 
         if (buffer_.doublePrecision) floatingPointFormat_ = 8;
         // skip empty records 
@@ -48,6 +49,7 @@ namespace Mille{
     }
 
     void MilleRecordROOT::flushOutputFile(){
+        std::lock_guard g(m_mx_milleIO); 
         file_->Flush(); 
     } 
 
@@ -57,22 +59,24 @@ namespace Mille{
     } 
 
     void MilleRecordROOT::open(){
-    file_.reset(TFile::Open(fname_.c_str(),"RECREATE")); 
-    if (!file_ || !file_->IsOpen()){
-        std::cerr << "Mille::openRoot: Could not open " << fname_ 
-            << " as output file." << std::endl;
-    }
-    outTree_ = new TTree("MilleRecords","MilleRecords");
-    outTree_->SetDirectory(file_.get()); 
-    outTree_->Branch("floats",&(buffer_.floatBuffer)); 
-    outTree_->Branch("ints",&(buffer_.intBuffer)); 
-    outTree_->Branch("doubles",&(buffer_.doubleBuffer)); 
-    outTree_->Branch("floatingPointFormat",&floatingPointFormat_); 
-    outTree_->SetAutoFlush(100); 
+        std::lock_guard g(m_mx_milleIO); 
+        file_.reset(TFile::Open(fname_.c_str(),"RECREATE")); 
+        if (!file_ || !file_->IsOpen()){
+            std::cerr << "Mille::openRoot: Could not open " << fname_ 
+                << " as output file." << std::endl;
+        }
+        outTree_ = new TTree("MilleRecords","MilleRecords");
+        outTree_->SetDirectory(file_.get()); 
+        outTree_->Branch("floats",&(buffer_.floatBuffer)); 
+        outTree_->Branch("ints",&(buffer_.intBuffer)); 
+        outTree_->Branch("doubles",&(buffer_.doubleBuffer)); 
+        outTree_->Branch("floatingPointFormat",&floatingPointFormat_); 
+        outTree_->SetAutoFlush(100); 
 
     } 
     void MilleRecordROOT::close(){
-    file_->Write(); 
-    file_->Close();
+        std::lock_guard g(m_mx_milleIO); 
+        file_->Write(); 
+        file_->Close();
     } 
 }

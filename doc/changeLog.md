@@ -4,6 +4,9 @@
 
 Changes are presented in reverse chronological order.
 
+2026-08-18: 
+- Add MilleRecordLocalBuffer to support Mille use in multi-threaded environments
+
 2026-06-08: 
 - Remove manual compiler lookup from CMakeLists
 - Fix clang warnings
