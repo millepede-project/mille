@@ -69,6 +69,7 @@
     }
 #endif
 
+#include <mutex>
 #include <memory>
 #include "Mille/MilleDataStructures.h"
 #include "Mille/IMilleReader.h"
