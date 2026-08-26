@@ -81,8 +81,12 @@ namespace Mille{
         m_parent->consumeBuffer(this); 
         // prepare for next record 
         resetBuffers();
-        newSetIfNeeded();     
       }
+      
+      /// this will *never* write a header - the parent is responsible for doing so.
+      virtual void newSetIfNeeded() override final{
+         return;   
+      } 
 
       private: 
         

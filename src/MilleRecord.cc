@@ -118,6 +118,7 @@ namespace Mille{
     
     void MilleRecord::consumeBuffer(MilleRecord* other){
         std::lock_guard g(m_mx_milleIO); 
+        newSetIfNeeded();
         buffer_.integrate(other->getBuffer());
     }
 
