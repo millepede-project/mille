@@ -26,7 +26,7 @@
 #include "Mille/MilleRecord.h"
 #include "testUtils.h"
 #include <random>
-#include <format>
+#include <string>
 
 
 // standardised test inputs
@@ -120,7 +120,7 @@ int MilleReaderTestSuite(Mille::IMilleReader & reader, MilleTestInputs & inputs,
     std::size_t iEntry = 0; 
     for (const auto & thisDummy : inputs.dummyData){
         ++iEntry; 
-        std::string theEntry = std::format(", Entry {} of {}",iEntry, inputs.dummyData.size());
+        std::string theEntry = ", Entry "+std::to_string(iEntry)+ " of "+std::to_string(inputs.dummyData.size());
         // should always return a status of 4/8 and the correct number of read bytes 
         res = reader.readToBuffer(doubles.data(), floats.data(), ints.data(),ints.size()); 
         nRead=res.first; status=res.second; 
