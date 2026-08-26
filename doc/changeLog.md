@@ -4,6 +4,10 @@
 
 Changes are presented in reverse chronological order.
 
+2026-08-26: 
+- Bugfix to MilleRecordLocalBuffer
+- Update unit tests to cover additional failure scenarios
+
 2026-08-18: 
 - Add MilleRecordLocalBuffer to support Mille use in multi-threaded environments
 

@@ -205,7 +205,7 @@ namespace Mille{
             /// ==== Helper functions  === 
             /// @brief Add header for a new record if buffers are empty.
             ///        Will not do anything if buffers are populated. 
-            void newSetIfNeeded(); 
+            virtual void newSetIfNeeded(); 
 
             /// @brief reset the internal buffers, ready for a new entry
             void resetBuffers(); 

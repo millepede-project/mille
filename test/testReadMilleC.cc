@@ -29,11 +29,12 @@ using namespace Mille;
 int main(int, char**){
 
     /// dummy data for testing 
-    MilleTestInputs inputs; 
+    MilleTestInputs inputs(1); 
     {
         auto record = spawnMilleRecord("milleTest.dat"); 
         inputs.writeTo(*record); 
     }
+    auto dummy = inputs.dummyData.front();
 
     // open using C-bindings
     int errFlag = 0; 
@@ -56,7 +57,7 @@ int main(int, char**){
     errFlag = 0; 
     read_mille(doubles.data(), floats.data(), ints.data(),&bufSize,&errFlag,1); 
     TEST_CONDITION(errFlag, int(-4), "Too short buffers: Exit code"); 
-    TEST_CONDITION(bufSize, int(3 + inputs.localLabels.size() + inputs.globalLabels.size() + 2 + inputs.specialFloat.size()), "Too short buffers: Length output");
+    TEST_CONDITION(bufSize, int(3 + dummy.localLabels.size() + dummy.globalLabels.size() + 2 + dummy.specialFloat.size()), "Too short buffers: Length output");
     // resize our read buffer - should give successful read after next rewind
     doubles.resize(bufSize,0);
     ints.resize(bufSize,0);
@@ -95,35 +96,35 @@ int main(int, char**){
     // epsilion, as the information has been internally stored as float 
     // in the binary file. 
     TEST_CONDITION((float)doubles[ix++],0, "Float header word"); 
-    TEST_CONDITION((float)doubles[ix++],inputs.residual, "Residual"); 
-    for (size_t i =0; i < inputs.localDeriv.size(); ++i){
-        TEST_CONDITION((float)doubles[ix++],inputs.localDeriv[i], "Local derivative index "<<i); 
+    TEST_CONDITION((float)doubles[ix++],dummy.residual, "Residual"); 
+    for (size_t i =0; i < dummy.localDeriv.size(); ++i){
+        TEST_CONDITION((float)doubles[ix++],dummy.localDeriv[i], "Local derivative index "<<i); 
     }
-    TEST_CONDITION((float)doubles[ix++],inputs.deltaResidual, "Uncertainty"); 
-    for (size_t i =0; i < inputs.globalDeriv.size(); ++i){
-        TEST_CONDITION((float)doubles[ix++],inputs.globalDeriv[i], "Global derivative index "<<i); 
+    TEST_CONDITION((float)doubles[ix++],dummy.deltaResidual, "Uncertainty"); 
+    for (size_t i =0; i < dummy.globalDeriv.size(); ++i){
+        TEST_CONDITION((float)doubles[ix++],dummy.globalDeriv[i], "Global derivative index "<<i); 
     }
     TEST_CONDITION((float)doubles[ix++],0, "Special header"); 
-    TEST_CONDITION((float)doubles[ix++],-1. * inputs.specialFloat.size(), "nSpecial"); 
-    for (size_t i =0; i < inputs.specialFloat.size(); ++i){
-        TEST_CONDITION((float)doubles[ix++],inputs.specialFloat[i], "Special float "<<i); 
+    TEST_CONDITION((float)doubles[ix++],-1. * dummy.specialFloat.size(), "nSpecial"); 
+    for (size_t i =0; i < dummy.specialFloat.size(); ++i){
+        TEST_CONDITION((float)doubles[ix++],dummy.specialFloat[i], "Special float "<<i); 
     }
 
     // check the ints 
     ix = 0; 
     TEST_CONDITION(ints[ix++],0, "Int header word"); 
     TEST_CONDITION(ints[ix++],0, "Residual label"); 
-    for (size_t i =0; i < inputs.localLabels.size(); ++i){
-        TEST_CONDITION(ints[ix++],inputs.localLabels[i], "Local label index "<<i); 
+    for (size_t i =0; i < dummy.localLabels.size(); ++i){
+        TEST_CONDITION(ints[ix++],dummy.localLabels[i], "Local label index "<<i); 
     }
     TEST_CONDITION(ints[ix++],0, "Uncertainty label"); 
-    for (size_t i =0; i < inputs.globalLabels.size(); ++i){
-        TEST_CONDITION(ints[ix++],inputs.globalLabels[i], "Global label index "<<i); 
+    for (size_t i =0; i < dummy.globalLabels.size(); ++i){
+        TEST_CONDITION(ints[ix++],dummy.globalLabels[i], "Global label index "<<i); 
     }
     TEST_CONDITION(ints[ix++],0, "Special header"); 
     TEST_CONDITION(ints[ix++],0, "nSpecial (int entry)"); 
-    for (size_t i =0; i < inputs.specialInt.size(); ++i){
-        TEST_CONDITION(ints[ix++],inputs.specialInt[i], "Special integer "<<i); 
+    for (size_t i =0; i < dummy.specialInt.size(); ++i){
+        TEST_CONDITION(ints[ix++],dummy.specialInt[i], "Special integer "<<i); 
     }
 
     return 0; 
