@@ -32,7 +32,7 @@
 
 using namespace Mille; 
 
-int compareExpectMeasurement(const MilleMeasurement & meas, const MilleTestInputs & inputs){
+int compareExpectMeasurement(const MilleMeasurement & meas, const MilleTestInputs::dummyRecord & inputs){
 
     TEST_CONDITION((float)meas.measurement, inputs.residual, "Extracted residual");
     TEST_CONDITION((float)meas.uncertainty, inputs.deltaResidual, "Extracted uncertainty");
@@ -65,29 +65,29 @@ int compareExpectSpecial(const MilleMeasurement & meas, const std::vector<int> &
 int main(int, char**){
 
     /// dummy data for testing 
-    MilleTestInputs inputs; 
+    MilleTestInputs inputs(1); 
     std::vector<int> specialInt{1,2};   // guaranteed to be very special
     std::vector<double> specialDouble{3,4}; 
+    auto dummy = inputs.dummyData.front(); 
 
     {
         // single floating point precision
         MilleRecordC mille("milleTest.dat");
-        
-        mille.addData(inputs.residual, inputs.deltaResidual,  
-        inputs.localLabels, inputs.localDeriv,
-        inputs.globalLabels, inputs.globalDeriv);
+        mille.addData(dummy.residual, dummy.deltaResidual,  
+        dummy.localLabels, dummy.localDeriv,
+        dummy.globalLabels, dummy.globalDeriv);
 
-        mille.addData(inputs.residual, inputs.deltaResidual,  
-        inputs.localLabels, inputs.localDeriv,
-        inputs.globalLabels, inputs.globalDeriv);
+        mille.addData(dummy.residual, dummy.deltaResidual,  
+        dummy.localLabels, dummy.localDeriv,
+        dummy.globalLabels, dummy.globalDeriv);
 
         mille.addSpecial(specialInt, specialDouble ); 
 
         mille.writeRecord();
 
-        mille.addData(inputs.residual, inputs.deltaResidual,  
-        inputs.localLabels, inputs.localDeriv,
-        inputs.globalLabels, inputs.globalDeriv);
+        mille.addData(dummy.residual, dummy.deltaResidual,  
+        dummy.localLabels, dummy.localDeriv,
+        dummy.globalLabels, dummy.globalDeriv);
 
         mille.writeRecord();
          
@@ -118,12 +118,12 @@ int main(int, char**){
 
     /// validate content 
     int ret = 0; 
-    ret = compareExpectMeasurement(measurementsFirst[0], inputs);
+    ret = compareExpectMeasurement(measurementsFirst[0], dummy);
     if (ret != 0) return ret; 
-    ret = compareExpectMeasurement(measurementsFirst[1], inputs);
+    ret = compareExpectMeasurement(measurementsFirst[1], dummy);
     if (ret != 0) return ret;
     ret = compareExpectSpecial(measurementsFirst[2], specialInt, specialDouble);
     if (ret != 0) return ret; 
-    ret = compareExpectMeasurement(measurementsSecond[0], inputs);
+    ret = compareExpectMeasurement(measurementsSecond[0], dummy);
     return ret; 
 }

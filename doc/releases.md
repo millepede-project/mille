@@ -2,9 +2,14 @@
  
 ## Version history
 
+### Version V01-01-01
+
+Fix to MilleRecordLocalBuffer, update to unit tests
+
 ### Version V01-01-00
 
 Add MilleRecordLocalBuffer class to support thread-local Mille accumulation in multi-threaded environments
+* do not use, use V01-01-01 or later instead *
 
 ### Version V01-00-05
 

@@ -22,8 +22,8 @@
 
 
 #include "testUtils.h"
-#include <Mille/MilleReaderC.h>
-#include <Mille/MilleRecordC.h>
+#include <Mille/MilleReaderCSV.h>
+#include <Mille/MilleRecordCSV.h>
 #include <test/milleReaderTests.h>
 
 using namespace Mille; 
@@ -31,26 +31,23 @@ using namespace Mille;
 int main(int, char**){
     using ::my_ssize; 
 
-    const std::string milleBinaryName = "milleTest.dat"; 
-    MilleTestInputs inputs; 
+    const std::string milleBinaryName = "milleTest.csv"; 
+    MilleTestInputs inputs(10); 
     {
-        MilleRecordC mille(milleBinaryName); 
+        MilleRecordCSV mille(milleBinaryName); 
 
         auto localBuffer = mille.spawnLocalBuffer(); 
-        localBuffer->addData(inputs.residual, inputs.deltaResidual, 
-                inputs.localLabels,
-                inputs.localDeriv, 
-                inputs.globalLabels,
-                inputs.globalDeriv); 
-        localBuffer->addSpecial(inputs.specialInt, inputs.specialFloat);
-        localBuffer->writeRecord();
+        inputs.writeTo(*localBuffer);
     }
 
-    MilleReaderC readBack(milleBinaryName); 
+    MilleReaderCSV readBack(milleBinaryName); 
     // test single precision
     if (!readBack.open(milleBinaryName)){
         std::cout << " Failed to open file"<<std::endl;
         return 1;    
     }
-    return MilleReaderTestSuite(readBack, inputs); 
+    int testSuite = MilleReaderTestSuite(readBack, inputs);
+    if (testSuite != 0){
+        return testSuite;
+    }
 }

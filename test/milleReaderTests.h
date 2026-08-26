@@ -25,35 +25,67 @@
 #include "Mille/IMilleReader.h"
 #include "Mille/MilleRecord.h"
 #include "testUtils.h"
+#include <random>
+#include <format>
 
 
 // standardised test inputs
 struct MilleTestInputs{
 
+    struct dummyRecord{
+        std::vector<unsigned int> localLabels;
+        std::vector<double> localDeriv;
+        std::vector<int> globalLabels;
+        std::vector<double> globalDeriv;
+        std::vector<int> specialInt;
+        std::vector<double> specialFloat;
+        double residual;
+        double deltaResidual; 
+    };
+
+    dummyRecord generateDummy(){
+        std::uniform_real_distribution<double> f;
+        dummyRecord r;
+        r.localLabels = {1,2,3}; 
+        r.localDeriv.push_back(f(m_rnd)); 
+        r.localDeriv.push_back(f(m_rnd)); 
+        r.localDeriv.push_back(f(m_rnd)); 
+        r.globalLabels = {42,45,96}; 
+        r.globalDeriv.push_back(f(m_rnd)); 
+        r.globalDeriv.push_back(f(m_rnd)); 
+        r.globalDeriv.push_back(f(m_rnd)); 
+        r.specialInt = {99};
+        r.specialFloat = {f(m_rnd)};
+        r.residual = f(m_rnd);
+        r.deltaResidual = std::abs(f(m_rnd));
+        return r; 
+    }
+
+    MilleTestInputs (int nEvents=1){
+        for (int k = 0; k < nEvents; ++k){
+            dummyData.push_back(generateDummy());
+        }
+    }
     /// dummy data for testing 
-    std::vector<unsigned int> localLabels{1,2,4}; 
-    std::vector<double> localDeriv{1.0, -0.3, 1.2}; 
-    std::vector<int> globalLabels{42,345}; 
-    std::vector<double> globalDeriv{-1.,1.}; 
-    std::vector<int> specialInt{99,101}; 
-    std::vector<double> specialFloat{-42.,11.4}; 
-    double residual = -0.033;
-    double deltaResidual = 1.e-3; 
+    std::vector<dummyRecord> dummyData; 
     /// helper function to write the test data into an 
     /// arbitraty type of Mille record. 
     void writeTo(Mille::MilleRecord & mille){
-        mille.addData(residual, deltaResidual, 
-                    localLabels,
-                    localDeriv, 
-                    globalLabels,
-                    globalDeriv); 
-        mille.addSpecial(specialInt, specialFloat); 
+        for (const dummyRecord & dummy : dummyData ){
+            mille.addData(dummy.residual, dummy.deltaResidual, 
+                        dummy.localLabels,
+                        dummy.localDeriv, 
+                        dummy.globalLabels,
+                        dummy.globalDeriv); 
+            mille.addSpecial(dummy.specialInt, dummy.specialFloat); 
 
-        mille.writeRecord();
+            mille.writeRecord();
+        }
         mille.flushOutputFile(); 
     }
-
+    std::random_device m_rnd; 
 };
+
 
 /// @brief Run a set of tests for any mille reader class
 /// @param reader: The reader instance to test
@@ -72,75 +104,85 @@ int MilleReaderTestSuite(Mille::IMilleReader & reader, MilleTestInputs & inputs,
     TEST_CONDITION(status, -1, "Invalid buffer: Exit code"); 
 
     // pass undersized buffers
+    const MilleTestInputs::dummyRecord & dummy = inputs.dummyData.front();
     auto res = reader.readToBuffer(doubles.data(), floats.data(), ints.data(),1); 
     nRead=res.first; status=res.second; 
     TEST_CONDITION(status, -4, "Too short buffers: Exit code"); 
-    TEST_CONDITION(nRead, 3 + inputs.localLabels.size() + inputs.globalLabels.size() + 2 + inputs.specialFloat.size(), "Too short buffers: Length output");
-    // resize our read buffer - should give successful read after next rewind
+    TEST_CONDITION(nRead, 3 + dummy.localLabels.size() + dummy.globalLabels.size() + 2 + dummy.specialFloat.size(), "Too short buffers: Length output");
+    // resize our read buffer - should give successful read after next rewind, bc. all reads are designed to give the same length 
     doubles.resize(nRead,0);
     ints.resize(nRead,0);
     floats.resize(nRead,0);
 
+    reader.reset();
+
+    // validate the output against the input 
+    std::size_t iEntry = 0; 
+    for (const auto & thisDummy : inputs.dummyData){
+        ++iEntry; 
+        std::string theEntry = std::format(", Entry {} of {}",iEntry, inputs.dummyData.size());
+        // should always return a status of 4/8 and the correct number of read bytes 
+        res = reader.readToBuffer(doubles.data(), floats.data(), ints.data(),ints.size()); 
+        nRead=res.first; status=res.second; 
+        TEST_CONDITION(status, expectedPrecision, "Status for successful read"+theEntry); 
+        TEST_CONDITION(nRead, ints.size(), "nRead for successful read"+theEntry); 
+
+
+        // check the derivatives - note that the interface guarantees them to end up 
+        // in the *double* buffer, regardless of the file-internal storage. 
+        size_t ix = 0; 
+        // use a float conversion to test at floating rather than double-precision
+        // epsilion, as the information has been internally stored as float 
+        // in the binary file. 
+        TEST_CONDITION((float)doubles[ix++],0, "Float header word"+theEntry); 
+        TEST_CONDITION((float)doubles[ix++],thisDummy.residual, "Residual"+theEntry); 
+        for (size_t i =0; i < thisDummy.localDeriv.size(); ++i){
+            TEST_CONDITION((float)doubles[ix++],thisDummy.localDeriv[i], "Local derivative index "<<i<<theEntry); 
+        }
+        TEST_CONDITION((float)doubles[ix++],thisDummy.deltaResidual, "Uncertainty"<<theEntry); 
+        for (size_t i =0; i < thisDummy.globalDeriv.size(); ++i){
+            TEST_CONDITION((float)doubles[ix++],thisDummy.globalDeriv[i], "Global derivative index "<<i<<theEntry); 
+        }
+        TEST_CONDITION((float)doubles[ix++],0, "Special header word"<<theEntry); 
+        TEST_CONDITION((int)(-1 * doubles[ix++]),thisDummy.specialInt.size(), "nSpecial"<<theEntry); 
+        for (size_t i =0; i < thisDummy.specialFloat.size(); ++i){
+            TEST_CONDITION((float)doubles[ix++],thisDummy.specialFloat[i], "Special float  index "<<i<<theEntry); 
+        }
+
+        // check the ints 
+        ix = 0; 
+        TEST_CONDITION(ints[ix++],0, "Int header word"<<theEntry); 
+        TEST_CONDITION(ints[ix++],0, "Residual label"<<theEntry); 
+        for (size_t i =0; i < thisDummy.localLabels.size(); ++i){
+            TEST_CONDITION(ints[ix++],thisDummy.localLabels[i], "Local label index "<<i<<theEntry); 
+        }
+        TEST_CONDITION(ints[ix++],0, "Uncertainty label"<<theEntry); 
+        for (size_t i =0; i < thisDummy.globalLabels.size(); ++i){
+            TEST_CONDITION(ints[ix++],thisDummy.globalLabels[i], "Global label index "<<i<<theEntry); 
+        }
+        TEST_CONDITION(ints[ix++], 0, "Special header word"<<theEntry); 
+        TEST_CONDITION(ints[ix++], 0, "nSpecial int"<<theEntry); 
+        for (size_t i =0; i < thisDummy.specialInt.size(); ++i){
+            TEST_CONDITION(ints[ix++],thisDummy.specialInt[i], "Special int  index "<<i<<theEntry); 
+        }
+    }
     // should now be at EOF and yield exit code 0 - regardless of buffer size
-    res = reader.readToBuffer(doubles.data(), floats.data(), ints.data(),1); 
+    res = reader.readToBuffer(doubles.data(), floats.data(), ints.data(),nRead); 
     nRead=res.first; status=res.second; 
     TEST_CONDITION(status, 0, "EOF: Exit code"); 
 
     // rewind the file and start over 
     reader.reset();
-    // should now return a status of 4 and the correct number of read bytes
-    res = reader.readToBuffer(doubles.data(), floats.data(), ints.data(),ints.size()); 
-    nRead=res.first; status=res.second; 
-    TEST_CONDITION(status, expectedPrecision, "Status for successful read"); 
-    TEST_CONDITION(nRead, ints.size(), "nRead for successful read"); 
 
-    // this should allow us to read the same entry again, without hitting EoF
+    for (size_t k = 0; k < inputs.dummyData.size(); ++k){
+        reader.skipEntry();
+    }
     reader.rewindEntry();
-    // should return a status of 4 and the correct number of read bytes
     res = reader.readToBuffer(doubles.data(), floats.data(), ints.data(),ints.size()); 
     nRead=res.first; status=res.second; 
     TEST_CONDITION(status, expectedPrecision, "Status for successful read after rewind"); 
     TEST_CONDITION(nRead, ints.size(), "nRead for successful read after rewind"); 
 
-    // validate the output against the input 
-
-    // check the derivatives - note that the interface guarantees them to end up 
-    // in the *double* buffer, regardless of the file-internal storage. 
-    size_t ix = 0; 
-    // use a float conversion to test at floating rather than double-precision
-    // epsilion, as the information has been internally stored as float 
-    // in the binary file. 
-    TEST_CONDITION((float)doubles[ix++],0, "Float header word"); 
-    TEST_CONDITION((float)doubles[ix++],inputs.residual, "Residual"); 
-    for (size_t i =0; i < inputs.localDeriv.size(); ++i){
-        TEST_CONDITION((float)doubles[ix++],inputs.localDeriv[i], "Local derivative index "<<i); 
-    }
-    TEST_CONDITION((float)doubles[ix++],inputs.deltaResidual, "Uncertainty"); 
-    for (size_t i =0; i < inputs.globalDeriv.size(); ++i){
-        TEST_CONDITION((float)doubles[ix++],inputs.globalDeriv[i], "Global derivative index "<<i); 
-    }
-    TEST_CONDITION((float)doubles[ix++],0, "Special header word"); 
-    TEST_CONDITION((int)(-1 * doubles[ix++]),inputs.specialInt.size(), "nSpecial"); 
-    for (size_t i =0; i < inputs.specialFloat.size(); ++i){
-        TEST_CONDITION((float)doubles[ix++],inputs.specialFloat[i], "Special float  index "<<i); 
-    }
-
-    // check the ints 
-    ix = 0; 
-    TEST_CONDITION(ints[ix++],0, "Int header word"); 
-    TEST_CONDITION(ints[ix++],0, "Residual label"); 
-    for (size_t i =0; i < inputs.localLabels.size(); ++i){
-        TEST_CONDITION(ints[ix++],inputs.localLabels[i], "Local label index "<<i); 
-    }
-    TEST_CONDITION(ints[ix++],0, "Uncertainty label"); 
-    for (size_t i =0; i < inputs.globalLabels.size(); ++i){
-        TEST_CONDITION(ints[ix++],inputs.globalLabels[i], "Global label index "<<i); 
-    }
-    TEST_CONDITION(ints[ix++], 0, "Special header word"); 
-    TEST_CONDITION(ints[ix++], 0, "nSpecial int"); 
-    for (size_t i =0; i < inputs.specialInt.size(); ++i){
-        TEST_CONDITION(ints[ix++],inputs.specialInt[i], "Special int  index "<<i); 
-    }
     return 0; 
 }
 
