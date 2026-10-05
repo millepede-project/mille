@@ -181,6 +181,12 @@ namespace Mille{
         /// and by MilleRecordLocalBuffer::writeRecord
         void consumeBuffer(MilleRecord* other);
 
+        /// @brief get a lock for the mutex in this record.
+        /// Used by child records to prevent overlapping writes. 
+        std::unique_lock<std::recursive_mutex> getLock(){
+            return std::unique_lock(m_mx_milleIO);
+        }
+
         protected: 
 
             /// @brief Interface to add an entry to the current record. 
@@ -215,7 +221,7 @@ namespace Mille{
             bool writeZeroDerivatives_ = false;   ///< Flag to write global derivatives with value zero
             bool hasSpecialInRecord_ = false;   ///< Flag whether we already have a 'special' block in the current record
             std::size_t recordLengthHint_ = 2000; /// < expected record length 
-            std::mutex m_mx_milleIO;        /// < Mutex to protect thread-unsafe operations on this instance
+            std::recursive_mutex m_mx_milleIO;        /// < Mutex to protect thread-unsafe operations on this instance
 
     };
 }
