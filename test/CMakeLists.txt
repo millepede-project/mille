@@ -64,6 +64,10 @@ add_executable(testMilleF testMilleF.f90)
 target_link_libraries(testMilleF PUBLIC MilleF)    
 add_test(NAME TestMilleF90 COMMAND testMilleF)
 
+add_executable(testMilleRecordMT testMilleRecordMT.cc)
+target_link_libraries(testMilleRecordMT PUBLIC MilleF)    
+add_test(NAME TestMilleRecordMT COMMAND testMilleRecordMT)
+
 add_test (NAME TestMillePy3 
   COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/../python/testMillePy.py
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
