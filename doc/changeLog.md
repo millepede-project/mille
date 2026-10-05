@@ -4,6 +4,10 @@
 
 Changes are presented in reverse chronological order.
 
+2026-10-05: 
+- Additional fix to MilleRecordLocalBuffer
+- Add dedicated MT writing unit test
+
 2026-08-26: 
 - Bugfix to MilleRecordLocalBuffer
 - Update unit tests to cover additional failure scenarios

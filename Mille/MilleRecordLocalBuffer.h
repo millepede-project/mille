@@ -59,6 +59,9 @@ namespace Mille{
       /// Will forward the call to the parent, and copy buffer 
       /// content to parent prior to the writing.
       virtual void writeRecord() override final{
+         // need to acquire an overall lock for 
+         // the sequence of calls. 
+         auto lock = m_parent->getLock();
          integrateToParent();
          m_parent->writeRecord(); 
       }

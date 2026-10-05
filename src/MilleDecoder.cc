@@ -62,7 +62,6 @@ namespace Mille{
         if (    buffer.doubleBuffer.at(startLocal) == 0 
                 && buffer.doubleBuffer.at(startGlobal) < 0 
                 && startGlobal == startLocal + 1 ){
-            std::cout <<" reading a special block" <<std::endl; 
             int nSpecial = int(-buffer.doubleBuffer.at(startGlobal)); 
             for (int k = startGlobal+1; k <= startGlobal+nSpecial; ++k){
                 meas.specialInts.push_back(buffer.intBuffer[k]);
