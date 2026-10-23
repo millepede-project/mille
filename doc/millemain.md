@@ -30,9 +30,7 @@
 
  The core components are implemented in C++, and bindings exist to allow their use within C, Fortran, and python3. 
 
- The code is maintained at DESY by the statistics tools group of the
- analysis center of the Helmholtz [Terascale](https://terascale.de) alliance
- using [GitLab](https://about.gitlab.com) ([code and wiki](https://gitlab.desy.de)).
+ The code is maintained and developed by the [CMS group](https://cms.desy.de/) of the [Particle Physics division](https://particle-physics.desy.de/index_eng.html) at DESY using [GitLab](https://about.gitlab.com) ([code and wiki](https://gitlab.desy.de)).
 
  The Mille software is provided by DESY under the terms of the
  [LGPLv2 license](http://www.gnu.org/licenses/old-licenses/lgpl-2.0-standalone.html).
