@@ -32,24 +32,22 @@
 #include <test/milleReaderTests.h>
 #include <future>
 #include <vector>
-#include <barrier>
 
 using namespace Mille;
 
 // ad-hoc Mille parsing & decoding via the C API 
-std::pair<bool, std::vector<std::vector<MilleMeasurement>>> readThread(const std::vector<std::string> & fin, int ithr, std::barrier<> & barrier){
-    thread_local MilleBuffer buf;
+std::pair<bool, std::vector<std::vector<MilleMeasurement>>> readThread(const std::vector<std::string> & fin, int ithr){
+    MilleBuffer buf;
     buf.doublePrecision = true; 
     buf.resize(200,true);
-    thread_local int status = 0; 
-    thread_local MilleDecoder dec;
+    int status = 0; 
+    MilleDecoder dec;
     // ensure heavy resizing to test thread-safety of internal arrays.
     ithr = 1000 * ithr + 155;
     std::vector<std::vector<MilleMeasurement>> res; 
     for (const auto & file : fin){
         std::string threadID = "Thread "+std::to_string(ithr)+" on file "+ file;
         // deliberately provoke simultaneous file I/O on many threads 
-        barrier.arrive_and_wait();
         open_mille(file.c_str(),file.size(),&status,ithr+1);  
         if (status != 0 ){
             std::cerr <<" Failed to open: "+threadID<<std::endl;
@@ -110,11 +108,10 @@ int main(int, char**){
             ti.writeTo(*Mille);
         }
     };
-    std::barrier startBarrier(nThreads);
     // now spawn threads to read back the information in a "closeandreload" fashion
     std::vector<std::future<std::pair<bool, std::vector<std::vector<MilleMeasurement>>>>> threads; 
     for (std::size_t nth = 0; nth < nThreads; ++nth){
-        threads.emplace_back(std::async(std::launch::async, &readThread, inputsForThreads[nth], nth, std::ref(startBarrier)));
+        threads.emplace_back(std::async(std::launch::async, &readThread, inputsForThreads[nth], nth));
     }
     // wait for the threads to finish and validate their output
     
