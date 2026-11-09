@@ -31,7 +31,29 @@ extern "C"
 #endif
 
 
+/// These bindings abstract away the 
+/// object-oriented Mille interface for 
+/// C- and Fortran clients. 
+/// Uses functions returning void to 
+/// provide functionality. 
+/// Open handles are identified by an index,
+/// which is expected to be 1-indexed.
+/// The code is designed for multi-threaded
+/// use. 
+/// Each file index is expected to only be used 
+/// by a single in-flight thread at a time.  
+///
+/// In single-threaded usage, there is an
+/// option to automatically assign
+/// an "invisible" handle index and interact
+/// with the most recently opened file, by ignoring 
+/// the file index argument in all calls. 
+/// Note that this is not thread-safe and
+/// **will** crash the code in an MT context. 
+
+
 /// Reserve space for output files - no longer strictly needed 
+/// but may save a few allocations 
 void initMille();
 
 /*______________________________________________________________*/
@@ -39,12 +61,12 @@ void initMille();
 /**
  * \param[in]  fileName  File name
  * \param[in]  lengthFileName  Length of file name
- * \param[in]  nFileIn  File number (1 .. maxNumFiles) or <=0 for next one
+ * \param[in]  nFileIn  File number (1 .. maxNumFiles) or <=0 for "next available"
  * \param[out] errorFlag error flag:
  *      * 0: if file opened and OK,
  *      * 1: if too many files open,
  *      * 2: if file could not be opened
- *      * 3: if file opened, but with error (can that happen?)
+ *      * 3: if file opened, but with error
  */
 void open_mille(const char *fileName, int lengthFileName, int *errorFlag, int nFileIn=-1); 
 /*______________________________________________________________*/
