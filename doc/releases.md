@@ -2,6 +2,10 @@
  
 ## Version history
 
+### Version V01-01-03
+
+Fix to race condition in `readMilleC`, dedicated unit test
+
 ### Version V01-01-02
 
 Further fixes to thread-safety in MilleRecordLocalBuffer, dedicated MT unit test
