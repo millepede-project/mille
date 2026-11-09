@@ -22,38 +22,143 @@
 */
 
 #include "Mille/readMilleC.h"
+#include "Mille/IMilleReader.h"
 #include "Mille/MilleFactory.h"
+#include <cstddef>
+#include <memory>
+#include <mutex>
 #include <vector>
 #include <iostream>
 #include <atomic>
+#include <string>
+#include <utility>
 
 using Mille::spawnMilleReader; 
 
-/* ________ global variables used for file handling __________ */
+/// Helper struct to provide a thread-safe
+/// way of managing in-flight file handles
+/// in a way that hides the OOP logic 
+/// from C-/Fortran client. 
+///
+/// Purely internal API not intended
+/// for client use. 
+/// 
+/// All public members take "fortran-style"
+/// indices starting with 1, as in the external API.
+/// They are internally translated to array indices. 
+struct fileHandleRegistry{
 
-std::vector<std::unique_ptr<Mille::IMilleReader>> g_readFileHandles;   ///< pointer to list of pointers to opened binary files
-std::atomic<int> g_lastInFileIndex = 0;                         ///< index of the last opened file handle
-/*______________________________________________________________*/
-
-/// helper to derive last opened file index
-namespace{
-    int resolveFileIndex(int nFileIn){
-        if (nFileIn <= 0){
-            return g_lastInFileIndex - 1;
+    /// @brief resize the registry with thread protection
+    /// @param targetSize: Desired size. 
+    /// Will not shrink the list. 
+    void resizeRegistry(std::size_t targetSize){
+        std::lock_guard g(mx_accessRegistry);
+        if (targetSize > readFileHandles.size()){
+            readFileHandles.resize(targetSize);
         }
-        else return nFileIn - 1; 
     }
-    bool validFileIndex(int fileIndex){
-        if (fileIndex < 0) return false;
-        if (fileIndex > (int)g_readFileHandles.size()) return false;
-        if (!g_readFileHandles.at(fileIndex)) return false;
+
+    
+    /// @brief insert a new reader into the registry
+    /// @param reader: Will be consumed and added to the registry
+    /// @param userIndexedSlot: destination slot in user indexing
+    /// 
+    /// Will automatically adapt the array size as required and
+    /// clean up existing readers in the slot. 
+    void insertReader(std::unique_ptr<Mille::IMilleReader>&& reader, int userIndexedSlot){
+        std::lock_guard g(mx_accessRegistry);
+
+        // if the user passes <=0, they want to auto-add at the 
+        // end of the current list
+        if (userIndexedSlot <= 0) userIndexedSlot = readFileHandles.size()+1; 
+        // translate to internal (C-style) indexing
+        int internalIndex = userIndexedSlot-1; 
+        // make space
+        // safe direct cast as internalIndex >=0 is guaranteed
+        if (std::size_t(internalIndex) >= readFileHandles.size()){
+            readFileHandles.resize(internalIndex+1);
+        }
+        // close a potentially existing reader at this slot. 
+        if (validFileIndex(internalIndex)){
+            readFileHandles.at(internalIndex)->close(); 
+        }
+        /// move the reader into the registry (take ownership) 
+        readFileHandles.at(internalIndex).swap(reader); 
+        // remember the user-facing index of the slot, as 
+        // this is now the most recently opened file. 
+        lastOpenedFileIndex = userIndexedSlot;
+    }
+
+    /// @brief close an open handle at a given slot
+    /// @param userIndexedSlot: The slot in user-indexing
+    void closeHandle(int userIndexedSlot){
+        std::lock_guard g(mx_accessRegistry);
+        int internal = userIndexToInternal(userIndexedSlot);
+        // don't close if there is nothing valid to close
+        if (!validFileIndex(internal)) return;  
+        readFileHandles.at(internal)->close(); 
+        readFileHandles.at(internal).reset(nullptr);
+    }
+
+    /// @brief get the reader at a given slot as a non-owning pointer.
+    /// @param userIndexedSlot: The slot in user-indexing.
+    /// @return a pointer to the reader at a valid slot, or a null pointer
+    /// if the slot is out of bounds or not populated with a valid reader. 
+    Mille::IMilleReader* getHandleChecked(int userIndexedSlot){
+        std::lock_guard g(mx_accessRegistry);
+        int internalSlot = userIndexToInternal(userIndexedSlot);
+        if (!validFileIndex(internalSlot)) return nullptr; 
+        return readFileHandles.at(internalSlot).get();
+    }
+
+    int getIndexLastOpenedFile() const{
+        return lastOpenedFileIndex; 
+    }
+
+    private:
+
+    // mutex to protect MT access
+    std::mutex mx_accessRegistry; 
+
+    // list of open / active file handles 
+    std::vector<std::unique_ptr<Mille::IMilleReader>> readFileHandles; 
+
+    // the (1-indexed) number of the most recently opened file 
+    std::atomic<int> lastOpenedFileIndex = 0;
+
+    /// @brief translates the user-passed index 
+    /// to the corresponding internal one. 
+    /// permit passing a value <=0 
+    /// to access the most recently opened
+    /// file
+    int userIndexToInternal (int userIndex){
+        if (userIndex <= 0){
+            return lastOpenedFileIndex - 1;
+        }
+        else return userIndex - 1; 
+    }
+
+    /// @brief check if a given internal file index
+    /// is valid (legal index and pointing)
+    /// to a properly initialized reader
+    /// @param internalFileIndex file index (internal, 0-based indexing)
+    bool validFileIndex(int internalFileIndex){
+        if (internalFileIndex < 0) return false;
+        if (internalFileIndex >= (int)readFileHandles.size()) return false;
+        if (!readFileHandles.at(internalFileIndex)) return false;
         return true; 
     }
-}
+    
+
+};
+
+/// expose one global instance of our registry. 
+struct fileHandleRegistry g_milleRegistry;
+
 
 /// Initialises the 'global' variables used for file handling.
 void initMille() {
-    g_readFileHandles.reserve(100); 
+    g_milleRegistry.resizeRegistry(100);
 }
 
 /*______________________________________________________________*/
@@ -61,23 +166,22 @@ void initMille() {
 void open_mille(const char *fileName, int lengthFileName, int *errorFlag, int nFileIn)
 {
     if (!errorFlag)
-        return; /* 'printout' error? */
-    if (nFileIn <= 0) nFileIn = g_readFileHandles.size()+1; 
-    int fileIndex = nFileIn - 1; /* index of specific file */
+        return; /* 'printout' error? */ 
 
     // some sanitation of the input file name
-    std::string fname = fileName;
-    fname = fname.substr(0,lengthFileName); 
-    fname[lengthFileName] = '\0';
+    std::string fname (fileName, lengthFileName);
 
-    // now access the file 
-    if (fileIndex >= (int)g_readFileHandles.size()) g_readFileHandles.resize(fileIndex+1); 
-    g_readFileHandles.at(fileIndex) = spawnMilleReader(fname); 
-    if (!g_readFileHandles.at(fileIndex) || !g_readFileHandles.at(fileIndex)->open(fname)){
+    // spawn the reader 
+    auto reader = spawnMilleReader(fname); 
+    if (!reader || !reader->open(fname)){
         *errorFlag = 2;     // failed to open file 
         return; 
     }
-    g_lastInFileIndex = nFileIn;
+    
+    // and then insert our reader to the registry. 
+    // will automatically close existing readers in the slot 
+    // and resize if required.
+    g_milleRegistry.insertReader(std::move(reader), nFileIn);
     // all good!
     *errorFlag = 0; 
 }
@@ -85,31 +189,26 @@ void open_mille(const char *fileName, int lengthFileName, int *errorFlag, int nF
 /*______________________________________________________________*/
 /// Close file.
 void close_mille(int nFileIn) {
-    int fileIndex = resolveFileIndex(nFileIn); /* index of current file */
-    if (!validFileIndex(fileIndex)) return; 
-    g_readFileHandles.at(fileIndex)->close();
+    g_milleRegistry.closeHandle(nFileIn); 
 }
 
 /*______________________________________________________________*/
 /// Rewind file.
 void reset_mille(int nFileIn) {
-    int fileIndex = resolveFileIndex(nFileIn); /* index of current file */
-    if (!validFileIndex(fileIndex)) return; 
-    g_readFileHandles.at(fileIndex)->reset();
+    auto handle = g_milleRegistry.getHandleChecked(nFileIn);
+    if (handle) handle->reset();
 }
 
 /*______________________________________________________________*/
 /// Rewind file.
 void reset_mille_entry(int nFileIn) {
-    int fileIndex = resolveFileIndex(nFileIn); /* index of current file */
-    if (!validFileIndex(fileIndex)) return; 
-    g_readFileHandles.at(fileIndex)->rewindEntry();
+    auto handle = g_milleRegistry.getHandleChecked(nFileIn);
+    if (handle) handle->rewindEntry();
 }
 
 void skip_mille(int nFileIn){
-    int fileIndex = resolveFileIndex(nFileIn); /* index of current file */
-    if (!validFileIndex(fileIndex)) return; 
-    g_readFileHandles.at(fileIndex)->skipEntry();
+    auto handle = g_milleRegistry.getHandleChecked(nFileIn);
+    if (handle) handle->skipEntry();
 }
 
 /**______________________________________________________________*/
@@ -127,14 +226,13 @@ void read_mille(double *bufferDouble, float *bufferFloat, int *bufferInt,
         return;
     *errorFlag = 0;
 
-    int fileIndex = resolveFileIndex(nFileIn); /* index of current file */
-    if (!validFileIndex(fileIndex)){
-        std::cerr <<" File index " <<fileIndex<<" from nFileIn "<<nFileIn<<" is either invalid or points to invalid reader instance. Will not read anything."<<std::endl;
+    // access the requested handler 
+    Mille::IMilleReader* reader = g_milleRegistry.getHandleChecked(nFileIn); 
+    if (!reader){
+        std::cerr <<" File index "<<nFileIn<<" is either invalid or points to invalid reader instance. Will not read anything."<<std::endl;
         *errorFlag = -3; 
         return; 
     }
-    // access the requested handler 
-    Mille::IMilleReader* reader = g_readFileHandles.at(fileIndex).get(); 
     // read the next record via the IMilleReader
     std::pair<int,int> readResult = reader->readToBuffer(bufferDouble, bufferFloat, bufferInt, *lengthBuffers); 
     *errorFlag = readResult.second; 
@@ -143,5 +241,5 @@ void read_mille(double *bufferDouble, float *bufferFloat, int *bufferInt,
 
 void last_mille_in_file_index(int* index){
     if (!index) return; 
-    *index = g_lastInFileIndex; 
+    *index = g_milleRegistry.getIndexLastOpenedFile(); 
 }

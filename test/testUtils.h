@@ -37,11 +37,41 @@ template <typename T, typename Q>  typename std::enable_if<std::is_convertible_v
     T r_as_t = rhs; 
     return std::abs(lhs - r_as_t)<=std::numeric_limits<T>::epsilon(); 
 }
+
+
 /// @brief Template specialisation to check for exact equivalence of integral values. 
 template <typename T> typename std::enable_if<std::is_integral_v<T>, bool>::type testCompat(T lhs, T rhs){
     return lhs == rhs; 
 }
 
+template <typename T, typename Q>  typename std::enable_if<std::is_convertible_v<Q,T>, bool>::type testCompat(const std::vector<T> & lhs, const std::vector<Q> & rhs){
+    bool ok = true; 
+    if (lhs.size() != rhs.size()) return false; 
+    for (std::size_t k = 0; k < rhs.size(); ++k){
+        T r_as_t = rhs.at(k); 
+        ok &= std::abs(lhs.at(k) - r_as_t)<=std::numeric_limits<T>::epsilon(); 
+    }
+    return ok; 
+}
+
+template <typename T>  typename std::enable_if<std::is_integral_v<T>, bool>::type testCompat(const std::vector<T> & lhs, const std::vector<T> & rhs){
+    bool ok = true; 
+    if (lhs.size() != rhs.size()) return false; 
+    for (std::size_t k = 0; k < rhs.size(); ++k){
+        ok &= lhs.at(k) == rhs.at(k);
+    }
+    return ok; 
+}
+
+// namespace{
+template <typename T> std::ostream &
+    operator<< (std::ostream & str, const std::vector<T> & v ){
+    str << "[ ";
+    for (const T& t : v) str << t <<" ";
+    str << "] "; 
+    return str; 
+}
+// }
 /// preprocessor macro to test for equivalence beween a test and a target value. 
 /// @param test_val: Test result
 /// @param target_val: Target value for test

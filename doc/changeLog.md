@@ -4,6 +4,10 @@
 
 Changes are presented in reverse chronological order.
 
+2026-11-09: 
+- Fix to race condition in readMilleC
+- Add dedicated MT reading unit test
+
 2026-10-05: 
 - Additional fix to MilleRecordLocalBuffer
 - Add dedicated MT writing unit test

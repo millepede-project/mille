@@ -59,6 +59,10 @@ add_executable(testReadMilleC testReadMilleC.cc)
 target_link_libraries(testReadMilleC PUBLIC MilleC)    
 add_test(NAME TestReadMilleC COMMAND testReadMilleC)
 
+add_executable(testMilleC_MT testMilleC_MT.cc)
+target_link_libraries(testMilleC_MT PUBLIC MilleC)    
+add_test(NAME TestMilleC_MT COMMAND testMilleC_MT)
+
 
 add_executable(testMilleF testMilleF.f90)
 target_link_libraries(testMilleF PUBLIC MilleF)    
