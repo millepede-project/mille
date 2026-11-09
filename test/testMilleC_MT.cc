@@ -28,9 +28,7 @@
 #include "Mille/MilleDecoder.h"
 #include "testUtils.h"
 #include <memory>
-#include <mutex>
 #include <string>
-#include <format>
 #include <test/milleReaderTests.h>
 #include <future>
 #include <vector>
@@ -49,7 +47,7 @@ std::pair<bool, std::vector<std::vector<MilleMeasurement>>> readThread(const std
     ithr = 1000 * ithr + 155;
     std::vector<std::vector<MilleMeasurement>> res; 
     for (const auto & file : fin){
-        std::string threadID = std::format ("Thread {} on file {}",ithr, file);
+        std::string threadID = "Thread "+std::to_string(ithr)+" on file "+ file;
         // deliberately provoke simultaneous file I/O on many threads 
         barrier.arrive_and_wait();
         open_mille(file.c_str(),file.size(),&status,ithr+1);  
@@ -106,7 +104,7 @@ int main(int, char**){
         for (int ifi = 0; ifi < nFilesPerThread; ++ifi){
             MilleTestInputs ti (recPerThread);
             inputs.back().push_back(ti.dummyData);
-            std::string fname = std::format("{}_{}_{}.dat",milleBinaryName,ithr,ifi);
+            std::string fname = milleBinaryName+"_"+std::to_string(ithr)+"_"+std::to_string(ifi)+".dat";
             auto Mille = spawnMilleRecord(fname, true);
             inputsForThreads.back().push_back(fname);
             ti.writeTo(*Mille);

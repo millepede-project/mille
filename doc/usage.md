@@ -79,6 +79,7 @@ This functionality is identical across all target languages, only the interfaces
  Internally, these functions manage instances of the C++ interface objects in the background.
 
  To handle multiple in-flight files, a **file index** (integer) is used to identify each given file. You can either explicitly assign a number when calling the `open_mille` / `open_mille_out` functions, or let the API automatically assign a number by passing `-1` for the file number (default argument). In the latter case, the assigned number can be retrieved by calling `last_mille_in_file_index` / `last_mille_out_file_index` after the file was opened. When working with a single file, the file index can be ignored. 
+ Note that in **multi-threaded usage**, the automatic file indices are not thread safe, and user-specified file indices should always be passed explicitly. 
   
  A `libMilleC` library implementing this interface with C-style linkage is built in addition to the `libMille2` library implementing the C++ interface. 
 
