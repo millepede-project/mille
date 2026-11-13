@@ -4,6 +4,9 @@
 
 Changes are presented in reverse chronological order.
 
+2026-11-13: 
+- Add `.mille` to the list of file extensions auto-resolved as C-binary. 
+
 2026-11-09: 
 - Fix to race condition in readMilleC
 - Add dedicated MT reading unit test

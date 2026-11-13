@@ -2,6 +2,10 @@
  
 ## Version history
 
+### Version V01-01-04
+
+Add `.mille` as a supported file extension for C-binaries. 
+
 ### Version V01-01-03
 
 Fix to race condition in `readMilleC`, dedicated unit test
