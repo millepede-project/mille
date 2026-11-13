@@ -35,7 +35,7 @@
 
 namespace Mille{
     MilleFormat deduceMilleFormat(const std::filesystem::path & fname){
-        if (fname.extension() == ".dat" || fname.extension() == ".bin") return MilleFormat::C;
+        if (fname.extension() == ".dat" || fname.extension() == ".bin" || fname.extension() == ".mille") return MilleFormat::C;
         if (fname.extension() == ".gz") return MilleFormat::Ccompressed;
         if (fname.extension() == ".root") return MilleFormat::ROOT;
         if (fname.extension() == ".txt" || fname.extension() == ".csv") return MilleFormat::CSV;
