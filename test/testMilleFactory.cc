@@ -41,8 +41,10 @@ using namespace Mille;
 int main(int, char**){
     TEST_CONDITION(dynamic_cast<MilleReaderC*>(spawnMilleReader("MyCoolFile.dat").get()) != nullptr, true, "Detection of C binary as .dat - reader"); 
     TEST_CONDITION(dynamic_cast<MilleReaderC*>(spawnMilleReader("MyCoolFile.bin").get()) != nullptr, true, "Detection of C binary as .bin - reader"); 
+    TEST_CONDITION(dynamic_cast<MilleReaderC*>(spawnMilleReader("MyCoolFile.mille").get()) != nullptr, true, "Detection of C binary as .mille - reader"); 
     TEST_CONDITION(dynamic_cast<MilleRecordC*>(spawnMilleRecord("MyCoolFile.dat").get()) != nullptr, true, "Detection of C binary as .dat - writer"); 
     TEST_CONDITION(dynamic_cast<MilleRecordC*>(spawnMilleRecord("MyCoolFile.bin").get()) != nullptr, true, "Detection of C binary as .bin - writer"); 
+    TEST_CONDITION(dynamic_cast<MilleRecordC*>(spawnMilleRecord("MyCoolFile.mille").get()) != nullptr, true, "Detection of C binary as .mille - writer"); 
     TEST_CONDITION(dynamic_cast<MilleReaderCSV*>(spawnMilleReader("MyCoolFile.csv").get()) != nullptr, true, "Detection of plain text as .csv - reader"); 
     TEST_CONDITION(dynamic_cast<MilleRecordCSV*>(spawnMilleRecord("MyCoolFile.csv").get()) != nullptr, true, "Detection of plain text as .csv - writer"); 
     TEST_CONDITION(dynamic_cast<MilleReaderCSV*>(spawnMilleReader("MyCoolFile.txt").get()) != nullptr, true, "Detection of plain text as .txt - reader"); 
