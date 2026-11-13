@@ -8,7 +8,7 @@ Currently, four formats are defined.
 Each is by default associated to a file extension. Files with the same extension will be automatically assumed to belong to said format. 
 
 The following formats exist, 
-1. **C-binary** - extension `.dat` 
+1. **C-binary** - extension `.dat` or `.mille` or `.bin` 
     - The original `Millepede-II` C-binary format. 
     - Backward compatible to existing binaries.
 2. **Compressed C-binary** - extension `.dat.gz`: 
