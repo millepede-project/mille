@@ -77,7 +77,7 @@ install(TARGETS convertMilleFormats
 
 # ===== LibZ for file compression ===== 
 if (SUPPORT_ZLIB)
-    target_link_libraries(Mille2 PUBLIC z )
+    target_link_libraries(Mille2 PUBLIC ZLIB::ZLIB)
     target_compile_definitions(Mille2 PUBLIC SUPPORT_LZ)
     target_sources(Mille2 PRIVATE src/MilleReaderCcompressed.cc
             PUBLIC 

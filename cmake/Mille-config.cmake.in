@@ -2,6 +2,11 @@
 get_filename_component(_dir "${CMAKE_CURRENT_LIST_FILE}" PATH)
 get_filename_component(_prefix "${_dir}/.." ABSOLUTE)
 
+if(@SUPPORT_ZLIB@)
+    include(CMakeFindDependencyMacro)
+    find_dependency(ZLIB)
+endif()
+
 # publish ROOT dependency if set 
 if("@build_ROOT_comps@")
 
